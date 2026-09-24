@@ -65,7 +65,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ledger reports
+          for path in ledger reports; do [ -e "$path" ] && git add "$path"; done
           if git diff --cached --quiet; then
             echo "Nothing new to commit."
             # Keep the repo active so GitHub does not pause this schedule after 60 days.
