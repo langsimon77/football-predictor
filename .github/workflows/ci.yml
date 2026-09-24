@@ -21,7 +21,7 @@ jobs:
         with:
           fetch-depth: 2  # the ledger check compares with the previous commit
 
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.2.0  # no floating major tag exists
         with:
           python-version: "3.12"
           enable-cache: true
