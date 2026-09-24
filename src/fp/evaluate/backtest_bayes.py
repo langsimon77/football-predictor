@@ -32,12 +32,16 @@ REFIT_DAYS = 7
 
 
 def predict_league(matches: pd.DataFrame, second_tier: pd.DataFrame, league: str,
-                   seasons: list[int], params: bayes_dc.BayesParams) -> pd.DataFrame:
+                   seasons: list[int], params: bayes_dc.BayesParams,
+                   until: pd.Timestamp | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Returns (predictions, one row per fit with its diagnostics)."""
     lg = matches[matches["league"] == league]
     teams_by_season = season_teams(matches, league)
     promo = fit_promotion_model(matches, second_tier)
     targets = lg[lg["season"].isin(seasons)].copy()
     targets["lock_utc"] = lock_time(targets["kickoff_utc"])
+    if until is not None:  # short smoke runs
+        targets = targets[targets["lock_utc"] <= until]
 
     rows, fits = [], []
     post: bayes_dc.Posterior | None = None
@@ -75,8 +79,7 @@ def predict_league(matches: pd.DataFrame, second_tier: pd.DataFrame, league: str
             })
     preds = pd.DataFrame(rows)
     check_features(preds)
-    preds.attrs["fits"] = fits
-    return preds
+    return preds, pd.DataFrame(fits)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -88,19 +91,20 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--dynamic", action="store_true", help="random-walk challenger")
     ap.add_argument("--xi", type=float, default=0.002)
     ap.add_argument("--sampler", default="nutpie")
+    ap.add_argument("--until", help="stop after this date (smoke test)")
     args = ap.parse_args(argv)
     matches = pd.read_parquet(PROCESSED / "matches.parquet")
     second_tier = pd.read_parquet(PROCESSED / "second_tier.parquet")
     params = bayes_dc.BayesParams(xi=args.xi, use_sot=args.sot, dynamic=args.dynamic,
                                   sampler=args.sampler)
     start = time.time()
-    preds = predict_league(matches, second_tier, args.league, args.seasons, params)
+    until = pd.Timestamp(args.until, tz="UTC") if args.until else None
+    preds, fits = predict_league(matches, second_tier, args.league, args.seasons, params, until)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     preds.to_parquet(args.out, index=False)
-    pd.DataFrame(preds.attrs["fits"]).to_parquet(args.out.with_suffix(".fits.parquet"),
-                                                 index=False)
-    print(f"{args.league} {args.seasons}: {len(preds)} predictions, "
-          f"{len(preds.attrs['fits'])} fits, {time.time() - start:.0f}s")
+    fits.to_parquet(args.out.with_suffix(".fits.parquet"), index=False)
+    print(f"{args.league} {args.seasons}: {len(preds)} predictions, {len(fits)} fits, "
+          f"{int(fits['ok'].sum())} passed, {time.time() - start:.0f}s")
     return 0
 
 

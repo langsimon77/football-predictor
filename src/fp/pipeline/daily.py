@@ -34,9 +34,10 @@ import pandas as pd
 
 from fp import ROOT, ledger
 from fp.ingest import matches as build
+from fp.models import bayes_dc, elo, posterior_store
 from fp.models import dixon_coles as dc
-from fp.models import elo
 from fp.models.priors import PromotedPrior, season_teams
+from fp.models.promotion import PromotionModel, fit_promotion_model, promoted_priors
 from fp.pipeline import data as data_pipeline
 from fp.validate import freshness
 from fp.validate.leakage import LOCK_MAX_HOURS, LOCK_MIN_HOURS, RUN_TIME_UTC, known_as_of
@@ -46,6 +47,11 @@ log = logging.getLogger(__name__)
 REPORT = ROOT / "reports" / "latest.md"
 DC_MODEL = "dc_mle_v0"
 ELO_MODEL = "elo_v0"
+BAYES_MODEL = "dc_bayes_v1"
+# The Bayesian model joins the live ledger only after Lang approves Phase 2
+# (spec S0: model changes wait for approval). Until then it runs in replays only.
+BAYES_LIVE = False
+BAYES_PARAMS = bayes_dc.BayesParams()
 LEAGUES = ("EPL", "LaLiga")
 PROMOTED_FLAG_GAMES = 6
 
@@ -57,6 +63,8 @@ class LeagueModels:
     curve: elo.GapCurve
     promoted: set[str]
     games_played: dict[str, int]
+    bayes: bayes_dc.Posterior | None = None
+    bayes_fallback: bool = False
 
 
 def model_version() -> tuple[str, bool]:
@@ -70,7 +78,9 @@ def model_version() -> tuple[str, bool]:
 
 
 def fit_league(matches: pd.DataFrame, fixtures: pd.DataFrame, league: str, now: pd.Timestamp,
-               prior: PromotedPrior, season: int) -> LeagueModels:
+               prior: PromotedPrior, season: int, second_tier: pd.DataFrame | None = None,
+               promo: PromotionModel | None = None, with_bayes: bool = False,
+               store: Path = posterior_store.STORE) -> LeagueModels:
     lg = matches[matches["league"] == league]
     teams_by_season = season_teams(matches, league)
     teams_by_season[season] = set(fixtures.loc[fixtures["league"] == league, "home_id"])
@@ -82,10 +92,28 @@ def fit_league(matches: pd.DataFrame, fixtures: pd.DataFrame, league: str, now: 
     tracker.ensure_season(season)
     this_season = known[known["season"] == season]
     games = pd.concat([this_season["home_id"], this_season["away_id"]]).value_counts()
-    return LeagueModels(
+    models = LeagueModels(
         dc_fit=fit, tracker=tracker, curve=elo.curve_as_of(tracker, now),
         promoted=prior_promoted(teams_by_season, season), games_played=games.to_dict(),
     )
+    if with_bayes and second_tier is not None and promo is not None:
+        priors = promoted_priors(promo, teams_by_season, second_tier, league, season)
+        post = bayes_dc.fit_checked(known, now, sorted(teams_by_season[season]), priors,
+                                    BAYES_PARAMS)
+        log.info("%s Bayesian fit %.1fs %s", league, post.seconds, post.diagnostics)
+        if post.ok:
+            posterior_store.save(post, league, now, store)
+            models.bayes = post
+        else:  # never publish from a failed fit: fall back to the last good one
+            stored = posterior_store.load(league, store)
+            if stored is not None:
+                models.bayes, models.bayes_fallback = stored[0], True
+                log.warning("%s: diagnostics failed; using posterior from %s", league,
+                            stored[1].get("as_of_utc"))
+            else:
+                log.warning("%s: diagnostics failed and no stored posterior; "
+                            "no Bayesian rows this run", league)
+    return models
 
 
 def prior_promoted(teams_by_season: dict[int, set[str]], season: int) -> set[str]:
@@ -135,6 +163,16 @@ def build_rows(cands: pd.DataFrame, models: dict[str, LeagueModels], now: pd.Tim
             "model_name": DC_MODEL, "degraded": not m.dc_fit.converged,
             "top_scorelines": json.dumps(top), "flags": json.dumps(flags),
         })
+        if m.bayes is not None and home in m.bayes.teams and away in m.bayes.teams:
+            b = bayes_dc.markets(m.bayes, home, away)
+            b_top, b_iv = b.pop("top_scorelines"), b.pop("intervals")
+            b_flags = flags + (["posterior_fallback"] if m.bayes_fallback else [])
+            rows.append({
+                **common, **b, "prediction_id": f"{r.match_id}:{BAYES_MODEL}",
+                "model_name": BAYES_MODEL, "degraded": m.bayes_fallback,
+                "top_scorelines": json.dumps(b_top), "intervals": json.dumps(b_iv),
+                "flags": json.dumps(b_flags),
+            })
         e = m.curve.probs(m.tracker.gap(home, away))[0]
         rows.append({
             **common, "prediction_id": f"{r.match_id}:{ELO_MODEL}", "model_name": ELO_MODEL,
@@ -214,22 +252,40 @@ def write_report(ledger_frame: pd.DataFrame, results: pd.DataFrame, now: pd.Time
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def run_once(now: pd.Timestamp, matches: pd.DataFrame, fixtures: pd.DataFrame,
-             ledger_path: Path, results_path: Path, report_path: Path | None,
-             prior: PromotedPrior, dry_run: bool = False) -> pd.DataFrame:
-    existing = ledger.load(ledger_path)
-    report = freshness.check(known_as_of(matches, now), fixtures, now=now)
-    season = int(fixtures["season"].max())
-    models = {lg: fit_league(matches, fixtures, lg, now, prior, season) for lg in LEAGUES}
-    cands = candidates(fixtures, now, existing)
+@dataclass
+class Context:
+    """Everything a run needs besides the clock."""
+
+    matches: pd.DataFrame
+    fixtures: pd.DataFrame
+    second_tier: pd.DataFrame
+    prior: PromotedPrior
+    promo: PromotionModel
+    ledger_path: Path
+    results_path: Path
+    report_path: Path | None
+    with_bayes: bool
+    store: Path = posterior_store.STORE
+
+
+def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataFrame:
+    existing = ledger.load(ctx.ledger_path)
+    report = freshness.check(known_as_of(ctx.matches, now), ctx.fixtures, now=now)
+    season = int(ctx.fixtures["season"].max())
+    cands = candidates(ctx.fixtures, now, existing)
+    # The Bayesian model takes seconds per league, so it only runs when there is
+    # something to lock. On quiet days the stored posterior simply waits.
+    bayes = ctx.with_bayes and len(cands) > 0
+    models = {lg: fit_league(ctx.matches, ctx.fixtures, lg, now, ctx.prior, season,
+                             ctx.second_tier, ctx.promo, bayes, ctx.store) for lg in LEAGUES}
     new = build_rows(cands, models, now, report.stale)
     log.info("%s: %d matches to lock", now, len(cands))
     if len(new) and not dry_run:
-        existing = ledger.append(new, ledger_path)
-    results = record_results(matches, fixtures, existing, now, results_path) if not dry_run \
-        else pd.DataFrame()
-    if report_path is not None and not dry_run:
-        write_report(existing, results, now, report_path)
+        existing = ledger.append(new, ctx.ledger_path)
+    results = (record_results(ctx.matches, ctx.fixtures, existing, now, ctx.results_path)
+               if not dry_run else pd.DataFrame())
+    if ctx.report_path is not None and not dry_run:
+        write_report(existing, results, now, ctx.report_path)
     return new
 
 
@@ -239,25 +295,36 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--offline", action="store_true", help="skip downloads")
     parser.add_argument("--replay", nargs=2, metavar=("START", "END"))
     parser.add_argument("--ledger", type=Path, default=ledger.PREDICTIONS)
+    parser.add_argument("--with-bayes", action="store_true",
+                        help="include the Bayesian model even before it is live")
     args = parser.parse_args(argv)
 
     data_pipeline.main(skip_download=args.offline)
     matches = pd.read_parquet(build.PROCESSED / "matches.parquet")
-    fixtures = pd.read_parquet(build.PROCESSED / "fixtures.parquet")
-    prior = PromotedPrior(matches)
-    results_path = args.ledger.parent / "results.parquet"
+    second_tier = pd.read_parquet(build.PROCESSED / "second_tier.parquet")
+    replay = args.replay is not None
+    ctx = Context(
+        matches=matches,
+        fixtures=pd.read_parquet(build.PROCESSED / "fixtures.parquet"),
+        second_tier=second_tier,
+        prior=PromotedPrior(matches),
+        promo=fit_promotion_model(matches, second_tier),
+        ledger_path=args.ledger,
+        results_path=args.ledger.parent / "results.parquet",
+        report_path=(args.ledger.parent / "latest.md" if replay
+                     else None if args.dry_run else REPORT),
+        with_bayes=BAYES_LIVE or args.with_bayes,
+        store=(args.ledger.parent / "posteriors" if replay else posterior_store.STORE),
+    )
 
-    if args.replay:
+    if replay:
         start, end = (pd.Timestamp(d, tz="UTC") for d in args.replay)
         offset = pd.Timedelta(hours=RUN_TIME_UTC.hour, minutes=RUN_TIME_UTC.minute)
         for day in pd.date_range(start, end, freq="D"):
-            run_once(day + offset, matches, fixtures, args.ledger, results_path,
-                     args.ledger.parent / "latest.md", prior)
+            run_once(day + offset, ctx)
         return 0
 
-    now = pd.Timestamp(datetime.now(UTC))
-    new = run_once(now, matches, fixtures, args.ledger, results_path,
-                   None if args.dry_run else REPORT, prior, dry_run=args.dry_run)
+    new = run_once(pd.Timestamp(datetime.now(UTC)), ctx, dry_run=args.dry_run)
     if args.dry_run and len(new):
         cols = ["match_id", "model_name", "p_home", "p_draw", "p_away", "late_lock"]
         print(new[cols].round(3).to_string(index=False))

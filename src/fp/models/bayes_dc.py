@@ -46,6 +46,7 @@ class BayesParams:
     window_days: int = 1100
     use_sot: bool = False
     dynamic: bool = False     # random-walk challenger: strengths drift month by month
+    centred: bool = True      # parameterisation; see build_model
     period_days: int = 30
     draws: int = 1000
     tune: int = 1000
@@ -158,20 +159,25 @@ def _column(frame: pd.DataFrame, name: str) -> np.ndarray:
 
 def build_model(d: dict, n: int, prior_mean_att: np.ndarray, prior_sd_att: np.ndarray,
                 prior_mean_def: np.ndarray, prior_sd_def: np.ndarray, promoted: np.ndarray,
-                use_sot: bool) -> pm.Model:
+                use_sot: bool, centred: bool = True) -> pm.Model:
     with pm.Model() as model:
         mu = pm.Normal("mu", 0.2, 0.5)
         home = pm.Normal("home", 0.25, 0.25)
         rho = pm.TruncatedNormal("rho", 0.0, 0.1, lower=-0.2, upper=0.2)
         sigma_att = pm.HalfNormal("sigma_att", 0.5)
         sigma_def = pm.HalfNormal("sigma_def", 0.5)
-        # Centred form. Each club has 70 to 110 matches in the window, and with that
-        # much data the centred form mixes far better than the non-centred one: in
-        # tests, the minimum effective sample size rose from about 400 to about 1,300.
+        # Two ways to write the same model. Centred (att ~ Normal(mean, sd)) samples
+        # best when clubs have lots of data relative to the spread sigma; non-centred
+        # (att = mean + sd * z) samples best when sigma is small. EPL attack suits the
+        # first, La Liga defence the second, so fit_checked tries both.
         sd_att = pt.where(promoted, prior_sd_att, sigma_att)
         sd_def = pt.where(promoted, prior_sd_def, sigma_def)
-        att_raw = pm.Normal("att_raw", prior_mean_att, sd_att, shape=n)
-        def_raw = pm.Normal("def_raw", prior_mean_def, sd_def, shape=n)
+        if centred:
+            att_raw = pm.Normal("att_raw", prior_mean_att, sd_att, shape=n)
+            def_raw = pm.Normal("def_raw", prior_mean_def, sd_def, shape=n)
+        else:
+            att_raw = prior_mean_att + sd_att * pm.Normal("z_att", 0, 1, shape=n)
+            def_raw = prior_mean_def + sd_def * pm.Normal("z_def", 0, 1, shape=n)
         # Centre so each sums to zero. Otherwise mu and the average attack can trade
         # off against each other, and the sampler drifts along that ridge.
         att = pm.Deterministic("att", att_raw - pt.mean(att_raw))
@@ -227,7 +233,7 @@ def fit(train: pd.DataFrame, as_of: pd.Timestamp, teams: list[str],
                      "tau_def"]
     else:
         model = build_model(d, n, pri[:, 0], pri[:, 1], pri[:, 2], pri[:, 3], is_prom,
-                            p.use_sot)
+                            p.use_sot, p.centred)
         var_names = ["mu", "home", "rho", "att", "def", "sigma_att", "sigma_def"]
 
     start = time.time()
@@ -259,13 +265,14 @@ def fit(train: pd.DataFrame, as_of: pd.Timestamp, teams: list[str],
 def fit_checked(train: pd.DataFrame, as_of: pd.Timestamp, teams: list[str],
                 promoted_priors: dict[str, tuple[float, float, float, float]] | None = None,
                 params: BayesParams | None = None) -> Posterior:
-    """Fit, and if diagnostics fail, retry once with twice the warm-up and draws and a
-    new seed. The caller must still check .ok: a second failure means fall back."""
+    """Fit, and if diagnostics fail, retry once in the other parameterisation with
+    twice the draws and a new seed. Same model, same posterior; only the sampler's
+    path differs. The caller must still check .ok: a second failure means fall back."""
     p = params or BayesParams()
     post = fit(train, as_of, teams, promoted_priors, p)
     if post.ok:
         return post
-    retry = BayesParams(**{**p.__dict__, "tune": 2 * p.tune, "draws": 2 * p.draws,
+    retry = BayesParams(**{**p.__dict__, "centred": not p.centred, "draws": 2 * p.draws,
                            "seed": p.seed + 1})
     second = fit(train, as_of, teams, promoted_priors, retry)
     second.diagnostics["retried"] = True
