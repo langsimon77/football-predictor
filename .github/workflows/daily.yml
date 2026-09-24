@@ -1,0 +1,86 @@
+name: Daily predictions
+
+on:
+  schedule:
+    - cron: "41 4 * * *"  # 04:41 UTC = 06:41 Juba. Off the hour: GitHub delays on-the-hour jobs.
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run: compute everything, lock nothing, commit nothing"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write  # commit the ledger and report
+  issues: write    # open an issue if the run fails
+
+concurrency:
+  group: daily
+  cancel-in-progress: false  # never interrupt a run that may be writing the ledger
+
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10.2.0  # no floating major tag exists
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install locked dependencies
+        run: uv sync --frozen
+
+      - name: Restore raw data cache
+        uses: actions/cache@v6
+        with:
+          path: data/raw
+          key: raw-${{ github.run_id }}
+          restore-keys: raw-
+
+      - name: Run the daily pipeline
+        env:
+          FOOTBALL_DATA_ORG_TOKEN: ${{ secrets.FOOTBALL_DATA_ORG_TOKEN }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            uv run python -m fp.pipeline.daily --dry-run
+          else
+            uv run python -m fp.pipeline.daily
+          fi
+
+      - name: Ledger is append-only against the last commit
+        env:
+          BASE_SHA: HEAD
+        run: uv run python scripts/check_ledger.py
+
+      - name: No banned dash characters in the report
+        run: uv run python scripts/check_dashes.py
+
+      - name: Commit and push the ledger and report
+        if: env.DRY_RUN != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ledger reports
+          if git diff --cached --quiet; then
+            echo "Nothing new to commit."
+            # Keep the repo active so GitHub does not pause this schedule after 60 days.
+            git commit --allow-empty -m "Daily run $(date -u +%F): no new locks"
+          else
+            git commit -m "Daily run $(date -u +%F): lock predictions, record results"
+          fi
+          git pull --rebase  # in case code was pushed while this run was working
+          git push
+
+      - name: Open an issue if the run failed
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "Daily run failed: $(date -u +%F)" \
+            --body "The daily run failed. Log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

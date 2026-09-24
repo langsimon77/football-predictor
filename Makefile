@@ -1,6 +1,6 @@
 UV ?= uv
 
-.PHONY: data audit rebuild test lint typecheck check
+.PHONY: data audit rebuild test lint typecheck check backtest daily-dry
 
 data:  ## Download (cached, rate-limited), build, validate, load DuckDB
 	$(UV) run python -m fp.pipeline.data
@@ -23,3 +23,9 @@ typecheck:
 	$(UV) run mypy src
 
 check: lint typecheck test  ## Everything CI runs
+
+backtest:  ## Phase 1F walk-forward backtest; writes reports/backtest_1f.md
+	$(UV) run python scripts/backtest_1f.py
+
+daily-dry:  ## Run the daily pipeline without writing anything
+	$(UV) run python -m fp.pipeline.daily --dry-run
