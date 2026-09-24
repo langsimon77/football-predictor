@@ -35,3 +35,9 @@ Append only. Newest at the bottom.
 | 24 Sep 2026 | User-Agent now names the repo URL as contact. | Wikimedia policy and good practice. | Made |
 | 24 Sep 2026 | Pin `astral-sh/setup-uv@v10.2.0`. | That project publishes no floating `v10` tag; the first CI run failed on it. | Made |
 | 24 Sep 2026 | football-data.org verified from GitHub's runner; 40 team spellings added from the API response. Daily run uses it on GitHub; local runs skip it. | Lang's home connection times out on that host. | Made |
+| 24 Sep 2026 | Phase 1 approved. | Lang replied "approved". | Made |
+| 24 Sep 2026 | Fast-track models live: `dc_mle_v0` (primary) and `elo_v0` (benchmark). | Phase 1F plan (PRD Q2). | Made |
+| 24 Sep 2026 | Tuned settings: decay 0.002 per day, ridge 10, Elo K 10. The first grid's optimum sat on its edge, so the grid was widened and the choice repeated on tuning seasons only; test seasons were scored twice. Both runs recorded in `reports/backtest_1f.md`. | Transparency about the forking path. | Made |
+| 24 Sep 2026 | Promoted-team prior estimated from 2017/18 to 2020/21 promoted clubs only: attack −0.21, defence +0.14. | Those seasons precede every tuning and test season, so no leakage. | Made |
+| 24 Sep 2026 | Daily workflow live at 04:41 UTC. On days with nothing to lock it still commits, which keeps the scheduled workflow from being paused after 60 days. | Spec S10 keepalive. | Made |
+| 24 Sep 2026 | First real daily run failed on `git add ledger` (folder did not exist yet); fixed, rerun succeeded. The failure opened issue #1 as designed; closed with a note. | Failure path exercised. | Made |

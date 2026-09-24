@@ -134,3 +134,65 @@ Tests prove all three: editing a probability, deleting a row, and double-locking
 ### 1.5 Is the data fresh?
 
 football-data.co.uk has the statistics we need, but it updates a few times a week. openfootball updates every day but has only scores. The freshness check compares the two. A match that finished more than 72 hours ago and is still missing from football-data.co.uk marks that league as stale. The run then takes the score from openfootball and flags itself. The check also lists any match within 72 hours that still has no confirmed kickoff time, because such a match cannot be locked on schedule.
+
+---
+
+## Chapter 1F: Two fast models, Elo and Dixon-Coles
+
+### 1F.1 Elo: one number per club
+
+Every club carries a rating. Before a match the model computes how often the home side "should" win:
+
+$$E = \frac{1}{1 + 10^{-(R_{\text{home}} + H - R_{\text{away}})/400}}$$
+
+$H = 60$ points is the home edge. After the match, the home side's rating moves by $K \cdot G \cdot (S - E)$ and the away side's by the same amount the other way. $S$ is 1 for a home win, 0.5 for a draw, 0 for a loss. $G$ grows with the winning margin: 1 for one goal, 1.5 for two, more for bigger wins. $K = 10$ sets how fast ratings react. Between seasons each rating moves a quarter of the way back to 1500, and promoted clubs start at the average of the clubs that went down.
+
+A rating gap is not yet a probability of home, draw, or away. An ordered logistic curve, refitted at each lock, turns the gap into those three numbers.
+
+**Intuition.** Elo only asks "who won, and by how much, against whom". It forgets nothing and learns slowly. That makes it a strong, simple benchmark.
+
+### 1F.2 Dixon-Coles: goals, not just results
+
+Each club gets two numbers: attack (how much it scores above average) and defence (how much it concedes above average; lower is better). Goals follow a Poisson distribution:
+
+$$\lambda_{\text{home}} = e^{\mu + h + a_{\text{home}} + d_{\text{away}}}, \qquad \lambda_{\text{away}} = e^{\mu + a_{\text{away}} + d_{\text{home}}}$$
+
+$\mu$ is the league's base scoring rate and $h$ the home edge. Poisson treats goals as independent chances, which slightly misjudges low scores: real matches end 0-0 and 1-1 a little more often than that. Dixon and Coles added one parameter, $\rho$, that corrects only the four scores 0-0, 1-0, 0-1, and 1-1.
+
+From the two rates we build a table of every scoreline from 0-0 to 10-10. Everything else is a sum over that table: home win (all cells where home scores more), over 2.5 (all cells with three or more goals), both teams to score, and the likeliest scores.
+
+Two refinements make it work on real data:
+
+- **Time decay.** A match played $t$ days ago counts with weight $e^{-0.002 t}$, so a result loses half its weight in 347 days. Tuned on 2021/22 and 2022/23.
+- **Shrinkage.** A penalty pulls every club towards a prior, so a club with few matches is not rated on a lucky week. Most clubs are pulled to average. Promoted clubs are pulled to the level promoted clubs really had in their first season: about 19% fewer goals scored and 14% more conceded than average [V: fitted on 24 promoted clubs, 2017/18 to 2020/21].
+
+### 1F.3 Worked example: Man City v Sunderland, locked Sat 19 Sep, 04:41 UTC
+
+This comes from the replay of the daily run over the rounds before the break [V: replay ledger].
+
+| | Elo | Dixon-Coles | Market (Betfair close) |
+|---|---|---|---|
+| Inputs | City 1631, Sunderland 1440, gap 252 with home edge | City attack +0.35, defence −0.36; Sunderland attack −0.17, defence −0.12 | |
+| Home, draw, away | 73%, 17%, 10% | 63%, 24%, 13% | 73%, 17%, 10% |
+| Expected goals | none | 1.90 v 0.76 | |
+| Likeliest scores | none | 2-0 (12.7%), 1-0 (12.2%), 1-1 (11.2%) | |
+
+City won 5-3. The surprise for a home win was $-\ln 0.73 = 0.32$ for Elo and $-\ln 0.63 = 0.46$ for Dixon-Coles.
+
+Why was Dixon-Coles less sure? Sunderland had conceded little in their first four games, and the shrinkage keeps City's ratings closer to average than their true level. That is the fast model's known weakness: it shrinks every club by the same fixed amount. The Bayesian model in Phase 2 learns from the data how much to shrink, club by club.
+
+### 1F.4 What the backtest says
+
+Walk-forward over 2023/24 to 2025/26, 2,227 matches, each predicted at the run that would have locked it [V: `reports/backtest_1f.md`]:
+
+| Model | RPS (lower is better) |
+|---|---|
+| League base rates | 0.229 |
+| Elo | 0.198 |
+| Dixon-Coles | 0.197 |
+| Market, Friday snapshot | 0.192 |
+| Sharp closing market | 0.191 |
+
+Dixon-Coles beats the base rates clearly. It ties Elo on home, draw, away: the difference is −0.0008 with a 95% interval from −0.0024 to +0.0008, which includes zero. Its extra value is the goals markets, which Elo cannot price. Both trail the closing market by about 0.006, close to the 0.005 we called a strong free-data result. Top-pick accuracy is 53%, well under the 60% leakage alarm.
+
+**An honest note on tuning.** The first tuning grid put the best settings on its edge, which means the true best could lie outside it. The grid was widened and the choice made again from the tuning seasons only. The test seasons were therefore scored twice, and the report says so. The result barely moved.
