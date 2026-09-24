@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2  # the ledger check compares with the previous commit
+
+      - uses: astral-sh/setup-uv@v10
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install locked dependencies
+        run: uv sync --frozen
+
+      - name: Restore raw data cache
+        uses: actions/cache@v6
+        with:
+          path: data/raw
+          key: raw-${{ github.run_id }}
+          restore-keys: raw-
+
+      - name: Download, build, and validate data
+        run: make data
+
+      - name: Lint, dash check, type check, tests
+        run: make check
+
+      - name: Ledger is append-only
+        env:
+          BASE_SHA: ${{ github.event.before }}
+        run: uv run python scripts/check_ledger.py
+
+      - name: Probe football-data.org from the runner
+        continue-on-error: true
+        env:
+          FOOTBALL_DATA_ORG_TOKEN: ${{ secrets.FOOTBALL_DATA_ORG_TOKEN }}
+        run: uv run python -m fp.ingest.football_data_api

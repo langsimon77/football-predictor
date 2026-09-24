@@ -15,3 +15,6 @@ data/interim/
 
 # macOS
 .DS_Store
+
+# Derived data: rebuilt from data/raw by `make data` (PRD item 25).
+data/processed/

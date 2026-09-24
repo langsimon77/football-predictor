@@ -5,15 +5,20 @@ description = "EPL and La Liga match predictions, locked before kickoff and scor
 readme = "README.md"
 requires-python = "==3.12.*"
 dependencies = [
+    "duckdb==1.5.5",
     "pandas==3.0.6",
+    "pandera==0.33.1",
     "pyarrow==25.0.1",
     "requests==2.34.2",
 ]
 
 [dependency-groups]
 dev = [
+    "mypy==2.3.1",
+    "pandas-stubs==3.0.5.260914",
     "pytest==9.1.1",
     "ruff==0.16.8",
+    "types-requests==2.33.0.20260906",
 ]
 
 [build-system]
@@ -33,3 +38,10 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["src"]
+ignore_missing_imports = true
+warn_unused_ignores = true
+check_untyped_defs = true
