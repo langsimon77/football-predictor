@@ -1,41 +1,42 @@
 # Checkpoint
 
-## Latest: 23 Sep 2026, end of Phase 0 (data audit)
+## Latest: 24 Sep 2026, Phase 1 (pipeline) built, waiting on GitHub sign-in for CI
 
-### Done
-- PRD approved. Lang's answers to Q1 to Q4 logged in `docs/DECISIONS.md`.
-- Installed `uv` 0.12.18 and Python 3.12.14. Created the project with pinned dependencies and `uv.lock`. Ran `git init` locally. No commits yet.
-- Wrote the polite downloader: named User-Agent, 1 request per 3 s per domain, dated cache, retries.
-- Downloaded and audited 44 football-data.co.uk files (2016/17 to 2026/27), `fixtures.csv`, and 22 openfootball files.
-- Checked robots.txt and terms for every source in spec S3, plus new candidates.
-- Built the canonical team table: 67 clubs, 158 aliases, 2 sources. 72 tests pass. `ruff` and the dash check pass.
-- Wrote `docs/DATA_SOURCES.md` and `docs/LEARN.md` chapter 0.
+### Done this session
+- Phase 0 approved. D1 to D6 adopted. Repo: https://github.com/langsimon77/football-predictor.
+- Keys checked (values never printed). API-Football key works, but its free plan excludes 2026/27, so team news goes through the Question Queue (D2). football-data.org still times out from this Mac. CI will probe it from GitHub's runner.
+- Installed GitHub CLI 2.101.0 (checksum verified). Lang's sign-in is not yet complete.
+- Built Phase 1: processed tables, pandera validation, freshness check, as_of lock clock, hash-chained ledger, DuckDB views, CI workflow, ledger CI guard.
+- `docs/LEARN.md` chapter 1 written. Chapter 0 corrected to the 04:41 UTC run time.
+- Two local commits, not yet pushed.
 
-### Phase 0 acceptance checks
+### Phase 1 acceptance checks
 | Check | Result |
 |---|---|
-| Every source in S3 marked Verified or replaced | Met, with two items waiting on Lang's free API keys (football-data.org, API-Football). |
-| Mapping test passes for all 2021/22 to 2026/27 teams | Passed, and extended to 2016/17. 72 of 72 tests pass. |
+| `make data` runs clean | Passed: 19 s with fresh downloads. 7,719 matches, 760 fixtures, 10,301 second-tier matches, 10 referee appointments. |
+| pandera checks pass | Passed on real data. Negative tests prove duplicates, negative counts, naive times, unmapped teams, missing matches, and impossible odds are rejected. |
+| Leakage test passes | Passed: every lock lands 24 to 48 h before kickoff; future inputs are caught. |
+| CI green | **Pending.** Needs the push, which needs Lang's GitHub sign-in. |
+
+Local totals: 106 tests pass; `ruff`, `mypy`, and the dash check pass.
 
 ### Open questions for Lang
-- D1 to D6 in `docs/DATA_SOURCES.md` section 5.
-- Is the robots.txt reading for football-data.co.uk acceptable? See `docs/DATA_SOURCES.md` section 2.
-- Which name and email should Git commits use?
+- None blocking beyond the sign-in and secrets below.
 
 ### Next actions
 | Action | Owner |
 |---|---|
-| Approve Phase 0, or reply with changes. Decide D1 to D6. | Lang |
-| Create an empty public GitHub repo named `football-predictor` and send the URL. | Lang |
-| Register free keys at football-data.org and api-football.com. Put them in `.env` in the project folder as `FOOTBALL_DATA_ORG_TOKEN=...` and `API_FOOTBALL_KEY=...`. Do not paste keys into chat. | Lang |
-| Phase 1 (pipeline, validation, leakage guard, ledger), then Phase 1F. Target: running on GitHub Actions with a dry run by Wed 7 Oct. | Claude, after approval |
+| Finish GitHub sign-in: run the `gh auth login` command from the latest chat message. | Lang |
+| Add the API keys as GitHub secrets: run `gh secret set -f .env` in the project folder. | Lang |
+| Push, confirm CI green, read the football-data.org probe from the runner. | Claude |
+| Phase 1F: Elo plus maximum-likelihood Dixon-Coles, daily lock workflow. Live before the Thu 8 Oct 04:41 UTC run. | Claude, after Phase 1 approval |
 
 ### Facts still unverified
-- football-data.org API behaviour. It timed out from this Mac and needs a key.
-- API-Football free plan terms and season coverage.
+- football-data.org from GitHub's runner (probe runs in CI).
 - The `HxG` provider and whether it includes penalties.
 - What counts as "activity" for GitHub's 60-day scheduled-workflow rule.
 - GitHub Pages speed from Juba (Phase 6).
 
 ## History
-- 23 Sep 2026, session 1: read spec, wrote PRD with 26 open questions.
+- 23 Sep 2026, session 1: PRD written with 26 open questions; approved.
+- 23 Sep 2026, session 2: Phase 0 data audit. Understat and FPL barred; openfootball added; 72 mapping tests.

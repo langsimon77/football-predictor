@@ -24,3 +24,12 @@ Append only. Newest at the bottom.
 | 24 Sep 2026 | GitHub repo: https://github.com/langsimon77/football-predictor (public). Commits use name "Lang" and email langdemijok@gmail.com, set for this repo only. | Lang's choice. The email will be visible in public commit history. | Made |
 | 24 Sep 2026 | API-Football free plan cannot serve current-season data ("Free plans do not have access to this season, try from 2022 to 2024"). Team news runs through the Question Queue (D2 fallback). EPL Friday and Saturday referees stay unknown (D3). | Verified with Lang's key on 24 Sep 2026. | Made |
 | 24 Sep 2026 | football-data.org still times out from this Mac on port 443. Test it from the GitHub runner in Phase 1. openfootball stays the primary calendar (D5). | Network path issue on this connection, not a key problem. | Made |
+| 24 Sep 2026 | Installed GitHub CLI 2.101.0 to `~/.local/bin/gh`, SHA-256 checked against the official release checksums. | Lang chose this route for pushing. Lang signs in with `gh auth login`. | Made |
+| 24 Sep 2026 | Daily run time 04:41 UTC (06:41 Juba). Lock = latest 04:41 run at or before kickoff minus 24 h. | PRD item 24: GitHub delays top-of-hour cron jobs. Every lock lands 24 to 48 h before kickoff (tested). | Made |
+| 24 Sep 2026 | A result counts as known 3 hours after kickoff (`result_available_utc`). Matches with no known kickoff time wait 15 hours. | Conservative: later only costs information; earlier would leak. | Made |
+| 24 Sep 2026 | Kickoff time source: football-data.co.uk `Time` (UK local) from 2019/20; openfootball local time before that. | Only the 2016/17 to 2018/19 files lack `Time`. openfootball covers them fully. | Made |
+| 24 Sep 2026 | Odds at or below 1.0 are treated as missing and logged. | Source placeholder: Barcelona v Girona, 18 Oct 2025, Pinnacle closing O/U = 0.0. | Made |
+| 24 Sep 2026 | UTC columns must be timezone-aware UTC; no silent coercion from naive times. | A test showed coercion would accept naive local times as UTC. | Made |
+| 24 Sep 2026 | Ledger rows are SHA-256 hash-chained. CI fails if any old row changes or disappears. | Tamper evidence for the public record (spec S4). | Made |
+| 24 Sep 2026 | `data/processed/` is git-ignored and rebuilt by `make data`. CI caches `data/raw/` between runs. | PRD item 25: keep third-party data out of the public repo. | Made |
+| 24 Sep 2026 | User-Agent now names the repo URL as contact. | Wikimedia policy and good practice. | Made |
