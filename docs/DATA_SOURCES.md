@@ -11,7 +11,7 @@ Claim labels: **[V]** Verified, with source. **[E]** Estimate, with basis. **[A]
 | football-data.co.uk season CSVs (`E0`, `SP1`, `E1`, `SP2`) | [V] Downloaded 44 files, 2016/17 to 2026/27. robots.txt allows general agents. | **Use.** Core match data and odds benchmark. |
 | football-data.co.uk `fixtures.csv` | [V] Has a `Referee` column, filled for EPL, empty for La Liga. | **Use** for EPL referees on Sunday and Monday matches (section 4). |
 | openfootball `football.json` | [V] Full 380-match schedules for 2016/17 to 2026/27. Public domain (CC0). Updated daily at 05:00 UTC. All 119 results so far in 2026/27 match football-data.co.uk exactly. | **Use** as the fixture calendar and results fallback. New source, not in the spec. |
-| football-data.org API v4, free plan | [V] 12 free competitions, including Premier League, La Liga, and Champions League. 10 calls a minute. Free plan lists fixtures and tables only. No referees, cards, lineups, or past seasons. Source: football-data.org/coverage and /pricing. The API timed out from this Mac on 23 Sep. It needs a free key that only Lang can register for. | **Use** later for Champions League dates (rest days) and as a calendar cross-check. Needs Lang's key. |
+| football-data.org API v4, free plan | [V] 12 free competitions, including Premier League, La Liga, and Champions League. 10 calls a minute. Free plan lists fixtures and tables only. No referees, cards, lineups, or past seasons. Source: football-data.org/coverage and /pricing. [V, 24 Sep 2026] Works from GitHub's runner with Lang's key: 380 PL, 380 PD, and 144 Champions League matches for 2026/27. Times out from Lang's home connection. | **Use** in the daily run (on GitHub) for Champions League dates and as a calendar cross-check. |
 | Understat | [V] robots.txt is `User-agent: * Disallow: /`. Checked twice. | **Do not use.** Spec S2 forbids it. Section 5, D1. |
 | Fantasy Premier League API | [V] FPL Terms 28(d): players "shall not use automated systems to access the Game and extract information from the Game". Terms 29: the Premier League owns all "Game data". | **Do not use.** Section 5, D2. |
 | FBref | [V] Returns HTTP 403 to automated requests. The spec already bars current-season use. | **Do not use.** |
@@ -19,7 +19,7 @@ Claim labels: **[V]** Verified, with source. **[E]** Estimate, with basis. **[A]
 | LaLiga Fantasy app API | [V] Terms are silent on automation, but the endpoints are unofficial and the parent laliga.com terms bar reproduction. | **Do not use.** Grey area. Lang may overrule. |
 | futbolfantasy.com (Spanish injury lists) | [V] robots.txt allows all. Legal notice reserves all exploitation rights and is silent on scraping. | **Do not scrape.** Link to it in questions so Lang can read it by hand. |
 | rfef.es (La Liga referee appointments) | [V] robots.txt allows crawling. Legal notice only bars copying audiovisual content. Appointments go up the day before each match, before 16:00 Spanish time (RFEF notice, Aug 2025). | Compliant, but always **too late for our lock**. Section 5, D3. |
-| API-Football free plan (api-sports.io) | Unverified. The site sits behind a bot check, which I did not try to bypass. 100 requests a day [E, basis: TheStatsAPI comparison, May 2026]. Season access unknown. Needs Lang to register. | **Candidate** for injuries, referees, and player stats in both leagues. Section 5, D2. |
+| API-Football free plan (api-sports.io) | [V, 24 Sep 2026, Lang's key] 100 requests a day, 10 a minute. The API answers: "Free plans do not have access to this season, try from 2022 to 2024." | **Not usable for live data.** Its 2022 to 2024 injury and lineup history could calibrate the missing-starter effect in Phase 5. |
 | Wikipedia API | [V] Allowed with a descriptive User-Agent that includes contact details (Wikimedia User-Agent policy). Content is CC BY-SA, so we attribute it. | **Use** for manager history in Phase 1. |
 
 ### Platforms
@@ -74,13 +74,13 @@ Second tiers (`E1`, `SP2`) have the same columns. `SP2` 2016/17 has no match sta
 ## 4. Team ID mapping
 
 - `data/manual/teams.csv`: 67 clubs (35 English, 32 Spanish) that played in the top flight from 2016/17 to 2026/27.
-- `data/manual/team_aliases.csv`: 158 spellings from two sources, football-data.co.uk (67) and openfootball (91).
+- `data/manual/team_aliases.csv`: 198 spellings from three sources: football-data.co.uk (67), openfootball (91), and football-data.org (40, current season, added 24 Sep 2026 from the runner).
 - `tests/test_team_mapping.py`: 72 tests, all passing [V: 23 Sep 2026]. They prove:
   - every top-flight name in every season maps, giving exactly 20 clubs;
   - every newly promoted club, 3 per season, appears under the same name in the previous season's second tier, so promoted-team priors join the right history;
   - both sources name the same 20 clubs in each of the 22 league-seasons;
   - all 119 matches played so far in 2026/27 have the same date and score in both sources.
-- football-data.org and API-Football spellings get added when their keys exist. I did not seed them from memory.
+- football-data.org spellings came from the API itself, not from memory. A test maps them wherever the API is reachable (CI).
 
 ## 5. Consequences for the spec: decisions for Lang
 

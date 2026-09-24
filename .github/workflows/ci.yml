@@ -39,6 +39,12 @@ jobs:
       - name: Download, build, and validate data
         run: make data
 
+      - name: Probe football-data.org (its files feed a mapping test)
+        continue-on-error: true
+        env:
+          FOOTBALL_DATA_ORG_TOKEN: ${{ secrets.FOOTBALL_DATA_ORG_TOKEN }}
+        run: uv run python -m fp.ingest.football_data_api
+
       - name: Lint, dash check, type check, tests
         run: make check
 
@@ -46,9 +52,3 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.before }}
         run: uv run python scripts/check_ledger.py
-
-      - name: Probe football-data.org from the runner
-        continue-on-error: true
-        env:
-          FOOTBALL_DATA_ORG_TOKEN: ${{ secrets.FOOTBALL_DATA_ORG_TOKEN }}
-        run: uv run python -m fp.ingest.football_data_api

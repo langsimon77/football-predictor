@@ -33,3 +33,5 @@ Append only. Newest at the bottom.
 | 24 Sep 2026 | Ledger rows are SHA-256 hash-chained. CI fails if any old row changes or disappears. | Tamper evidence for the public record (spec S4). | Made |
 | 24 Sep 2026 | `data/processed/` is git-ignored and rebuilt by `make data`. CI caches `data/raw/` between runs. | PRD item 25: keep third-party data out of the public repo. | Made |
 | 24 Sep 2026 | User-Agent now names the repo URL as contact. | Wikimedia policy and good practice. | Made |
+| 24 Sep 2026 | Pin `astral-sh/setup-uv@v10.2.0`. | That project publishes no floating `v10` tag; the first CI run failed on it. | Made |
+| 24 Sep 2026 | football-data.org verified from GitHub's runner; 40 team spellings added from the API response. Daily run uses it on GitHub; local runs skip it. | Lang's home connection times out on that host. | Made |

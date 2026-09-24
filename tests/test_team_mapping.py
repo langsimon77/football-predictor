@@ -1,7 +1,7 @@
 """Team mapping tests (Phase 0 acceptance check).
 
-The football-data.co.uk tests need the raw CSVs. Run `make audit` first.
-They skip, not fail, when the files are absent, so CI can run without them.
+Data tests need the raw downloads. Run `make data` first.
+They skip, not fail, when files are absent. CI downloads everything before testing.
 """
 
 from __future__ import annotations
@@ -131,3 +131,17 @@ def test_current_season_results_agree_across_sources(division):
     assert (merged["_merge"] == "both").all(), merged[merged["_merge"] != "both"]
     assert (merged["date_fd"] == merged["date_of"]).all()
     assert (merged["score_fd"] == merged["score_of"]).all()
+
+
+@pytest.mark.parametrize("code", ["PL", "PD"])
+def test_football_data_org_names_map(code):
+    """Runs where the API is reachable (GitHub's runner). This Mac's network times out."""
+    from fp.ingest import football_data_api
+
+    copies = cached_copies(football_data_api.SOURCE, f"{code}_{fd.CURRENT_SEASON}.json")
+    if not copies:
+        pytest.skip("football-data.org files not downloaded here")
+    frame = football_data_api.read_matches(copies[-1])
+    names = set(frame["home_name"]) | set(frame["away_name"])
+    ids = {teams.to_team_id(n, football_data_api.SOURCE) for n in names}
+    assert len(ids) == 20
