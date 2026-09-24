@@ -43,7 +43,8 @@ EXPECTATION_COLUMNS = [
     "exp_corners_home", "exp_corners_away", "exp_yellows",
 ]
 TEXT_COLUMNS = [  # JSON strings
-    "top_scorelines", "tiers", "news_adjustments", "unanswered_questions", "flags",
+    "top_scorelines", "intervals", "tiers", "news_adjustments", "unanswered_questions",
+    "flags",
 ]
 HASH_COLUMNS = ["prev_hash", "row_hash"]
 COLUMNS = IDENTITY_COLUMNS + PROBABILITY_COLUMNS + EXPECTATION_COLUMNS + TEXT_COLUMNS + HASH_COLUMNS
@@ -95,7 +96,13 @@ def _canonical(value: object) -> object:
 
 
 def row_hash(row: dict, prev_hash: str) -> str:
-    body = {k: _canonical(row.get(k)) for k in COLUMNS if k not in HASH_COLUMNS}
+    """SHA-256 over the previous hash and this row's non-empty cells.
+
+    Empty cells are left out, so adding a column in a later phase (empty for old
+    rows) does not change any old row's hash.
+    """
+    body = {k: v for k in COLUMNS if k not in HASH_COLUMNS
+            and (v := _canonical(row.get(k))) is not None}
     payload = prev_hash + json.dumps(body, sort_keys=True, default=str)
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 

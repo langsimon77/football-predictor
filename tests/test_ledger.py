@@ -91,3 +91,12 @@ def test_cannot_lock_after_kickoff(tmp_path):
     rows["lock_utc"] = rows["kickoff_utc"] + pd.Timedelta(minutes=1)
     with pytest.raises(ledger.LedgerError, match="kickoff"):
         ledger.append(rows, tmp_path / "p.parquet")
+
+
+def test_adding_a_column_later_keeps_old_hashes(tmp_path, monkeypatch):
+    """A later phase may add a column. Old rows leave it empty, so their hashes hold."""
+    path = tmp_path / "predictions.parquet"
+    ledger.append(make_rows(["m1", "m2"]), path)
+    monkeypatch.setattr(ledger, "COLUMNS", [*ledger.COLUMNS[:-2], "new_metric",
+                                            *ledger.HASH_COLUMNS])
+    ledger.verify_chain(ledger.load(path))
