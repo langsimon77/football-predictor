@@ -1,0 +1,17 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Third-party raw and intermediate data stay out of Git (PRD item 25).
+data/raw/
+data/interim/
+
+# Local secrets
+.env
+
+# macOS
+.DS_Store

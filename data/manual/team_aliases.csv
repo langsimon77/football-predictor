@@ -1,0 +1,159 @@
+source,alias,team_id
+football_data_co_uk,Arsenal,arsenal
+football_data_co_uk,Aston Villa,aston_villa
+football_data_co_uk,Bournemouth,bournemouth
+football_data_co_uk,Brentford,brentford
+football_data_co_uk,Brighton,brighton
+football_data_co_uk,Burnley,burnley
+football_data_co_uk,Cardiff,cardiff
+football_data_co_uk,Chelsea,chelsea
+football_data_co_uk,Coventry,coventry
+football_data_co_uk,Crystal Palace,crystal_palace
+football_data_co_uk,Everton,everton
+football_data_co_uk,Fulham,fulham
+football_data_co_uk,Huddersfield,huddersfield
+football_data_co_uk,Hull,hull
+football_data_co_uk,Ipswich,ipswich
+football_data_co_uk,Leeds,leeds
+football_data_co_uk,Leicester,leicester
+football_data_co_uk,Liverpool,liverpool
+football_data_co_uk,Luton,luton
+football_data_co_uk,Man City,man_city
+football_data_co_uk,Man United,man_united
+football_data_co_uk,Middlesbrough,middlesbrough
+football_data_co_uk,Newcastle,newcastle
+football_data_co_uk,Norwich,norwich
+football_data_co_uk,Nott'm Forest,nottm_forest
+football_data_co_uk,Sheffield United,sheffield_united
+football_data_co_uk,Southampton,southampton
+football_data_co_uk,Stoke,stoke
+football_data_co_uk,Sunderland,sunderland
+football_data_co_uk,Swansea,swansea
+football_data_co_uk,Tottenham,tottenham
+football_data_co_uk,Watford,watford
+football_data_co_uk,West Brom,west_brom
+football_data_co_uk,West Ham,west_ham
+football_data_co_uk,Wolves,wolves
+football_data_co_uk,Alaves,alaves
+football_data_co_uk,Almeria,almeria
+football_data_co_uk,Ath Bilbao,athletic_bilbao
+football_data_co_uk,Ath Madrid,atletico_madrid
+football_data_co_uk,Barcelona,barcelona
+football_data_co_uk,Betis,real_betis
+football_data_co_uk,Cadiz,cadiz
+football_data_co_uk,Celta,celta_vigo
+football_data_co_uk,Eibar,eibar
+football_data_co_uk,Elche,elche
+football_data_co_uk,Espanol,espanyol
+football_data_co_uk,Getafe,getafe
+football_data_co_uk,Girona,girona
+football_data_co_uk,Granada,granada
+football_data_co_uk,Huesca,huesca
+football_data_co_uk,La Coruna,deportivo_la_coruna
+football_data_co_uk,Las Palmas,las_palmas
+football_data_co_uk,Leganes,leganes
+football_data_co_uk,Levante,levante
+football_data_co_uk,Malaga,malaga
+football_data_co_uk,Mallorca,mallorca
+football_data_co_uk,Osasuna,osasuna
+football_data_co_uk,Oviedo,real_oviedo
+football_data_co_uk,Real Madrid,real_madrid
+football_data_co_uk,Santander,racing_santander
+football_data_co_uk,Sevilla,sevilla
+football_data_co_uk,Sociedad,real_sociedad
+football_data_co_uk,Sp Gijon,sporting_gijon
+football_data_co_uk,Valencia,valencia
+football_data_co_uk,Valladolid,valladolid
+football_data_co_uk,Vallecano,rayo_vallecano
+football_data_co_uk,Villarreal,villarreal
+openfootball,AFC Bournemouth,bournemouth
+openfootball,Arsenal FC,arsenal
+openfootball,Aston Villa,aston_villa
+openfootball,Aston Villa FC,aston_villa
+openfootball,Brentford FC,brentford
+openfootball,Brighton & Hove Albion,brighton
+openfootball,Brighton & Hove Albion FC,brighton
+openfootball,Burnley FC,burnley
+openfootball,Cardiff City,cardiff
+openfootball,Chelsea FC,chelsea
+openfootball,Coventry City FC,coventry
+openfootball,Crystal Palace,crystal_palace
+openfootball,Crystal Palace FC,crystal_palace
+openfootball,Everton FC,everton
+openfootball,Fulham FC,fulham
+openfootball,Huddersfield Town,huddersfield
+openfootball,Hull City,hull
+openfootball,Hull City AFC,hull
+openfootball,Ipswich Town FC,ipswich
+openfootball,Leeds United FC,leeds
+openfootball,Leicester City,leicester
+openfootball,Leicester City FC,leicester
+openfootball,Liverpool FC,liverpool
+openfootball,Luton Town FC,luton
+openfootball,Manchester City,man_city
+openfootball,Manchester City FC,man_city
+openfootball,Manchester United,man_united
+openfootball,Manchester United FC,man_united
+openfootball,Middlesbrough FC,middlesbrough
+openfootball,Newcastle United,newcastle
+openfootball,Newcastle United FC,newcastle
+openfootball,Norwich City,norwich
+openfootball,Norwich City FC,norwich
+openfootball,Nottingham Forest FC,nottm_forest
+openfootball,Sheffield United,sheffield_united
+openfootball,Sheffield United FC,sheffield_united
+openfootball,Southampton FC,southampton
+openfootball,Stoke City,stoke
+openfootball,Sunderland AFC,sunderland
+openfootball,Swansea City,swansea
+openfootball,Tottenham Hotspur,tottenham
+openfootball,Tottenham Hotspur FC,tottenham
+openfootball,Watford FC,watford
+openfootball,West Bromwich Albion,west_brom
+openfootball,West Bromwich Albion FC,west_brom
+openfootball,West Ham United,west_ham
+openfootball,West Ham United FC,west_ham
+openfootball,Wolverhampton Wanderers,wolves
+openfootball,Wolverhampton Wanderers FC,wolves
+openfootball,Athletic Club,athletic_bilbao
+openfootball,Atlético Madrid,atletico_madrid
+openfootball,Club Atlético de Madrid,atletico_madrid
+openfootball,CA Osasuna,osasuna
+openfootball,CD Alavés,alaves
+openfootball,Deportivo Alavés,alaves
+openfootball,CD Leganés,leganes
+openfootball,Cádiz CF,cadiz
+openfootball,Deportivo La Coruña,deportivo_la_coruna
+openfootball,RC Deportivo La Coruña,deportivo_la_coruna
+openfootball,Elche CF,elche
+openfootball,Espanyol Barcelona,espanyol
+openfootball,RCD Espanyol de Barcelona,espanyol
+openfootball,FC Barcelona,barcelona
+openfootball,Getafe CF,getafe
+openfootball,Girona FC,girona
+openfootball,Granada CF,granada
+openfootball,Levante UD,levante
+openfootball,Málaga CF,malaga
+openfootball,RC Celta,celta_vigo
+openfootball,RC Celta de Vigo,celta_vigo
+openfootball,RCD Mallorca,mallorca
+openfootball,Rayo Vallecano,rayo_vallecano
+openfootball,Rayo Vallecano de Madrid,rayo_vallecano
+openfootball,Real Betis,real_betis
+openfootball,Real Betis Balompié,real_betis
+openfootball,Real Madrid,real_madrid
+openfootball,Real Madrid CF,real_madrid
+openfootball,Real Oviedo,real_oviedo
+openfootball,Real Racing Club de Santander,racing_santander
+openfootball,Real Sociedad,real_sociedad
+openfootball,Real Sociedad de Fútbol,real_sociedad
+openfootball,Real Valladolid,valladolid
+openfootball,Real Valladolid CF,valladolid
+openfootball,SD Eibar,eibar
+openfootball,SD Huesca,huesca
+openfootball,Sevilla FC,sevilla
+openfootball,Sporting Gijón,sporting_gijon
+openfootball,UD Almería,almeria
+openfootball,UD Las Palmas,las_palmas
+openfootball,Valencia CF,valencia
+openfootball,Villarreal CF,villarreal
