@@ -4,7 +4,7 @@
 
 ### Done this session
 - Phase 0 approved. D1 to D6 adopted. Repo: https://github.com/langsimon77/football-predictor.
-- Keys checked (values never printed). API-Football key works, but its free plan excludes 2026/27, so team news goes through the Question Queue (D2). football-data.org still times out from this Mac. CI will probe it from GitHub's runner.
+- Keys checked (values never printed). API-Football key works, but its free plan excludes 2026/27, so team news goes through the Question Queue (D2). football-data.org times out from this Mac but works from GitHub's runner.
 - Installed GitHub CLI 2.101.0 (checksum verified). Lang signed in as langsimon77 and set both API keys as GitHub Actions secrets.
 - Built Phase 1: processed tables, pandera validation, freshness check, as_of lock clock, hash-chained ledger, DuckDB views, CI workflow, ledger CI guard.
 - `docs/LEARN.md` chapter 1 written. Chapter 0 corrected to the 04:41 UTC run time.
@@ -16,9 +16,9 @@
 | `make data` runs clean | Passed: 19 s with fresh downloads. 7,719 matches, 760 fixtures, 10,301 second-tier matches, 10 referee appointments. |
 | pandera checks pass | Passed on real data. Negative tests prove duplicates, negative counts, naive times, unmapped teams, missing matches, and impossible odds are rejected. |
 | Leakage test passes | Passed: every lock lands 24 to 48 h before kickoff; future inputs are caught. |
-| CI green | Passed on GitHub's runner (Ubuntu 24.04), full run in under 4 minutes. |
+| CI green | Passed on GitHub's runner (Ubuntu 24.04): 108 tests, none skipped. 4 minutes cold, 30 seconds with the data cache. |
 
-Local totals: 106 tests pass; `ruff`, `mypy`, and the dash check pass.
+Local: 106 pass, 2 skip (football-data.org unreachable here). `ruff`, `mypy`, and the dash check pass.
 
 ### Open questions for Lang
 - Approve Phase 1 so Phase 1F (fast-track model and daily lock) can start.
