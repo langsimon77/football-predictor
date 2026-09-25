@@ -49,3 +49,6 @@ Append only. Newest at the bottom.
 | 25 Sep 2026 | Test stage run once on GitHub (run 36182318598, NumPyro): `bsot` RPS 0.1970 against Elo 0.1982 (interval of the difference −0.0030 to +0.0006), fast DC 0.1974, market 0.1912. Significant edge over Elo in the EPL only. | `reports/backtest_phase2_test.md`. | Made |
 | 25 Sep 2026 | Finding: Dixon-Coles probabilities are too timid (calibration slope 1.22; Elo 1.00). Calibration map (spec S5.6) to be built in Phase 4 on regenerated tuning-season predictions (GitHub run 36183165274). | Explains Man City 64% against the market's 73%. | Made |
 | 25 Sep 2026 | Corrected LEARN chapter 1F: the Bayesian model did not fix the shrinkage gap. | Honesty about an earlier prediction. | Made |
+| 25 Sep 2026 | Phase 2 approved. `dc_bayes_v1` live as the primary model; `dc_mle_v0` and `elo_v0` continue as challengers. | Lang's answers 1 and 2. | Made |
+| 25 Sep 2026 | The Bayesian model refits on every daily run, not only on lock days. | Spec S5.6 step 1; keeps the fallback posterior at most a day old. | Made |
+| 25 Sep 2026 | Calibration moved forward to Phase 3a, before corners and cards. Applying it live needs a separate approval, since it changes model outputs. | Lang's answer 3. | Made |

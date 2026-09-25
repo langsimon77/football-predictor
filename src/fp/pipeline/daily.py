@@ -48,9 +48,10 @@ REPORT = ROOT / "reports" / "latest.md"
 DC_MODEL = "dc_mle_v0"
 ELO_MODEL = "elo_v0"
 BAYES_MODEL = "dc_bayes_v1"
-# The Bayesian model joins the live ledger only after Lang approves Phase 2
-# (spec S0: model changes wait for approval). Until then it runs in replays only.
-BAYES_LIVE = False
+# Live since Lang approved Phase 2 on 25 Sep 2026 (spec S0: model changes wait
+# for approval). The fast model and Elo keep running beside it as challengers.
+BAYES_LIVE = True
+PRIMARY_MODEL = BAYES_MODEL
 # Chosen on the tuning seasons (reports/backtest_phase2_tune.md) and the runner
 # benchmark (reports/sampler_benchmark.md).
 BAYES_PARAMS = bayes_dc.BayesParams(use_sot=True, sampler="numpyro")
@@ -143,7 +144,7 @@ def build_rows(cands: pd.DataFrame, models: dict[str, LeagueModels], now: pd.Tim
     for r in cands.itertuples():
         m = models[str(r.league)]
         home, away = str(r.home_id), str(r.away_id)
-        flags = ["fast_track_model"]
+        flags: list[str] = []
         if r.late_lock:
             flags.append("late_lock")
         if stale:
@@ -163,7 +164,7 @@ def build_rows(cands: pd.DataFrame, models: dict[str, LeagueModels], now: pd.Tim
         rows.append({
             **common, **goals, "prediction_id": f"{r.match_id}:{DC_MODEL}",
             "model_name": DC_MODEL, "degraded": not m.dc_fit.converged,
-            "top_scorelines": json.dumps(top), "flags": json.dumps(flags),
+            "top_scorelines": json.dumps(top), "flags": json.dumps(["fast_track_model", *flags]),
         })
         if m.bayes is not None and home in m.bayes.teams and away in m.bayes.teams:
             b = bayes_dc.markets(m.bayes, home, away)
@@ -204,52 +205,72 @@ def record_results(matches: pd.DataFrame, fixtures: pd.DataFrame, locked: pd.Dat
     return results
 
 
+MODEL_LABELS = {
+    BAYES_MODEL: "Bayesian Dixon-Coles with shots on target",
+    DC_MODEL: "fast maximum-likelihood Dixon-Coles",
+    ELO_MODEL: "Elo",
+}
+
+
+def _primary_rows(ledger_frame: pd.DataFrame) -> pd.DataFrame:
+    """One row per match: the primary model's, or the fast model's if the primary
+    has none for that match (for example when both Bayesian fits failed)."""
+    order = [PRIMARY_MODEL, DC_MODEL]
+    rows = ledger_frame[ledger_frame["model_name"].isin(order)].copy()
+    rows["rank"] = rows["model_name"].map({m: i for i, m in enumerate(order)})
+    return rows.sort_values("rank").drop_duplicates("match_id", keep="first")
+
+
 def write_report(ledger_frame: pd.DataFrame, results: pd.DataFrame, now: pd.Timestamp,
                  path: Path) -> None:
+    from fp.evaluate import metrics
     from fp.teams import teams
 
     short = teams().set_index("team_id")["short_name"].to_dict()
     juba = "Africa/Juba"
-    dcl = ledger_frame[ledger_frame["model_name"] == DC_MODEL].copy()
-    upcoming = dcl[dcl["kickoff_utc"] > now].sort_values("kickoff_utc")
+    primary = _primary_rows(ledger_frame)
+    upcoming = primary[primary["kickoff_utc"] > now].sort_values("kickoff_utc")
     lines = [
         "# Latest predictions",
         "",
-        f"Updated {now.tz_convert(juba):%a %d %b %Y, %H:%M} Juba time. Model: `{DC_MODEL}` "
-        "(fast-track maximum-likelihood Dixon-Coles). Probabilities are locked and never edited.",
+        f"Updated {now.tz_convert(juba):%a %d %b %Y, %H:%M} Juba time. Primary model: "
+        f"`{PRIMARY_MODEL}` ({MODEL_LABELS[PRIMARY_MODEL]}). Probabilities are locked and "
+        "never edited. The range after the home-win chance is the model's 80% interval.",
         "",
         "## Locked, not yet played",
         "",
-        "| Kickoff (Juba) | Match | Home | Draw | Away | Over 2.5 | BTTS | Exp. goals | Flags |",
+        "| Kickoff (Juba) | Match | Home (80% range) | Draw | Away | Over 2.5 | BTTS | "
+        "Exp. goals | Flags |",
         "|---|---|---|---|---|---|---|---|---|",
     ]
     for r in upcoming.itertuples():
-        flags = ", ".join(
-            f.split(":")[0] for f in json.loads(str(r.flags)) if f != "fast_track_model"
-        )
+        flags = [f.split(":")[0] for f in json.loads(str(r.flags)) if f != "fast_track_model"]
+        if r.model_name != PRIMARY_MODEL:
+            flags.append(f"shown from {r.model_name}")
+        intervals = json.loads(str(r.intervals)) if isinstance(r.intervals, str) else {}
+        home = f"{r.p_home:.0%}"
+        if "p_home" in intervals:
+            lo, hi = intervals["p_home"]
+            home += f" ({lo:.0%} to {hi:.0%})"
         kickoff = cast(pd.Timestamp, r.kickoff_utc).tz_convert(juba)
         lines.append(
-            f"| {kickoff:%a %d %b %H:%M} | {short[r.home_id]} v "
-            f"{short[r.away_id]} | {r.p_home:.0%} | {r.p_draw:.0%} | {r.p_away:.0%} | "
-            f"{r.p_over_2_5:.0%} | {r.p_btts:.0%} | {r.exp_goals_home:.1f} to "
-            f"{r.exp_goals_away:.1f} | {flags or 'none'} |"
+            f"| {kickoff:%a %d %b %H:%M} | {short[r.home_id]} v {short[r.away_id]} | {home} | "
+            f"{r.p_draw:.0%} | {r.p_away:.0%} | {r.p_over_2_5:.0%} | {r.p_btts:.0%} | "
+            f"{r.exp_goals_home:.1f} to {r.exp_goals_away:.1f} | {', '.join(flags) or 'none'} |"
         )
     if upcoming.empty:
         lines.append("| none | | | | | | | | |")
-    played = dcl.merge(results, on="match_id") if len(results) else dcl.iloc[0:0]
-    if len(played):
-        from fp.evaluate import metrics
 
-        y = metrics.outcome_1x2(played["home_goals"].to_numpy(), played["away_goals"].to_numpy())
-        probs = played[["p_home", "p_draw", "p_away"]].to_numpy(dtype=float)
-        lines += [
-            "",
-            "## Scored so far",
-            "",
-            f"{len(played)} locked matches played. Mean RPS {metrics.rps(probs, y).mean():.3f} "
-            "(lower is better; 0 is perfect). "
-            f"Top pick right in {(probs.argmax(axis=1) == y).mean():.0%}.",
-        ]
+    scored = ledger_frame.merge(results, on="match_id") if len(results) else None
+    if scored is not None and len(scored):
+        lines += ["", "## Scored so far", "",
+                  "Lower RPS is better; 0 is perfect.", "",
+                  "| Model | Matches | Mean RPS | Top pick right |", "|---|---|---|---|"]
+        for model, g in scored.groupby("model_name"):
+            y = metrics.outcome_1x2(g["home_goals"].to_numpy(), g["away_goals"].to_numpy())
+            probs = g[["p_home", "p_draw", "p_away"]].to_numpy(dtype=float)
+            lines.append(f"| `{model}` | {len(g)} | {metrics.rps(probs, y).mean():.3f} | "
+                         f"{(probs.argmax(axis=1) == y).mean():.0%} |")
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
@@ -275,9 +296,9 @@ def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataF
     report = freshness.check(known_as_of(ctx.matches, now), ctx.fixtures, now=now)
     season = int(ctx.fixtures["season"].max())
     cands = candidates(ctx.fixtures, now, existing)
-    # The Bayesian model takes seconds per league, so it only runs when there is
-    # something to lock. On quiet days the stored posterior simply waits.
-    bayes = ctx.with_bayes and len(cands) > 0
+    # Refit every run, lock day or not (spec S5.6 step 1). This keeps the fallback
+    # store fresh, so a failed fit on a lock day falls back to yesterday's posterior.
+    bayes = ctx.with_bayes
     models = {lg: fit_league(ctx.matches, ctx.fixtures, lg, now, ctx.prior, season,
                              ctx.second_tier, ctx.promo, bayes, ctx.store) for lg in LEAGUES}
     new = build_rows(cands, models, now, report.stale)
