@@ -1,0 +1,86 @@
+{
+  "use": false,
+  "rule": "favoured probability sets the start; wide interval or disagreement drops one tier; one flag caps at Medium; two or more force Low",
+  "thresholds": [
+    {
+      "market": "1x2_bdc",
+      "high": 0.58,
+      "low": 0.44,
+      "width_max": 0.16,
+      "disagree_max": 0.07,
+      "basis": "bdc forecasts, 2021/22 and 2022/23"
+    },
+    {
+      "market": "1x2_stack",
+      "high": 0.6,
+      "low": 0.44,
+      "width_max": 0.16,
+      "disagree_max": 0.07,
+      "basis": "stack forecasts, 2021/22 and 2022/23 (stack cross-fitted)"
+    },
+    {
+      "market": "goals_over_2_5",
+      "high": 0.61,
+      "low": 0.55,
+      "width_max": 0.16,
+      "disagree_max": null,
+      "basis": "dc_bayes_v1, 2021/22 and 2022/23"
+    },
+    {
+      "market": "corners_over_8.5",
+      "high": 0.7,
+      "low": 0.59,
+      "width_max": null,
+      "disagree_max": null,
+      "basis": "corners_total_poisson_v1, 2021/22 and 2022/23"
+    },
+    {
+      "market": "corners_over_9.5",
+      "high": 0.6,
+      "low": 0.56,
+      "width_max": null,
+      "disagree_max": null,
+      "basis": "corners_total_poisson_v1, 2021/22 and 2022/23"
+    },
+    {
+      "market": "corners_over_10.5",
+      "high": 0.68,
+      "low": 0.56,
+      "width_max": null,
+      "disagree_max": null,
+      "basis": "corners_total_poisson_v1, 2021/22 and 2022/23"
+    },
+    {
+      "market": "corners_over_11.5",
+      "high": 0.78,
+      "low": 0.67,
+      "width_max": null,
+      "disagree_max": null,
+      "basis": "corners_total_poisson_v1, 2021/22 and 2022/23"
+    },
+    {
+      "market": "cards_over_3.5",
+      "high": 0.71,
+      "low": 0.6,
+      "width_max": null,
+      "disagree_max": null,
+      "basis": "cards_nb_v1, 2021/22 and 2022/23"
+    },
+    {
+      "market": "cards_over_4.5",
+      "high": 0.76,
+      "low": 0.6,
+      "width_max": null,
+      "disagree_max": null,
+      "basis": "cards_nb_v1, 2021/22 and 2022/23"
+    },
+    {
+      "market": "cards_over_5.5",
+      "high": 0.87,
+      "low": 0.68,
+      "width_max": null,
+      "disagree_max": null,
+      "basis": "cards_nb_v1, 2021/22 and 2022/23"
+    }
+  ]
+}

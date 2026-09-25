@@ -1,0 +1,24 @@
+{
+  "models": [
+    "elo",
+    "dc",
+    "bdc",
+    "multinomial",
+    "ordered_logit",
+    "random_forest",
+    "xgboost"
+  ],
+  "weights": [
+    0.05,
+    0.05,
+    0.05,
+    0.3448,
+    0.05,
+    0.05,
+    0.4052
+  ],
+  "floor": 0.05,
+  "fitted_on": "2021/22 and 2022/23 walk-forward predictions",
+  "n_matches": 1520,
+  "use": false
+}

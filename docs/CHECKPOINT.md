@@ -1,40 +1,41 @@
 # Checkpoint
 
-## Latest: 25 Sep 2026, Phase 3b approved and live; awaiting approval to start Phase 4
+## Latest: 26 Sep 2026, Phase 4 built and tested; awaiting Lang's two decisions
 
 ### Done this session
-- Lang agreed to leave calibration off until Phase 4, and approved Phase 3b.
-- As-of features for corners and cards: rolling team averages, Elo gap at lock, league table at lock, derby list. Leakage-checked; a planted-future test passes; live and backtest paths give identical features.
-- Models: total-corners (Poisson) and total yellows (negative binomial, EPL referee effect).
-- Tuning (2021/22, 2022/23) and test (2023/24 to 2025/26) backtests on GitHub.
-- Corners and cards live since 25 Sep 2026 (Lang approved). They fill the primary ledger row. GitHub dry run and real run pass (2.5 minutes a run); corners and cards posteriors cached for the fallback.
-- Derby list approved by Lang and extended by 10 pairs for this season's clubs (39 pairs).
-- Report gains expected corners and expected yellows columns.
-- Walk-forward predictions for corners and cards kept in `data/backtests/`.
+- Four challengers (ordered logit, multinomial, Random Forest, XGBoost) on 28 lock-time features. Settings chosen on 2017/18 to 2020/21 only. Walk-forward with monthly refits on GitHub (run 36195202742, 5.5 minutes); predictions kept in `data/backtests/`.
+- Stacked ensemble with a 5% floor and the capped weekly re-weight (`src/fp/ensemble/stacking.py`), replayed over the test seasons.
+- Calibration revisited on the stack: no map passes the strict rule.
+- Confidence tiers (`src/fp/ensemble/tiers.py`, 6 tests): cut points from the tuning seasons in `data/tiers/thresholds.json` (not used live yet).
+- Report `reports/backtest_phase4.md` and figure `reports/figures/phase4_reliability.png` from `scripts/backtest_phase4.py` (36 s).
+- LEARN chapter 4; MODEL_CHANGELOG and DECISIONS updated.
 
-### Phase 3 acceptance checks
+### Phase 4 acceptance checks
 | Check | Result |
 |---|---|
-| Dispersion reported | Cards: negative binomial shape about 29 to 37 (mild extra spread). Corners per team: about 13, but home and away corners correlate negatively (−0.35 EPL, −0.27 La Liga), so the total is modelled directly and is close to Poisson (shape about 51). |
-| Log score beats league-average baseline | Cards: −0.019 (interval −0.028 to −0.010). Corners: −0.009 (interval −0.015 to −0.002). Both pass. |
-| Calibration plots | `reports/figures/calibration_cards.png`, `calibration_corners_total.png`: close to the diagonal on every line. |
-| Diagnostics | Test fits: corners 209 of 209, cards 208 of 209 (the one failure fell back to the previous good fit). |
-
-Also: cards beat a team-average baseline (−0.017); corners do not (level). Local: all tests pass except 2 that skip here. `ruff`, `mypy`, dash check pass.
+| Full backtest against the closing market | Test log loss: stack 0.9738, Bayesian 0.9759, Friday market 0.9601, closing market 0.9571. Stack minus Bayesian −0.0022 (interval −0.0064 to +0.0019), not clear. Stack minus Elo −0.0049 (clear). |
+| Tier hit rates clearly separated | 1X2 yes (Bayesian High 74%, Medium 54%, Low 43%; no overlap). Over/under: 2 of 8 lines only. |
+| Leakage red flag | Passed: no forecast above 60% top-pick accuracy (highest 54.4%). |
 
 ### Known weaknesses
-- Corners are barely more predictable than the clubs' own recent averages.
-- Dixon-Coles 1X2 still too timid since 2023/24 (Phase 4).
+- Blending adds little: the seven models share one signal, and the stack weights swing between near-identical models.
+- Still 0.014 behind the market at the Friday snapshot.
+- Over/under tiers barely separate.
+- The Bayesian model stays timid (slope 1.23); its High tier wins more than promised.
 
 ### Open questions for Lang
-1. Approve starting Phase 4 (challengers, stacking, calibration revisited, confidence tiers)?
+1. Published forecast: keep the Bayesian model and log the stack and four challengers as shadows (recommended), or publish the stack?
+2. Tiers in the ledger: switch on, with the promoted-club flag dropped from the caps (recommended) or exactly as specified?
 
 ### Next actions
 | Action | Owner |
 |---|---|
-| Approve Phase 4, or reply with changes. | Lang |
-| Watch `reports/latest.md` from Thu 8 Oct. | Lang |
-| Phase 4: challengers (ordered logit, multinomial, XGBoost, Random Forest), stacking, calibration revisited, confidence tiers. | Claude, after approval |
+| Answer the two questions. | Lang |
+| After approval: daily integration (lock-time challenger features, monthly challenger refits, shadow rows, tier columns), replay and dry run on GitHub before 8 Oct. | Claude |
+| Phase 5: news and the Question Queue. | Claude, after Phase 4 approval |
+
+### Working notes
+- XGBoost runs locally only when Python is started directly with scikit-learn's OpenMP library: `DYLD_LIBRARY_PATH=$PWD/.venv/lib/python3.12/site-packages/sklearn/.dylibs .venv/bin/python ...`. `uv run` drops the variable. GitHub needs nothing special.
 
 ### Facts still unverified
 - The `HxG` provider and whether it includes penalties.
@@ -47,3 +48,4 @@ Also: cards beat a team-average baseline (−0.017); corners do not (level). Loc
 - 24 Sep 2026, session 3: Phase 1 pipeline; CI green on GitHub. Phase 1F models, backtest, daily workflow live.
 - 24 to 25 Sep 2026, session 4: Phase 2 Bayesian model, tuning, GitHub-run test stage.
 - 25 Sep 2026, session 5: Bayesian model live as primary. Phase 3a calibration studied, not applied. Phase 3b corners and cards built and tested.
+- 26 Sep 2026, session 6: Phase 3b approved and live (25 Sep). Phase 4 challengers, stacking, calibration revisited, tiers; report written; awaiting decisions.

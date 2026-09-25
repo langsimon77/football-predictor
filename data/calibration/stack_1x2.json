@@ -1,0 +1,8 @@
+{
+  "method": "identity",
+  "fitted_on": "cross-fitted stack forecasts, 2021/22 and 2022/23",
+  "n_matches": 1520,
+  "chosen_on": "fit 2021/22, validate 2022/23",
+  "test_log_loss_change": 0.0,
+  "use": false
+}

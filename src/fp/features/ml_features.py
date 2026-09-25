@@ -63,6 +63,17 @@ def schedule(matches: pd.DataFrame, frame: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame.from_dict(out, orient="index")
 
 
+def promoted_teams(matches: pd.DataFrame) -> dict[tuple[str, int], int]:
+    """1 for a club in its first top-flight season after promotion, else 0."""
+    promoted: dict[tuple[str, int], int] = {}
+    for league in ("EPL", "LaLiga"):
+        tbs = season_teams(matches, league)
+        for season, teams in tbs.items():
+            for team in teams:
+                promoted[(team, season)] = int(team not in tbs.get(season - 1, teams))
+    return promoted
+
+
 def build(matches: pd.DataFrame) -> pd.DataFrame:
     frame = rolling.match_features(matches)
     frame = frame[frame["season"] >= FIRST_SEASON].copy()
@@ -71,12 +82,7 @@ def build(matches: pd.DataFrame) -> pd.DataFrame:
     for col in ("dc_home", "dc_draw", "dc_away", "dc_exp_goals_home", "dc_exp_goals_away"):
         frame[col] = frame["match_id"].map(fast[col])
     frame = frame.join(schedule(matches, frame), on="match_id")
-    promoted: dict[tuple[str, int], int] = {}
-    for league in ("EPL", "LaLiga"):
-        tbs = season_teams(matches, league)
-        for season, teams in tbs.items():
-            for team in teams:
-                promoted[(team, season)] = int(team not in tbs.get(season - 1, teams))
+    promoted = promoted_teams(matches)
     frame["promoted_home"] = [promoted.get((t, s), 0)
                               for t, s in zip(frame["home_id"], frame["season"], strict=True)]
     frame["promoted_away"] = [promoted.get((t, s), 0)

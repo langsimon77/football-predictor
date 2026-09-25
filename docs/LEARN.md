@@ -404,3 +404,118 @@ Inputs at lock: Elo gap +231 for Arsenal; Arsenal's matches average 5.1 corners 
 Both beat the league-average baseline, as spec S11 requires. Cards also clearly beat a simple team average. Corners do not: once you know the two clubs' recent corner rates, our model adds little. That is an honest finding about how predictable corners are.
 
 The calibration plots (`reports/figures/calibration_corners_total.png` and `calibration_cards.png`) show forecasts close to what happened on every line: when the model says 60% for over 9.5 corners, about 60% of those matches go over.
+
+## Chapter 4: Challengers, blending, and confidence tiers
+
+### 4.1 Four challengers
+
+So far every forecast came from models built on football logic: Elo and Dixon-Coles. Phase 4 adds four general-purpose models that learn the link between numbers and results straight from past matches:
+
+- **Ordered logit.** One number, "how much stronger is the home side", turned into home, draw, away by a fitted S-curve. Home win, draw, and away win are treated as steps on one ladder.
+- **Multinomial logistic regression.** Gives each of the three results its own weighted sum of the inputs. Draws are free to behave differently from wins.
+- **Random Forest.** 500 decision trees, each asking yes-or-no questions ("is the Elo gap above 120?"), then averaging their answers.
+- **XGBoost.** Trees built one after another, each fixing the previous ones' mistakes.
+
+They all read the same 28 inputs, each as it stood at the lock: the fast Dixon-Coles forecast, the Elo gap, rolling shots, corners, fouls and yellows, rest days, league games in the last 14 days, games played this season, promoted flags, derby, and late-season importance. No odds and no team news (spec S5.5, PRD item 6).
+
+### 4.2 Choosing settings without peeking
+
+Each model has dials, like the depth of the trees. We set them by testing on 2017/18 to 2020/21 only, always training on earlier matches and scoring later ones. The tuning and test seasons played no part. Then we walked forward over 2021/22 to 2025/26: at the first lock of each month, refit on results known by then, and forecast that month's matches [V: `data/backtests/challengers_walkforward_2021_2025_cv.parquet`].
+
+Simple settings won: the multinomial with the strongest shrinkage, XGBoost with the shallowest trees (two questions deep) and the fewest of them, Random Forest with large leaves. A sign that there is little extra pattern to find.
+
+### 4.3 Blending: the stacked ensemble
+
+A stack is a weighted average of the models' probabilities:
+
+$$p_{\text{stack}} = w_1\, p_{\text{Elo}} + w_2\, p_{\text{fast DC}} + \dots + w_7\, p_{\text{XGBoost}}$$
+
+The weights are fitted to give the lowest log loss on the tuning seasons, with every model kept at 5% or more so it can earn its way back (spec S5.6). The fit gave XGBoost 41%, the multinomial 34%, and 5% to each of the other five [V: `data/stacking/stack_1x2.json`].
+
+### 4.4 What the test seasons say (2023/24 to 2025/26, 2,227 matches with odds, scored once)
+
+| Forecast | Log loss |
+|---|---|
+| League base rates | 1.0702 |
+| Elo | 0.9786 |
+| XGBoost | 0.9775 |
+| Fast Dixon-Coles | 0.9770 |
+| Bayesian (live primary) | 0.9759 |
+| Random Forest | 0.9752 |
+| Ordered logit | 0.9746 |
+| Multinomial | 0.9739 |
+| **Stack** | **0.9738** |
+| Market at the Friday or Tuesday snapshot | 0.9601 |
+| Sharp closing market | 0.9571 |
+
+[V: `reports/backtest_phase4.md`]
+
+- The stack beats Elo clearly (−0.0049, interval −0.0096 to −0.0005).
+- It beats the Bayesian model on average (−0.0022), but the interval (−0.0064 to +0.0019) includes zero. Not proven.
+- Apart from base rates, every model sits within 0.005 of the others. The market is 0.014 ahead even at the Friday or Tuesday snapshot, taken at about the same time as our lock [E: football-data.co.uk notes, PRD item 9].
+
+**Why the blend barely helps.** Blending pays when models make different mistakes. These seven all read the same thing, team strength from past results, so they make nearly the same mistakes. The weights show it: fitted on 2021/22 alone, Random Forest gets 48%; on 2022/23 alone, XGBoost gets 59%, and Random Forest drops to the 5% floor. When the weights swing like that, the data cannot tell the models apart. Equal weights on all seven do just as well on the tuning seasons.
+
+**The recommendation** follows the rule we used for calibration: change only when the whole interval favours the change. Keep the Bayesian model as the published forecast. Log the stack and the four challengers every day as shadow models, like Elo today, and test again at the end of 2026/27 with a full live season added.
+
+One thing the stack does better: it is less timid (calibration slope 1.10 against 1.23 for the Bayesian model), because the challengers learn their probabilities straight from results. No calibration map improved it further [V: section 4 of the report].
+
+### 4.5 Confidence tiers: a safety margin that hides nothing
+
+Every match still gets a forecast. The tier is a label: how far to trust it.
+
+**Why it helps.** A 70% forecast that is honest still loses 3 times in 10. The tier cannot change that. What it can do is sort the forecasts so that the High group holds the matches where the model is surest and nothing is known to be wrong with the inputs. You then know which forecasts to lean on. Nothing is hidden: Medium and Low are published beside High, with their own records.
+
+**Why small and good beats large and poor.** A High tier that covers 20% of matches and wins 74% of the time tells you something. A High tier that covers 60% and wins 55% is just the average forecast with a badge. The margin costs coverage; the dashboard will show both the record and the coverage so you can see the trade (spec S7).
+
+**The rule.**
+
+1. Favoured probability sets the starting tier. For home, draw, away that is the top probability. For an over/under line it is the chance of the likelier side. Cut points come from the tuning seasons: the top quarter starts High, the bottom third starts Low [A: the quarter and third are design choices].
+2. Uncertainty drops one tier: an 80% interval wider than 90% of tuning forecasts, or the stack and the Bayesian model disagreeing more than 90% of tuning forecasts.
+3. Data flags: one caps the tier at Medium; two force Low. Flags: promoted club with fewer than 6 league games, unknown referee (cards), manager change in the last 30 days, unanswered key question, source failure.
+
+**Results for the Bayesian forecast, test seasons** [V: section 6 of the report]:
+
+| Tier | Share of matches | Promised (mean top probability) | Favourite won | 95% interval |
+|---|---|---|---|---|
+| High | 19% | 68% | 74% | 70% to 78% |
+| Medium | 42% | 53% | 54% | 51% to 57% |
+| Low | 39% | 42% | 43% | 39% to 46% |
+
+The three tiers are clearly apart: no interval overlaps the next. High wins more often than promised, the known timidity from chapter 2.
+
+**The honest test (PRD item 13).** Separation by top probability is arithmetic: any sensible model shows it. The real question is whether the other inputs pick out forecasts that do worse than they promise. We measure "excess surprise": the log loss a forecast earned, minus the log loss it expected of itself. Zero means honest; above zero means worse than promised.
+
+- **Wide interval, disagreement:** no clear effect for the Bayesian forecast. For the stack, big disagreement with the Bayesian model does flag worse forecasts on the test seasons (+0.083, interval +0.012 to +0.154).
+- **Promoted club, early season:** the opposite of its purpose. Those forecasts did *better* than promised (−0.084, interval −0.154 to −0.010). The promoted-team prior from chapter 2 appears to handle them well. I recommend dropping this flag from the caps.
+- **Unknown EPL referee:** cards over 3.5 forecasts without a known referee do worse than promised (+0.030, interval +0.009 to +0.049). The flag earns its place.
+- **Over/under lines:** forecasts sit between about 50% and 75%, so the tiers barely separate. Clearly separated on only 2 of 8 lines. Read an over/under High as "a bit surer", not "safe".
+
+### 4.6 Worked example: Arsenal v Leeds, locked Fri 9 Oct, 04:41 UTC
+
+Every challenger was refitted on the 6,959 matches with results known at lock and fed this match's lock-time inputs: Elo gap +231 for Arsenal, 14 days' rest each, 5 league games played each, neither promoted [V: computed 26 Sep 2026 from results up to 20 Sep; Bayesian numbers from section 2.6].
+
+| Model | Arsenal | Draw | Leeds | Weight in stack |
+|---|---|---|---|---|
+| Elo | 69.8% | 18.6% | 11.6% | 5% |
+| Fast Dixon-Coles | 60.0% | 25.1% | 14.8% | 5% |
+| Bayesian | 62% | 24% | 14% | 5% |
+| Ordered logit | 62.9% | 22.1% | 15.0% | 5% |
+| Multinomial | 61.2% | 24.0% | 14.7% | 34% |
+| Random Forest | 66.3% | 21.8% | 11.9% | 5% |
+| XGBoost | 64.0% | 23.8% | 12.2% | 41% |
+| **Stack** | **63.1%** | **23.5%** | **13.4%** | |
+
+Tiers for the published Bayesian forecast:
+
+| Market | Favoured side | Tier | Why |
+|---|---|---|---|
+| 1X2 | Arsenal 62% | High | 62% is above the 58% cut; interval 14 points wide (limit 16); stack and Bayesian differ by 1 point (limit 7); no flags. |
+| Over/under 2.5 goals | Under, 56% | Medium | Between the 55% and 61% cuts. |
+| Over/under 9.5 corners | Over, 54% | Low | Below the 56% cut. |
+| Over/under 4.5 yellows | Under, 74% | Medium | Between the 60% and 76% cuts; the referee is unknown at lock (Saturday), which would cap it at Medium anyway. |
+
+### 4.7 What waits for your decision
+
+1. Keep the Bayesian model as the published forecast and log the stack and the four challengers as shadows (recommended), or publish the stack.
+2. Switch tiers on in the ledger, with or without the promoted-club flag (recommended: without).
