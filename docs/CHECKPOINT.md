@@ -1,35 +1,41 @@
 # Checkpoint
 
-## Latest: 25 Sep 2026, Bayesian model live; Phase 3a (calibration) complete, awaiting Lang's approval
+## Latest: 25 Sep 2026, Phase 3b (corners and cards) complete, awaiting Lang's approval
 
 ### Done this session
-- Phase 2 approved. `dc_bayes_v1` is live as the primary model; `dc_mle_v0` and `elo_v0` run beside it. It refits on every daily run. Verified on GitHub with a dry run and a real run; first posteriors cached for the fallback.
-- The live report shows the primary model with its 80% home-win range and scores every model side by side.
-- Phase 3a (calibration, moved forward by Lang): built power and Dirichlet calibration with tests; scored on the tuning and test seasons; tested the spec's monthly walk-forward version.
-- Backtests now store the full scoreline table; 3,800 walk-forward predictions kept in `data/backtests/`.
+- Lang agreed to leave calibration off until Phase 4, and approved Phase 3b.
+- As-of features for corners and cards: rolling team averages, Elo gap at lock, league table at lock, derby list. Leakage-checked; a planted-future test passes; live and backtest paths give identical features.
+- Models: total-corners (Poisson) and total yellows (negative binomial, EPL referee effect).
+- Tuning (2021/22, 2022/23) and test (2023/24 to 2025/26) backtests on GitHub.
+- Daily integration built behind `COUNTS_LIVE` (off). Corners and cards go on the primary ledger row. Replay passes; about one minute per daily run.
+- Report gains expected corners and expected yellows columns.
+- Walk-forward predictions for corners and cards kept in `data/backtests/`.
 
-### Phase 3a findings
-| Question | Answer |
+### Phase 3 acceptance checks
+| Check | Result |
 |---|---|
-| Does a fixed map from the tuning seasons help? | No. The model was not timid in 2021/22 and 2022/23, so the map is nearly "no change". Test log loss −0.0003, interval −0.0027 to +0.0021. |
-| Does a monthly map help? | It fixes the timidity (slope 1.24 to 1.09, level with the market) but the accuracy gain is not clear (log loss interval −0.0035 to +0.0017), and BTTS gets slightly worse (+0.0009). |
-| Apply either live? | **Recommend no.** Neither passes the clear-improvement rule. Revisit in Phase 4 with the Elo blend. |
+| Dispersion reported | Cards: negative binomial shape about 29 to 37 (mild extra spread). Corners per team: about 13, but home and away corners correlate negatively (−0.35 EPL, −0.27 La Liga), so the total is modelled directly and is close to Poisson (shape about 51). |
+| Log score beats league-average baseline | Cards: −0.019 (interval −0.028 to −0.010). Corners: −0.009 (interval −0.015 to −0.002). Both pass. |
+| Calibration plots | `reports/figures/calibration_cards.png`, `calibration_corners_total.png`: close to the diagonal on every line. |
+| Diagnostics | Test fits: corners 209 of 209, cards 208 of 209 (the one failure fell back to the previous good fit). |
+
+Also: cards beat a team-average baseline (−0.017); corners do not (level). Local: all tests pass except 2 that skip here. `ruff`, `mypy`, dash check pass.
 
 ### Known weaknesses
-- The Bayesian model is too timid since 2023/24 (slope 1.24). Accepted for now; Phase 4.
-- The 80% intervals reflect parameter uncertainty only.
-- No corners, cards, news, or tiers yet.
+- Corners are barely more predictable than the clubs' own recent averages.
+- Dixon-Coles 1X2 still too timid since 2023/24 (Phase 4).
+- The derby list is my seed (Assumption).
 
 ### Open questions for Lang
-1. Accept the recommendation not to switch calibration on, and revisit it in Phase 4?
-2. Approve moving on to Phase 3b: corners and cards models?
+1. Approve Phase 3b and switch corners and cards live before the first lock (Thu 8 Oct)?
+2. Check the derby list in `data/manual/derbies.csv`: add, remove, or approve as is.
 
 ### Next actions
 | Action | Owner |
 |---|---|
 | Answer the two questions above. | Lang |
-| Watch `reports/latest.md` from Thu 8 Oct. | Lang |
-| Phase 3b: hierarchical negative binomial models for corners and cards (spec S5.3, S5.4). | Claude, after approval |
+| If approved: flip `COUNTS_LIVE`, dry-run on GitHub, confirm the count posteriors are cached. | Claude |
+| Phase 4: challengers (ordered logit, multinomial, XGBoost, Random Forest), stacking, calibration revisited, confidence tiers. | Claude, after approval |
 
 ### Facts still unverified
 - The `HxG` provider and whether it includes penalties.
@@ -41,4 +47,4 @@
 - 23 Sep 2026, session 2: Phase 0 data audit. Understat and FPL barred; openfootball added; 72 mapping tests.
 - 24 Sep 2026, session 3: Phase 1 pipeline; CI green on GitHub. Phase 1F models, backtest, daily workflow live.
 - 24 to 25 Sep 2026, session 4: Phase 2 Bayesian model, tuning, GitHub-run test stage.
-- 25 Sep 2026, session 5: Bayesian model live as primary. Phase 3a calibration studied, not applied.
+- 25 Sep 2026, session 5: Bayesian model live as primary. Phase 3a calibration studied, not applied. Phase 3b corners and cards built and tested.

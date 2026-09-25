@@ -8,3 +8,6 @@ Our own walk-forward predictions, kept because GitHub deletes workflow artifacts
 | `dc_bayes_v1_walkforward_2021_2025_fits.parquet` | One row per weekly fit: time, diagnostics, pass or fail. 345 fits, all passed. | Same runs |
 
 Each prediction was made at the daily run that would have locked it, from a fit made at or before that time on results known by then.
+| `cards_nb_walkforward_2021_2025.parquet` | 3,800 predictions of `cards_nb_v1`: expected total yellows, over 3.5, 4.5, 5.5, the full distribution of the total (0 to 16), whether the EPL referee was known at lock. | GitHub runs 36188267315 (tuning) and 36191021061 (test), 25 Sep 2026 |
+| `corners_total_poisson_walkforward_2021_2025.parquet` | 3,800 predictions of `corners_total_poisson_v1`: expected total and per-team corners, over 8.5 to 11.5, the full distribution of the total (0 to 30). | GitHub runs 36190976694 (tuning) and 36192216819 (test), 25 Sep 2026 |
+| `*_fits.parquet` | One row per weekly fit with diagnostics and, for negative binomial models, the dispersion estimate. | Same runs |

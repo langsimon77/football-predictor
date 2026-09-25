@@ -345,3 +345,62 @@ Two further points. First, the calibration question returns in Phase 4, where th
 ### 3a.4 The general lesson
 
 Proper scoring rules (RPS, log loss) are dominated by the randomness of football itself. A correction that moves a 68% forecast to 74% changes the score of each such match only a little, so even a real improvement in honesty can be invisible in the average score over three seasons. That is why we track the slope separately, and why a clear-improvement rule protects us from fooling ourselves in both directions.
+
+---
+
+## Chapter 3b: Corners and yellow cards
+
+### 3b.1 Counting things: Poisson and negative binomial
+
+Corners and cards are counts: 0, 1, 2, and so on. The simplest model for a count is the Poisson distribution, where the spread (variance) equals the average. Real counts often spread more than that. The negative binomial adds one number, $\alpha$, to allow it:
+
+$$\text{variance} = \text{mean} + \frac{\text{mean}^2}{\alpha}$$
+
+A large $\alpha$ means nearly Poisson; a small one means much wider. The spec asks us to test both and keep the negative binomial unless the data show no extra spread.
+
+### 3b.2 The corners surprise: the two sides pull against each other
+
+Our first corners model predicted each team's corners separately, then added them up as if they were independent. Each team's corners do spread more than Poisson ($\alpha \approx 13$). But the total came out worse than simply using the league average [V: `reports/backtest_phase3b_corners_tune.md`].
+
+The reason: home and away corners are **negatively correlated**, −0.35 in the EPL and −0.27 in La Liga over 2021/22 and 2022/23 [V: computed from the match data]. When one side leads, it sits back, and the side chasing the game wins corners. Adding two independent counts makes the total too spread out, because independence ignores this pull.
+
+The fix was to model the match total directly. Each club gets a "corner tendency" effect (how many corners its matches produce), plus how lopsided the match looks (Elo gap at lock) and both sides' recent shot volume. Once modelled this way, the total is close to Poisson ($\alpha \approx 51$), and the Poisson version scored best. Each side's expected corners come from splitting the total by the clubs' recent corner shares.
+
+Yellow cards behave the other way: home and away yellows correlate positively (+0.18 EPL, +0.27 La Liga), because tense matches book both sides. The cards model works on the total from the start.
+
+### 3b.3 The cards model
+
+$$\log(\text{expected yellows}) = \text{league level} + \text{discipline}_{\text{home}} + \text{discipline}_{\text{away}} + \text{referee} + \text{match terms}$$
+
+- **Club discipline:** pooled across the league, like attack and defence in chapter 2.
+- **Referee:** EPL only (decision D3), also pooled. La Liga referees are appointed the day before kickoff, after our lock, so the model never uses them. For EPL matches where the appointment is not known at lock (Friday, Saturday, Tuesday, Wednesday kickoffs), the forecast averages over the referee spread, which makes it slightly wider.
+- **Match terms:** how close the match looks, recent fouls, derby, and late-season importance.
+
+What the data say [V: fit as of 9 Oct 2026]: derbies bring about 19% more yellows ($e^{0.177}$). Closeness and fouls matter a little. The spread between EPL referees is only about 3.6% once clubs and match type are accounted for, far less than football folklore suggests. So skipping referee questions (D3) costs little.
+
+### 3b.4 No peeking: features at lock time
+
+"How lopsided is this match?" uses the Elo gap as it stood at the lock, not a rating fitted later (PRD item 7). Rolling averages of shots, corners, fouls, and yellows use only results known at the lock. A test plants a fake 9-0 thrashing on the Saturday afternoon and checks that Man City's features for their Sunday match do not move. The live path and the backtest path give identical features for the same match.
+
+### 3b.5 Worked example: Arsenal v Leeds, locked Fri 9 Oct, 04:41 UTC
+
+| | Forecast |
+|---|---|
+| Expected corners | Arsenal 5.8, Leeds 4.2 |
+| Over 9.5 corners | 54% |
+| Expected yellow cards | 3.4 |
+| Over 4.5 yellows | 26% |
+| Referee | Not known at lock (Saturday kickoff), so averaged |
+
+Inputs at lock: Elo gap +231 for Arsenal; Arsenal's matches average 5.1 corners for and 3.5 against; Leeds 4.4 for and 5.8 against [V: `features_for_fixtures` as of 9 Oct].
+
+### 3b.6 Results on the test seasons (2023/24 to 2025/26, 2,280 matches, scored once)
+
+| Model | Log score against league average | Against team average |
+|---|---|---|
+| Yellow cards (negative binomial) | −0.019 (interval −0.028 to −0.010) | −0.017 (interval −0.027 to −0.007) |
+| Corners (total, Poisson) | −0.009 (interval −0.015 to −0.002) | −0.001 (not significant) |
+
+Both beat the league-average baseline, as spec S11 requires. Cards also clearly beat a simple team average. Corners do not: once you know the two clubs' recent corner rates, our model adds little. That is an honest finding about how predictable corners are.
+
+The calibration plots (`reports/figures/calibration_corners_total.png` and `calibration_cards.png`) show forecasts close to what happened on every line: when the model says 60% for over 9.5 corners, about 60% of those matches go over.

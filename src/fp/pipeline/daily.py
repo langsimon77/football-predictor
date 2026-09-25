@@ -33,11 +33,13 @@ import numpy as np
 import pandas as pd
 
 from fp import ROOT, ledger
+from fp.features import rolling
 from fp.ingest import matches as build
 from fp.models import bayes_dc, elo, posterior_store
 from fp.models import dixon_coles as dc
 from fp.models.priors import PromotedPrior, season_teams
 from fp.models.promotion import PromotionModel, fit_promotion_model, promoted_priors
+from fp.pipeline import counts_live
 from fp.pipeline import data as data_pipeline
 from fp.validate import freshness
 from fp.validate.leakage import LOCK_MAX_HOURS, LOCK_MIN_HOURS, RUN_TIME_UTC, known_as_of
@@ -138,7 +140,9 @@ def candidates(fixtures: pd.DataFrame, now: pd.Timestamp, existing: pd.DataFrame
 
 
 def build_rows(cands: pd.DataFrame, models: dict[str, LeagueModels], now: pd.Timestamp,
-               stale: bool) -> pd.DataFrame:
+               stale: bool, counts: dict[str, counts_live.LeagueCounts] | None = None,
+               fixture_features: pd.DataFrame | None = None,
+               referees: dict[str, str] | None = None) -> pd.DataFrame:
     version, dirty = model_version()
     rows = []
     for r in cands.itertuples():
@@ -171,6 +175,13 @@ def build_rows(cands: pd.DataFrame, models: dict[str, LeagueModels], now: pd.Tim
             b_top, b_iv = b.pop("top_scorelines"), b.pop("intervals")
             b.pop("matrix")
             b_flags = flags + (["posterior_fallback"] if m.bayes_fallback else [])
+            if counts is not None and fixture_features is not None:
+                # Corners and cards ride on the primary row: one row, one full forecast.
+                c_cols, c_flags = counts_live.columns(
+                    counts[str(r.league)], fixture_features, str(r.match_id),
+                    (referees or {}).get(str(r.match_id)))
+                b.update(c_cols)
+                b_flags += c_flags
             rows.append({
                 **common, **b, "prediction_id": f"{r.match_id}:{BAYES_MODEL}",
                 "model_name": BAYES_MODEL, "degraded": m.bayes_fallback,
@@ -241,11 +252,15 @@ def write_report(ledger_frame: pd.DataFrame, results: pd.DataFrame, now: pd.Time
         "## Locked, not yet played",
         "",
         "| Kickoff (Juba) | Match | Home (80% range) | Draw | Away | Over 2.5 | BTTS | "
-        "Exp. goals | Flags |",
-        "|---|---|---|---|---|---|---|---|---|",
+        "Exp. goals | Exp. corners | Exp. yellows | Flags |",
+        "|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for r in upcoming.itertuples():
-        flags = [f.split(":")[0] for f in json.loads(str(r.flags)) if f != "fast_track_model"]
+        flags = [f.split(":")[0] for f in json.loads(str(r.flags))
+                 if f != "fast_track_model" and not f.startswith("counts:")]
+        c_home, c_away = cast(float, r.exp_corners_home), cast(float, r.exp_corners_away)
+        corners = f"{c_home:.1f} to {c_away:.1f}" if pd.notna(c_home) else ""
+        yellows = f"{cast(float, r.exp_yellows):.1f}" if pd.notna(r.exp_yellows) else ""
         if r.model_name != PRIMARY_MODEL:
             flags.append(f"shown from {r.model_name}")
         intervals = json.loads(str(r.intervals)) if isinstance(r.intervals, str) else {}
@@ -257,10 +272,11 @@ def write_report(ledger_frame: pd.DataFrame, results: pd.DataFrame, now: pd.Time
         lines.append(
             f"| {kickoff:%a %d %b %H:%M} | {short[r.home_id]} v {short[r.away_id]} | {home} | "
             f"{r.p_draw:.0%} | {r.p_away:.0%} | {r.p_over_2_5:.0%} | {r.p_btts:.0%} | "
-            f"{r.exp_goals_home:.1f} to {r.exp_goals_away:.1f} | {', '.join(flags) or 'none'} |"
+            f"{r.exp_goals_home:.1f} to {r.exp_goals_away:.1f} | {corners} | {yellows} | "
+            f"{', '.join(flags) or 'none'} |"
         )
     if upcoming.empty:
-        lines.append("| none | | | | | | | | |")
+        lines.append("| none | | | | | | | | | | |")
 
     scored = ledger_frame.merge(results, on="match_id") if len(results) else None
     if scored is not None and len(scored):
@@ -274,6 +290,14 @@ def write_report(ledger_frame: pd.DataFrame, results: pd.DataFrame, now: pd.Time
                          f"{(probs.argmax(axis=1) == y).mean():.0%} |")
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def known_referees(appointments: pd.DataFrame | None, now: pd.Timestamp) -> dict[str, str]:
+    """EPL referee appointments our pipeline had actually seen by `now`."""
+    if appointments is None or appointments.empty:
+        return {}
+    seen = appointments[appointments["first_seen_utc"] <= now]
+    return dict(zip(seen["match_id"], seen["referee"], strict=True))
 
 
 @dataclass
@@ -290,6 +314,8 @@ class Context:
     report_path: Path | None
     with_bayes: bool
     store: Path = posterior_store.STORE
+    with_counts: bool = False
+    referee_appointments: pd.DataFrame | None = None
 
 
 def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataFrame:
@@ -302,7 +328,15 @@ def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataF
     bayes = ctx.with_bayes
     models = {lg: fit_league(ctx.matches, ctx.fixtures, lg, now, ctx.prior, season,
                              ctx.second_tier, ctx.promo, bayes, ctx.store) for lg in LEAGUES}
-    new = build_rows(cands, models, now, report.stale)
+    counts = fixture_features = referees = None
+    if ctx.with_counts:
+        features = rolling.match_features(known_as_of(ctx.matches, now))
+        counts = {lg: counts_live.fit_league(ctx.matches, features, lg, now, ctx.store)
+                  for lg in LEAGUES}
+        if len(cands):
+            fixture_features = rolling.features_for_fixtures(cands, ctx.matches, now)
+            referees = known_referees(ctx.referee_appointments, now)
+    new = build_rows(cands, models, now, report.stale, counts, fixture_features, referees)
     log.info("%s: %d matches to lock", now, len(cands))
     if len(new) and not dry_run:
         existing = ledger.append(new, ctx.ledger_path)
@@ -321,6 +355,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--ledger", type=Path, default=ledger.PREDICTIONS)
     parser.add_argument("--with-bayes", action="store_true",
                         help="include the Bayesian model even before it is live")
+    parser.add_argument("--with-counts", action="store_true",
+                        help="include corners and cards even before they are live")
     args = parser.parse_args(argv)
 
     data_pipeline.main(skip_download=args.offline)
@@ -339,6 +375,8 @@ def main(argv: list[str] | None = None) -> int:
                      else None if args.dry_run else REPORT),
         with_bayes=BAYES_LIVE or args.with_bayes,
         store=(args.ledger.parent / "posteriors" if replay else posterior_store.STORE),
+        with_counts=counts_live.COUNTS_LIVE or args.with_counts,
+        referee_appointments=pd.read_parquet(build.PROCESSED / "referee_appointments.parquet"),
     )
 
     if replay:

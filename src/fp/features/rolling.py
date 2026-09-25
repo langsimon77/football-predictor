@@ -69,7 +69,10 @@ def rolling_at(targets: pd.DataFrame, state: pd.DataFrame, team_col: str,
                prefix: str) -> pd.DataFrame:
     """Latest rolling averages for targets[team_col] known at targets['lock_utc']."""
     left = targets[["match_id", team_col, "lock_utc"]].rename(columns={team_col: "team"})
+    left["lock_utc"] = left["lock_utc"].astype("datetime64[ns, UTC]")
     left = left.sort_values("lock_utc")
+    state = state.assign(result_available_utc=state["result_available_utc"].astype(
+        "datetime64[ns, UTC]"))
     merged = pd.merge_asof(left, state, left_on="lock_utc", right_on="result_available_utc",
                            by="team", direction="backward", allow_exact_matches=True)
     cols = [c for c in state.columns if c.startswith("ewm_")]
@@ -98,8 +101,10 @@ def derby_pairs() -> set[frozenset[str]]:
     return {frozenset((a, b)) for a, b in zip(table["team_a"], table["team_b"], strict=True)}
 
 
-def standings_at(season_matches: pd.DataFrame, as_of: pd.Timestamp) -> pd.DataFrame:
-    """League table from results known at as_of: points, goal difference, games played."""
+def standings_at(season_matches: pd.DataFrame, as_of: pd.Timestamp,
+                 teams: list[str] | None = None) -> pd.DataFrame:
+    """League table from results known at as_of: points, goal difference, games played.
+    teams: every club in the league this season (default: those in season_matches)."""
     known = season_matches[season_matches["result_available_utc"] <= as_of]
     rows = []
     for h, a, hg, ag in zip(known["home_id"], known["away_id"],
@@ -108,7 +113,7 @@ def standings_at(season_matches: pd.DataFrame, as_of: pd.Timestamp) -> pd.DataFr
         hp, ap = (3, 0) if hg > ag else (1, 1) if hg == ag else (0, 3)
         rows.append((h, hp, hg - ag))
         rows.append((a, ap, ag - hg))
-    teams = sorted(set(season_matches["home_id"]))
+    teams = teams or sorted(set(season_matches["home_id"]))
     table = pd.DataFrame(rows, columns=["team", "points", "gd"])
     agg = table.groupby("team").agg(points=("points", "sum"), gd=("gd", "sum"),
                                     played=("points", "size"))
@@ -160,5 +165,53 @@ def match_features(matches: pd.DataFrame) -> pd.DataFrame:
     frame["as_of_utc"] = frame["lock_utc"]
     frame["source_max_utc"] = frame[["home_source_utc", "away_source_utc"]].max(axis=1)
     frame["source_max_utc"] = frame["source_max_utc"].fillna(frame["lock_utc"])
+    check_features(frame)
+    return frame
+
+
+def features_for_fixtures(fixtures: pd.DataFrame, matches: pd.DataFrame,
+                          now: pd.Timestamp) -> pd.DataFrame:
+    """As-of features for upcoming fixtures, computed at the actual lock time `now`.
+
+    fixtures needs match_id, league, season, home_id, away_id, kickoff_utc.
+    Uses only results known at `now`, exactly like match_features does for the past.
+    """
+    frame = fixtures[["match_id", "league", "season", "home_id", "away_id",
+                      "kickoff_utc"]].copy()
+    frame["lock_utc"] = now
+    known = matches[matches["result_available_utc"] <= now]
+    state = rolling_state(known)
+    frame = frame.join(rolling_at(frame, state, "home_id", "home_"), on="match_id")
+    frame = frame.join(rolling_at(frame, state, "away_id", "away_"), on="match_id")
+    gaps, important = {}, {}
+    for league, group in frame.groupby("league"):
+        season = int(group["season"].iloc[0])
+        teams_by_season = season_teams(known, str(league))
+        teams_by_season[season] = set(group["home_id"]) | set(group["away_id"]) | \
+            teams_by_season.get(season, set())
+        tracker = elo.EloTracker(known[known["league"] == league], teams_by_season)
+        tracker.advance_to(now)
+        tracker.ensure_season(season)
+        season_games = known[(known["league"] == league) & (known["season"] == season)]
+        table = standings_at(season_games, now, sorted(teams_by_season[season]))
+        top = table["points"].iloc[0]
+        line = table["points"].iloc[DROP_PLACE - 2]
+        for r in group.itertuples():
+            gaps[r.match_id] = tracker.gap(str(r.home_id), str(r.away_id))
+            flag = False
+            for team in (r.home_id, r.away_id):
+                row = table.loc[team]
+                if row["played"] >= LATE_SEASON_PLAYED:
+                    flag = flag or top - row["points"] <= RACE_POINTS \
+                        or abs(row["points"] - line) <= RACE_POINTS
+            important[r.match_id] = int(flag)
+    frame["elo_gap"] = frame["match_id"].map(gaps)
+    frame["important"] = frame["match_id"].map(important).astype(int)
+    pairs = derby_pairs()
+    frame["derby"] = [int(frozenset((h, a)) in pairs)
+                      for h, a in zip(frame["home_id"], frame["away_id"], strict=True)]
+    frame["as_of_utc"] = now
+    frame["source_max_utc"] = frame[["home_source_utc", "away_source_utc"]].max(axis=1)
+    frame["source_max_utc"] = frame["source_max_utc"].fillna(now)
     check_features(frame)
     return frame
