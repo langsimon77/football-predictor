@@ -304,3 +304,44 @@ The cure is a calibration map, a small curve fitted on the tuning seasons that s
 
 - **Goals only, no shots on target.** Tuning RPS 0.2031 against 0.2014 with shots. Dropped.
 - **Random-walk ratings** that drift month by month instead of time-decay weights (spec S5.1 challenger). On 2022/23: RPS 0.2075 against 0.2063, twice the fitting time, and 2 of 35 fits failed diagnostics. Dropped.
+
+---
+
+## Chapter 3a: Calibration, and why we did not switch it on
+
+### 3a.1 What calibration means
+
+A forecaster is calibrated if, of all the times it says 70%, the thing happens about 70% of the time. Phase 2 found our model saying 68% where the home side won 74%: too timid. A calibration map is a small correction fitted to past forecasts and results that stretches the forecasts back into line.
+
+We tried two maps (spec S5.6):
+
+- **Power scaling:** raise each of the three probabilities to a power $\alpha$ and rescale so they sum to 1. With $\alpha > 1$, favourites go up and long shots go down.
+- **Dirichlet calibration:** a small linear map on the logarithms of the three probabilities, $q = \text{softmax}(W \log p + b)$, pulled towards "no change" by a penalty. The three-outcome version of beta calibration.
+
+After calibrating home, draw, and away, the scoreline table is stretched region by region to match (PRD item 22), so the heatmap, over/under, and both-teams-to-score all stay consistent.
+
+### 3a.2 What happened
+
+**The fixed map did nothing useful.** We chose the method on the tuning seasons (fit on 2021/22, check on 2022/23), as always. But in those seasons the model was *not* timid: its slope on 2022/23 was 0.97, almost perfect. So the best map was nearly "no change". On the test seasons it improved log loss by 0.0003, with a 95% interval from −0.0027 to +0.0021: noise [V: `reports/calibration_phase3a.md`].
+
+**The timidity is new.** It appeared from 2023/24. That fits the Elo result: Elo refits its probability curve at every lock on recent results, so it adapts when the leagues become more lopsided. A map fitted once cannot follow a moving target.
+
+**A monthly map follows it.** Spec S5.6 already describes refitting the map every month on recent predictions. We tested that, each month using only predictions whose results were known before the month began:
+
+| | Slope | RPS | Log loss |
+|---|---|---|---|
+| Raw | 1.24 | 0.1967 | 0.9745 |
+| Monthly map | 1.09 | 0.1963 | 0.9737 |
+| Sharp market, for reference | 1.08 | | |
+
+The shape is fixed: the forecasts are now as honest at the extremes as the market's. But the accuracy gain is small and not clear (log loss interval −0.0035 to +0.0017), and both-teams-to-score gets slightly worse (+0.0009, a real but tiny cost of stretching the table).
+
+### 3a.3 Why we did not switch it on
+
+Our rule: apply a correction only if it clearly improves out-of-sample log loss, meaning the whole 95% interval of the change sits below zero. Neither map passes. A small, uncertain gain is not worth changing live forecasts for.
+
+Two further points. First, the calibration question returns in Phase 4, where the Bayesian model is blended with Elo; Elo's adaptive, well-calibrated probabilities may fix the timidity as part of the blend. Second, nothing is lost by waiting. Calibration is a fixed transformation of the raw locked probabilities, fitted only on the past, so we can compute at any time what a calibrated forecast would have said.
+
+### 3a.4 The general lesson
+
+Proper scoring rules (RPS, log loss) are dominated by the randomness of football itself. A correction that moves a 68% forecast to 74% changes the score of each such match only a little, so even a real improvement in honesty can be invisible in the average score over three seasons. That is why we track the slope separately, and why a clear-improvement rule protects us from fooling ourselves in both directions.
