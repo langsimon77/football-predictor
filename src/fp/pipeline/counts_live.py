@@ -27,8 +27,8 @@ from fp.validate.leakage import known_as_of
 
 log = logging.getLogger(__name__)
 
-# Off until Lang approves Phase 3b (spec S0: model changes wait for approval).
-COUNTS_LIVE = False
+# Live since Lang approved Phase 3b on 25 Sep 2026 (spec S0).
+COUNTS_LIVE = True
 CORNERS_MODEL = "corners_total_poisson_v1"
 CARDS_MODEL = "cards_nb_v1"
 STORE = ROOT / "data" / "posteriors"

@@ -1,30 +1,40 @@
 team_a,team_b,name,label
-arsenal,tottenham,North London derby,Assumption: common usage; Lang to confirm
-man_city,man_united,Manchester derby,Assumption: common usage; Lang to confirm
-liverpool,everton,Merseyside derby,Assumption: common usage; Lang to confirm
-liverpool,man_united,North West derby,Assumption: common usage; Lang to confirm
-newcastle,sunderland,Tyne-Wear derby,Assumption: common usage; Lang to confirm
-chelsea,tottenham,London rivalry,Assumption: common usage; Lang to confirm
-arsenal,chelsea,London rivalry,Assumption: common usage; Lang to confirm
-west_ham,tottenham,London rivalry,Assumption: common usage; Lang to confirm
-chelsea,fulham,West London derby,Assumption: common usage; Lang to confirm
-brentford,fulham,West London derby,Assumption: common usage; Lang to confirm
-crystal_palace,brighton,M23 derby,Assumption: common usage; Lang to confirm
-leeds,man_united,Roses rivalry,Assumption: common usage; Lang to confirm
-aston_villa,west_brom,West Midlands derby,Assumption: common usage; Lang to confirm
-aston_villa,wolves,West Midlands derby,Assumption: common usage; Lang to confirm
-wolves,west_brom,Black Country derby,Assumption: common usage; Lang to confirm
-ipswich,norwich,East Anglian derby,Assumption: common usage; Lang to confirm
-southampton,bournemouth,South Coast derby,Assumption: common usage; Lang to confirm
-real_madrid,barcelona,El Clasico,Assumption: common usage; Lang to confirm
-real_madrid,atletico_madrid,Madrid derby,Assumption: common usage; Lang to confirm
-sevilla,real_betis,Seville derby,Assumption: common usage; Lang to confirm
-athletic_bilbao,real_sociedad,Basque derby,Assumption: common usage; Lang to confirm
-barcelona,espanyol,Barcelona derby,Assumption: common usage; Lang to confirm
-valencia,levante,Valencia derby,Assumption: common usage; Lang to confirm
-valencia,villarreal,Valencian Community derby,Assumption: common usage; Lang to confirm
-celta_vigo,deportivo_la_coruna,Galician derby,Assumption: common usage; Lang to confirm
-sporting_gijon,real_oviedo,Asturian derby,Assumption: common usage; Lang to confirm
-getafe,rayo_vallecano,Madrid-area rivalry,Assumption: common usage; Lang to confirm
-atletico_madrid,getafe,Madrid-area rivalry,Assumption: common usage; Lang to confirm
-osasuna,athletic_bilbao,Northern rivalry,Assumption: common usage; Lang to confirm
+arsenal,tottenham,North London derby,Common usage; approved by Lang 25 Sep 2026
+man_city,man_united,Manchester derby,Common usage; approved by Lang 25 Sep 2026
+liverpool,everton,Merseyside derby,Common usage; approved by Lang 25 Sep 2026
+liverpool,man_united,North West derby,Common usage; approved by Lang 25 Sep 2026
+newcastle,sunderland,Tyne-Wear derby,Common usage; approved by Lang 25 Sep 2026
+chelsea,tottenham,London rivalry,Common usage; approved by Lang 25 Sep 2026
+arsenal,chelsea,London rivalry,Common usage; approved by Lang 25 Sep 2026
+west_ham,tottenham,London rivalry,Common usage; approved by Lang 25 Sep 2026
+chelsea,fulham,West London derby,Common usage; approved by Lang 25 Sep 2026
+brentford,fulham,West London derby,Common usage; approved by Lang 25 Sep 2026
+crystal_palace,brighton,M23 derby,Common usage; approved by Lang 25 Sep 2026
+leeds,man_united,Roses rivalry,Common usage; approved by Lang 25 Sep 2026
+aston_villa,west_brom,West Midlands derby,Common usage; approved by Lang 25 Sep 2026
+aston_villa,wolves,West Midlands derby,Common usage; approved by Lang 25 Sep 2026
+wolves,west_brom,Black Country derby,Common usage; approved by Lang 25 Sep 2026
+ipswich,norwich,East Anglian derby,Common usage; approved by Lang 25 Sep 2026
+southampton,bournemouth,South Coast derby,Common usage; approved by Lang 25 Sep 2026
+real_madrid,barcelona,El Clasico,Common usage; approved by Lang 25 Sep 2026
+real_madrid,atletico_madrid,Madrid derby,Common usage; approved by Lang 25 Sep 2026
+sevilla,real_betis,Seville derby,Common usage; approved by Lang 25 Sep 2026
+athletic_bilbao,real_sociedad,Basque derby,Common usage; approved by Lang 25 Sep 2026
+barcelona,espanyol,Barcelona derby,Common usage; approved by Lang 25 Sep 2026
+valencia,levante,Valencia derby,Common usage; approved by Lang 25 Sep 2026
+valencia,villarreal,Valencian Community derby,Common usage; approved by Lang 25 Sep 2026
+celta_vigo,deportivo_la_coruna,Galician derby,Common usage; approved by Lang 25 Sep 2026
+sporting_gijon,real_oviedo,Asturian derby,Common usage; approved by Lang 25 Sep 2026
+getafe,rayo_vallecano,Madrid-area rivalry,Common usage; approved by Lang 25 Sep 2026
+atletico_madrid,getafe,Madrid-area rivalry,Common usage; approved by Lang 25 Sep 2026
+osasuna,athletic_bilbao,Northern rivalry,Common usage; approved by Lang 25 Sep 2026
+arsenal,man_united,Historic rivalry,Common usage; added at Lang's request 25 Sep 2026
+hull,leeds,Yorkshire derby,Common usage; added at Lang's request 25 Sep 2026
+coventry,aston_villa,West Midlands derby,Common usage; added at Lang's request 25 Sep 2026
+athletic_bilbao,alaves,Basque derby,Common usage; added at Lang's request 25 Sep 2026
+real_sociedad,alaves,Basque derby,Common usage; added at Lang's request 25 Sep 2026
+osasuna,real_sociedad,Northern rivalry,Common usage; added at Lang's request 25 Sep 2026
+racing_santander,athletic_bilbao,Cantabrian-Basque rivalry,Common usage; added at Lang's request 25 Sep 2026
+sevilla,malaga,Andalusian derby,Common usage; added at Lang's request 25 Sep 2026
+real_betis,malaga,Andalusian derby,Common usage; added at Lang's request 25 Sep 2026
+atletico_madrid,rayo_vallecano,Madrid derby,Common usage; added at Lang's request 25 Sep 2026
