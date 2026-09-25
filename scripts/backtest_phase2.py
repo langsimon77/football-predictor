@@ -5,7 +5,7 @@ Reads prediction files written by `python -m fp.evaluate.backtest_bayes`
 (one per league and variant), scores them, and writes a Markdown report.
 
     uv run python scripts/backtest_phase2.py --stage tune  DIR
-    uv run python scripts/backtest_phase2.py --stage test  DIR --variant goals
+    uv run python scripts/backtest_phase2.py --stage test  DIR --variants sot
 """
 
 from __future__ import annotations
@@ -36,10 +36,13 @@ def table(frame: pd.DataFrame) -> str:
 
 
 def load_variant(folder: Path, stage: str, variant: str) -> tuple[pd.DataFrame, pd.DataFrame]:
-    preds = pd.concat([pd.read_parquet(f) for f in sorted(folder.glob(f"{stage}_*_{variant}"
-                                                                        ".parquet"))])
-    fits = pd.concat([pd.read_parquet(f) for f in sorted(folder.glob(f"{stage}_*_{variant}"
-                                                                       ".fits.parquet"))])
+    """Read every prediction and fit file for one variant, including files inside
+    the per-artifact subfolders that `gh run download` creates."""
+    pred_files = sorted(f for f in folder.rglob(f"{stage}_*_{variant}.parquet")
+                        if not f.name.endswith(".fits.parquet"))
+    fit_files = sorted(folder.rglob(f"{stage}_*_{variant}.fits.parquet"))
+    preds = pd.concat([pd.read_parquet(f) for f in pred_files])
+    fits = pd.concat([pd.read_parquet(f) for f in fit_files])
     return preds, fits
 
 
