@@ -129,6 +129,7 @@ def markets(post: Posterior, home_id: str, away_id: str, top_n: int = 5) -> dict
         {"score": f"{i}-{j}", "p": round(float(mean[i, j]), 4)}
         for i, j in zip(*np.unravel_index(order, mean.shape), strict=True)
     ]
+    point["matrix"] = mean  # posterior predictive scoreline table, rows = home goals
     point["intervals"] = {
         k: [round(float(np.percentile(v, 10)), 4), round(float(np.percentile(v, 90)), 4)]
         for k, v in per_draw.items() if k.startswith("p_")

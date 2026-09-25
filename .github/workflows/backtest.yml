@@ -7,6 +7,9 @@ name: Bayesian backtest
 on:
   workflow_dispatch:
     inputs:
+      stage:
+        description: "tune or test (only names the files)"
+        default: "test"
       seasons:
         description: "Season start years, space separated"
         default: "2023 2024 2025"
@@ -68,10 +71,10 @@ jobs:
           esac
           uv run python -m fp.evaluate.backtest_bayes ${{ matrix.league }} ${{ matrix.season }} \
             $flag --sampler ${{ inputs.sampler }} \
-            --out out/test_${{ matrix.league }}${{ matrix.season }}_${{ inputs.variant }}.parquet
+            --out out/${{ inputs.stage }}_${{ matrix.league }}${{ matrix.season }}_${{ inputs.variant }}.parquet
 
       - uses: actions/upload-artifact@v7
         with:
-          name: backtest-${{ matrix.league }}-${{ matrix.season }}-${{ inputs.variant }}
+          name: ${{ inputs.stage }}-${{ matrix.league }}-${{ matrix.season }}-${{ inputs.variant }}
           path: out/
           retention-days: 90

@@ -169,6 +169,7 @@ def build_rows(cands: pd.DataFrame, models: dict[str, LeagueModels], now: pd.Tim
         if m.bayes is not None and home in m.bayes.teams and away in m.bayes.teams:
             b = bayes_dc.markets(m.bayes, home, away)
             b_top, b_iv = b.pop("top_scorelines"), b.pop("intervals")
+            b.pop("matrix")
             b_flags = flags + (["posterior_fallback"] if m.bayes_fallback else [])
             rows.append({
                 **common, **b, "prediction_id": f"{r.match_id}:{BAYES_MODEL}",

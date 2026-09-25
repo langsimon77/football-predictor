@@ -76,6 +76,9 @@ def predict_league(matches: pd.DataFrame, second_tier: pd.DataFrame, league: str
                 "bdc_exp_goals_home": out["exp_goals_home"],
                 "bdc_exp_goals_away": out["exp_goals_away"],
                 "bdc_intervals": json.dumps(out["intervals"]),
+                # Full 11 x 11 scoreline table, flattened, so calibration can rescale
+                # it and re-derive every goals market (PRD item 22).
+                "bdc_matrix": out["matrix"].ravel().round(6).tolist(),
             })
     preds = pd.DataFrame(rows)
     check_features(preds)
