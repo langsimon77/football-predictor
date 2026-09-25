@@ -35,8 +35,15 @@ from scipy.stats import nbinom, poisson
 
 from fp.models.bayes_dc import DIAG_ESS, DIAG_RHAT
 
-MAX_COUNT = {"corners": 30, "cards": 16}
-LINES = {"corners": (8.5, 9.5, 10.5, 11.5), "cards": (3.5, 4.5, 5.5)}
+MAX_COUNT = {"corners": 30, "corners_total": 30, "cards": 16}
+LINES = {"corners": (8.5, 9.5, 10.5, 11.5), "corners_total": (8.5, 9.5, 10.5, 11.5),
+         "cards": (3.5, 4.5, 5.5)}
+# Match-level targets: one row per match, a pooled effect per club (home and away
+# club both contribute), plus these covariates. Continuous ones are standardised.
+MATCH_COVARIATES = {
+    "cards": {"continuous": ["close", "fouls"], "binary": ["derby", "important"]},
+    "corners_total": {"continuous": ["lopsided", "shots"], "binary": []},
+}
 
 
 @dataclass
@@ -125,6 +132,33 @@ def card_rows(matches: pd.DataFrame, features: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+def total_corner_rows(matches: pd.DataFrame, features: pd.DataFrame) -> pd.DataFrame:
+    """One row per match for the total-corners model.
+
+    Home and away corners are negatively correlated (about -0.3: the side chasing
+    the game wins corners while the leader sits back), so modelling the total
+    directly avoids pretending they are independent.
+    """
+    f = features.set_index("match_id")
+    col = matches["match_id"]
+    h_for, a_for = col.map(f["home_corners_for"]), col.map(f["away_corners_for"])
+    h_against, a_against = col.map(f["home_corners_against"]), col.map(f["away_corners_against"])
+    home_side = (h_for + a_against) / 2
+    away_side = (a_for + h_against) / 2
+    out = pd.DataFrame({
+        "match_id": col.to_numpy(),
+        "home": matches["home_id"].to_numpy(), "away": matches["away_id"].to_numpy(),
+        "lopsided": np.abs(col.map(f["elo_gap"]).to_numpy()) / 100,
+        "shots": (col.map(f["home_shots_for"]) + col.map(f["away_shots_for"])).to_numpy(),
+        # Home side's expected share of the corners, from rolling averages at lock.
+        "share": (home_side / (home_side + away_side)).fillna(0.55).to_numpy(),
+        "kickoff_utc": matches["kickoff_utc"].to_numpy(),
+    })
+    if "home_corners" in matches:
+        out["y"] = (matches["home_corners"] + matches["away_corners"]).to_numpy(dtype=float)
+    return out
+
+
 def _pooled(name: str, n: int, sigma, centred: bool):
     """A vector of pooled effects summing to zero; centred or non-centred form."""
     if centred:
@@ -175,16 +209,17 @@ def fit(train: pd.DataFrame, as_of: pd.Timestamp, teams: list[str], p: CountPara
                      "sigma_for", "sigma_against"]
             refs: list[str] = []
         else:
-            scales = {k: _scale(train[k]) for k in ("close", "fouls")}
-            close = np.nan_to_num(_z(train["close"], scales["close"]))
-            fouls = np.nan_to_num(_z(train["fouls"], scales["fouls"]))
+            spec = MATCH_COVARIATES[p.target]
+            scales = {k: _scale(train[k]) for k in spec["continuous"]}
+            x = np.column_stack(
+                [np.nan_to_num(_z(train[k], scales[k])) for k in spec["continuous"]]
+                + [train[k].to_numpy(dtype=float) for k in spec["binary"]])
             s_disc = pm.HalfNormal("sigma_disc", 0.3)
-            disc = _pooled("disc", n, s_disc, p.centred)
-            b = pm.Normal("b", 0, 0.3, shape=4)  # close, fouls, derby, important
+            disc = _pooled("disc", n, s_disc, p.centred)  # club effect ("discipline" for cards)
+            b = pm.Normal("b", 0, 0.3, shape=x.shape[1])
             hi = train["home"].map(idx).to_numpy()
             ai = train["away"].map(idx).to_numpy()
-            eta = (intercept + disc[hi] + disc[ai] + b[0] * close + b[1] * fouls
-                   + b[2] * train["derby"].to_numpy() + b[3] * train["important"].to_numpy())
+            eta = intercept + disc[hi] + disc[ai] + pt.dot(x, b)
             names = ["intercept", "disc", "b", "sigma_disc"]
             refs = []
             if p.use_referee:
@@ -268,11 +303,11 @@ def predict(post: CountPosterior, row: dict, rng: np.random.Generator | None = N
             total[:, j] = (home_pmf[:, : j + 1] * away_pmf[:, j::-1]).sum(axis=1)
         extra = {"exp_home": float(mus[0].mean()), "exp_away": float(mus[1].mean())}
     else:
-        close = np.nan_to_num(_z([row["close"]], post.scales["close"]))[0]
-        fouls = np.nan_to_num(_z([row["fouls"]], post.scales["fouls"]))[0]
+        spec = MATCH_COVARIATES[post.target]
+        x = np.array([np.nan_to_num(_z([row[k]], post.scales[k]))[0] for k in spec["continuous"]]
+                     + [float(row[k]) for k in spec["binary"]])
         eta = (d["intercept"] + d["disc"][:, idx[row["home"]]] + d["disc"][:, idx[row["away"]]]
-               + d["b"][:, 0] * close + d["b"][:, 1] * fouls + d["b"][:, 2] * row["derby"]
-               + d["b"][:, 3] * row["important"])
+               + d["b"] @ x)
         ref_known = False
         if "ref" in d:
             name = row.get("referee")
@@ -283,10 +318,14 @@ def predict(post: CountPosterior, row: dict, rng: np.random.Generator | None = N
                 rng = rng or np.random.default_rng(0)
                 eta = eta + rng.normal(0.0, d["sigma_ref"])
         total = _pmf(np.exp(eta), alpha, k)
-        extra = {"referee_known": ref_known}
+        extra = {"referee_known": ref_known} if post.target == "cards" else {}
     pmf = total.mean(axis=0)
     pmf = pmf / pmf.sum()
-    out = {"exp_total": float((pmf * k).sum()), "pmf": pmf,
-           "over": {line: float(pmf[k > line].sum()) for line in LINES[post.target]}}
+    exp_total = float((pmf * k).sum())
+    out: dict = {"exp_total": exp_total, "pmf": pmf,
+                 "over": {line: float(pmf[k > line].sum()) for line in LINES[post.target]}}
+    if post.target == "corners_total":  # split the total by the expected share
+        share = float(row.get("share", 0.55))
+        out["exp_home"], out["exp_away"] = exp_total * share, exp_total * (1 - share)
     out.update(extra)
     return out

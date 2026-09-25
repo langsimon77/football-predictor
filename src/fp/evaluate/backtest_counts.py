@@ -43,7 +43,8 @@ def predict_league(matches: pd.DataFrame, features: pd.DataFrame, target: str, l
                    ) -> tuple[pd.DataFrame, pd.DataFrame]:
     lg = matches[matches["league"] == league]
     teams = sorted(set(lg["home_id"]) | set(lg["away_id"]))
-    to_rows = cn.corner_rows if target == "corners" else cn.card_rows
+    to_rows = {"corners": cn.corner_rows, "corners_total": cn.total_corner_rows,
+               "cards": cn.card_rows}[target]
     targets = lg[lg["season"].isin(seasons)].copy()
     targets["lock_utc"] = lock_time(targets["kickoff_utc"])
     if target == "cards":
@@ -94,7 +95,7 @@ def predict_league(matches: pd.DataFrame, features: pd.DataFrame, target: str, l
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("target", choices=["corners", "cards"])
+    ap.add_argument("target", choices=["corners", "corners_total", "cards"])
     ap.add_argument("league")
     ap.add_argument("seasons", nargs="+", type=int)
     ap.add_argument("--out", type=Path, required=True)
