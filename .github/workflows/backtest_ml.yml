@@ -1,0 +1,45 @@
+name: Challenger backtest
+
+# Walk-forward backtest of the home, draw, away challengers (ordered logit,
+# multinomial, Random Forest, XGBoost). XGBoost needs an OpenMP runtime, which
+# GitHub's Linux runner has. Predictions are uploaded as an artifact.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  challengers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10.2.0  # no floating major tag exists
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install locked dependencies
+        run: uv sync --frozen
+
+      - name: Restore raw data cache
+        uses: actions/cache/restore@v6
+        with:
+          path: data/raw
+          key: raw-${{ github.run_id }}
+          restore-keys: raw-
+
+      - name: Build data
+        run: make data
+
+      - name: Walk-forward backtest, 2021/22 to 2025/26
+        run: uv run python -m fp.evaluate.backtest_ml --out out/challengers_walkforward_2021_2025.parquet
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: challengers
+          path: out/
+          retention-days: 90
