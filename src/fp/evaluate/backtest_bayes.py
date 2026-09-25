@@ -89,6 +89,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--sot", action="store_true", help="add the shots-on-target layer")
     ap.add_argument("--dynamic", action="store_true", help="random-walk challenger")
+    ap.add_argument("--period-days", type=int, default=30, help="random-walk step length")
     ap.add_argument("--xi", type=float, default=0.002)
     ap.add_argument("--sampler", default="nutpie")
     ap.add_argument("--until", help="stop after this date (smoke test)")
@@ -96,7 +97,7 @@ def main(argv: list[str] | None = None) -> int:
     matches = pd.read_parquet(PROCESSED / "matches.parquet")
     second_tier = pd.read_parquet(PROCESSED / "second_tier.parquet")
     params = bayes_dc.BayesParams(xi=args.xi, use_sot=args.sot, dynamic=args.dynamic,
-                                  sampler=args.sampler)
+                                  period_days=args.period_days, sampler=args.sampler)
     start = time.time()
     until = pd.Timestamp(args.until, tz="UTC") if args.until else None
     preds, fits = predict_league(matches, second_tier, args.league, args.seasons, params, until)

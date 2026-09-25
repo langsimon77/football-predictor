@@ -1,0 +1,77 @@
+name: Bayesian backtest
+
+# Walk-forward backtest of the Bayesian Dixon-Coles model, one runner per league
+# and season, in parallel. Results are uploaded as artifacts, then scored with
+# scripts/backtest_phase2.py. Runs on GitHub so it does not depend on any laptop.
+
+on:
+  workflow_dispatch:
+    inputs:
+      seasons:
+        description: "Season start years, space separated"
+        default: "2023 2024 2025"
+      variant:
+        description: "goals, sot, or dynamic"
+        default: "sot"
+      sampler:
+        description: "nutpie or numpyro"
+        default: "numpyro"
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      seasons: ${{ steps.s.outputs.seasons }}
+    steps:
+      - id: s
+        run: echo "seasons=$(echo '${{ inputs.seasons }}' | jq -cR 'split(" ") | map(select(. != ""))')" >> "$GITHUB_OUTPUT"
+
+  backtest:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        league: [EPL, LaLiga]
+        season: ${{ fromJSON(needs.plan.outputs.seasons) }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10.2.0  # no floating major tag exists
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install locked dependencies
+        run: uv sync --frozen
+
+      - name: Restore raw data cache
+        uses: actions/cache/restore@v6
+        with:
+          path: data/raw
+          key: raw-${{ github.run_id }}
+          restore-keys: raw-
+
+      - name: Build data
+        run: make data
+
+      - name: Walk-forward backtest
+        run: |
+          flag=""
+          case "${{ inputs.variant }}" in
+            sot) flag="--sot" ;;
+            dynamic) flag="--dynamic --period-days 60" ;;
+          esac
+          uv run python -m fp.evaluate.backtest_bayes ${{ matrix.league }} ${{ matrix.season }} \
+            $flag --sampler ${{ inputs.sampler }} \
+            --out out/test_${{ matrix.league }}${{ matrix.season }}_${{ inputs.variant }}.parquet
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: backtest-${{ matrix.league }}-${{ matrix.season }}-${{ inputs.variant }}
+          path: out/
+          retention-days: 90

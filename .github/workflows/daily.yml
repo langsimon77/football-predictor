@@ -42,6 +42,13 @@ jobs:
           key: raw-${{ github.run_id }}
           restore-keys: raw-
 
+      - name: Restore the last good Bayesian posteriors (fallback store)
+        uses: actions/cache@v6
+        with:
+          path: data/posteriors
+          key: posteriors-${{ github.run_id }}
+          restore-keys: posteriors-
+
       - name: Run the daily pipeline
         env:
           FOOTBALL_DATA_ORG_TOKEN: ${{ secrets.FOOTBALL_DATA_ORG_TOKEN }}

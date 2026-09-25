@@ -57,7 +57,7 @@ def main() -> int:
         teams = sorted(set(lg["home_id"]) | set(lg["away_id"]))
         priors = promoted_priors(promo, season_teams(matches, league), second_tier, league,
                                  SEASON)
-        post = bayes_dc.fit(known_as_of(lg, as_of), as_of, teams, priors,
+        post = bayes_dc.fit_checked(known_as_of(lg, as_of), as_of, teams, priors,
                             bayes_dc.BayesParams(xi=0.0, window_days=330))
         h, a = replay(post, games, rng)
         x, y = games["home_goals"].to_numpy(), games["away_goals"].to_numpy()

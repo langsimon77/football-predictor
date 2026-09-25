@@ -30,6 +30,7 @@ class Config:
     dc: dc.DCParams = field(default_factory=dc.DCParams)
     elo: elo.EloParams = field(default_factory=elo.EloParams)
     base_window_days: int = 1100
+    refit_days: int = 0  # 0 = refit Dixon-Coles at every lock; 7 = weekly, like Phase 2
 
 
 def predict_league(matches: pd.DataFrame, league: str, cfg: Config,
@@ -41,6 +42,8 @@ def predict_league(matches: pd.DataFrame, league: str, cfg: Config,
     tracker = elo.EloTracker(lg, teams_by_season, cfg.elo)
 
     rows = []
+    fit_at: pd.Timestamp | None = None
+    fit_season: int | None = None
     for lock_key, group in targets.groupby("lock_utc", sort=True):
         lock = cast(pd.Timestamp, lock_key)  # groupby key of a UTC datetime column
         season = int(group["season"].iloc[0])
@@ -48,8 +51,11 @@ def predict_league(matches: pd.DataFrame, league: str, cfg: Config,
         tracker.advance_to(lock)
         tracker.ensure_season(season)
         curve = elo.curve_as_of(tracker, lock)
-        fit = dc.fit(known, lock, cfg.dc, prior.for_season(teams_by_season, season),
-                     extra_teams=sorted(teams_by_season[season]))
+        if (cfg.refit_days == 0 or fit_at is None or season != fit_season
+                or lock - fit_at >= pd.Timedelta(days=cfg.refit_days)):
+            fit = dc.fit(known, lock, cfg.dc, prior.for_season(teams_by_season, season),
+                         extra_teams=sorted(teams_by_season[season]))
+            fit_at, fit_season = lock, season
         recent = known[known["kickoff_utc"] >= lock - pd.Timedelta(days=cfg.base_window_days)]
         outcome = metrics.outcome_1x2(recent["home_goals"].to_numpy(),
                                       recent["away_goals"].to_numpy())

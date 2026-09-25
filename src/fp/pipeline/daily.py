@@ -51,7 +51,9 @@ BAYES_MODEL = "dc_bayes_v1"
 # The Bayesian model joins the live ledger only after Lang approves Phase 2
 # (spec S0: model changes wait for approval). Until then it runs in replays only.
 BAYES_LIVE = False
-BAYES_PARAMS = bayes_dc.BayesParams()
+# Chosen on the tuning seasons (reports/backtest_phase2_tune.md) and the runner
+# benchmark (reports/sampler_benchmark.md).
+BAYES_PARAMS = bayes_dc.BayesParams(use_sot=True, sampler="numpyro")
 LEAGUES = ("EPL", "LaLiga")
 PROMOTED_FLAG_GAMES = 6
 

@@ -18,3 +18,6 @@ data/interim/
 
 # Derived data: rebuilt from data/raw by `make data` (PRD item 25).
 data/processed/
+
+# Last good Bayesian posteriors: carried between runs by the Actions cache.
+data/posteriors/
