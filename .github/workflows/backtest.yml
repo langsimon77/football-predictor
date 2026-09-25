@@ -13,8 +13,11 @@ on:
       seasons:
         description: "Season start years, space separated"
         default: "2023 2024 2025"
+      model:
+        description: "goals, corners, or cards"
+        default: "goals"
       variant:
-        description: "goals, sot, or dynamic"
+        description: "goals model: goals, sot, dynamic; count models: nb or poisson"
         default: "sot"
       sampler:
         description: "nutpie or numpyro"
@@ -64,17 +67,24 @@ jobs:
 
       - name: Walk-forward backtest
         run: |
-          flag=""
-          case "${{ inputs.variant }}" in
-            sot) flag="--sot" ;;
-            dynamic) flag="--dynamic --period-days 60" ;;
-          esac
-          uv run python -m fp.evaluate.backtest_bayes ${{ matrix.league }} ${{ matrix.season }} \
-            $flag --sampler ${{ inputs.sampler }} \
-            --out out/${{ inputs.stage }}_${{ matrix.league }}${{ matrix.season }}_${{ inputs.variant }}.parquet
+          out="out/${{ inputs.stage }}_${{ inputs.model }}_${{ matrix.league }}${{ matrix.season }}_${{ inputs.variant }}.parquet"
+          if [ "${{ inputs.model }}" = "goals" ]; then
+            flag=""
+            case "${{ inputs.variant }}" in
+              sot) flag="--sot" ;;
+              dynamic) flag="--dynamic --period-days 60" ;;
+            esac
+            uv run python -m fp.evaluate.backtest_bayes ${{ matrix.league }} ${{ matrix.season }} \
+              $flag --sampler ${{ inputs.sampler }} --out "$out"
+          else
+            flag=""
+            [ "${{ inputs.variant }}" = "poisson" ] && flag="--poisson"
+            uv run python -m fp.evaluate.backtest_counts ${{ inputs.model }} ${{ matrix.league }} \
+              ${{ matrix.season }} $flag --sampler ${{ inputs.sampler }} --out "$out"
+          fi
 
       - uses: actions/upload-artifact@v7
         with:
-          name: ${{ inputs.stage }}-${{ matrix.league }}-${{ matrix.season }}-${{ inputs.variant }}
+          name: ${{ inputs.stage }}-${{ inputs.model }}-${{ matrix.league }}-${{ matrix.season }}-${{ inputs.variant }}
           path: out/
           retention-days: 90
