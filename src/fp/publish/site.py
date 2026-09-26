@@ -147,7 +147,8 @@ def render(fixtures: pd.DataFrame, generated: pd.Timestamp) -> str:
         '<button data-sort="tier">By tier</button><button data-sort="home">By home chance'
         '</button><a href="fixtures.csv" download>CSV</a></div>'
         f"{body}<footer>Forecasts from a Bayesian Dixon-Coles model with team news from "
-        "a daily question queue. Bookmaker odds are never an input. Not betting advice."
+        "a daily question queue. Bookmaker odds are never an input. Not betting advice. "
+        "Match data: football-data.co.uk; fixtures: openfootball."
         f"{link}</footer></main><script>{JS}</script></body></html>")
 
 

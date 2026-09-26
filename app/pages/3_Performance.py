@@ -67,7 +67,8 @@ else:
                 "away win. Log loss punishes confident misses hardest. Brier is the squared "
                 "distance from the result. Base rates: the league's recent share of home "
                 "wins, draws, and away wins. Market: bookmaker prices with the margin removed, "
-                "never used as an input. Only matches every model priced are compared.")
+                "never used as an input. Only matches every model priced are compared. "
+                "Match data and odds: football-data.co.uk.")
 
     fig = go.Figure()
     for model, g in both.sort_values("kickoff_utc").groupby("model_name"):

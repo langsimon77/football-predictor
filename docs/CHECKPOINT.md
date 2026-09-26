@@ -1,44 +1,39 @@
 # Checkpoint
 
-## Latest: 26 Sep 2026, Phase 5 live; awaiting approval to start Phase 6
+## Latest: 26 Sep 2026, Phase 6 built and tested; awaiting Lang's go-live decision (GitHub Pages)
 
 ### Done this session
-- Phase 4 approved and live: shadows (four challengers, `stack_v1`) and tiers on every Bayesian row.
-- Phase 5 approved and live (`NEWS_LIVE` on):
-  - Question Queue: one Issue a day for matches locking at the next run, at most 10, ranked; ticks trusted only in bot or owner Issues.
-  - News scales the Bayesian scoring rates, capped at 12% (sizes accepted as Assumptions); `dc_bayes_v1_nonews` locked when news moves a forecast.
-  - Manager check from Wikipedia; 40 clubs seeded.
-  - Unanswered questions and manager changes are tier flags (S7 rule kept).
-- Dry run on the first real gameweek passed (`reports/phase5_dry_run.md`). GitHub self-test of the Issue loop passed (Issue #2).
+- Phases 4 and 5 approved and live (shadows, tiers, Question Queue; first Issue Wed 7 Oct).
+- Phase 6 built:
+  - `src/fp/publish/`: the daily run writes precomputed dashboard files (`app/data/`) and a static fixtures page (`site/`).
+  - `app/`: seven Streamlit pages (Fixtures, Match, Team ratings, Performance, What-if, Questions, Methods), reading only those files; own `requirements.txt`.
+  - `docs/MODEL_CARD.md`; LEARN chapter 6.
+  - Daily workflow: dashboard cache, ratings history committed, Pages deploy gated by the `PAGES_ENABLED` variable (off).
+- Tested: 5-day local replay (all seven pages load with no errors on a phone-sized screen; every chart captioned); GitHub one-day replay (run 36227565338) publishes every file; export takes seconds.
 
-### Phase 5 acceptance checks
+### Phase 6 acceptance checks
 | Check | Result |
 |---|---|
-| Sensible adjustments within caps | Yes: every multiplier between 0.88 and 1.12. |
-| Questions specific and ranked | Yes: clubs, league, kickoff in Juba time and UTC, team-news links; at most 10 a day; ranked by expected shift. |
-
-### What happens next, automatically
-| When (Juba time) | What |
-|---|---|
-| Wed 7 Oct, 06:41 | First Issue: Málaga v Espanyol. |
-| Thu 8 Oct, 06:41 | First real lock (Málaga v Espanyol). Issue with the 10 Saturday matches. |
-| Fri 9 Oct, 06:41 | Saturday matches lock with your ticks. Issue with 7 Sunday matches. |
+| Loads under 3 seconds on mobile | Static page: one 19 KB request, no other files, rendered in 18 ms locally [V]; about 1 second on 4G [E]. Streamlit cannot meet this from a cold start (PRD Q4); the static page is the fast door. |
+| Every chart captioned | Yes: every chart has a one-line caption and an "Explain this" note (checked on all seven pages). |
+| No em or en dashes | Yes: dash check covers the app, the page, and JSON. |
 
 ### Known weaknesses
-- News effect sizes are Assumptions; the news-on against news-off test after 10 gameweeks decides.
-- Blending adds little; still 0.014 behind the Friday market; over/under tiers barely separate.
+- The Streamlit app wakes slowly after a quiet night (free host).
+- Stack weights fitted on one season shift between reruns; Phase 7's weekly re-weight needs a steadier fit (to be proposed).
+- Ratings history starts on the first live run; no backfill.
 
 ### Open questions for Lang
-1. Approve starting Phase 6 (dashboard, plus the static GitHub Pages fixtures page)?
+1. Turn on GitHub Pages (publishes the fixtures page and dashboard files at https://langsimon77.github.io/football-predictor/)?
+2. Approve starting Phase 7 (weekly and monthly automation, Streamlit Cloud deploy)?
 
 ### Next actions
 | Action | Owner |
 |---|---|
-| Approve Phase 6, or reply with changes. | Lang |
+| Answer the two questions. | Lang |
+| On a yes to Pages: switch Pages to "GitHub Actions", set `PAGES_ENABLED`, check the first deploy. | Claude |
+| Streamlit Cloud: sign in at share.streamlit.io with GitHub and deploy `app/Home.py` (Phase 7; only Lang can create the account). | Lang, guided |
 | Tick the daily Issue from Wed 7 Oct. | Lang |
-| Watch the 7, 8 and 9 Oct runs. | Claude, next session |
-| After 10 gameweeks: news-on against news-off report. | Claude |
-| End of 2026/27: re-test `stack_v1` against `dc_bayes_v1`. | Claude |
 
 ### Working notes
 - XGBoost runs locally only when Python is started directly with scikit-learn's OpenMP library: `DYLD_LIBRARY_PATH=$PWD/.venv/lib/python3.12/site-packages/sklearn/.dylibs .venv/bin/python ...`. `uv run` drops the variable. GitHub needs nothing special.
@@ -55,3 +50,4 @@
 - 24 to 25 Sep 2026, session 4: Phase 2 Bayesian model, tuning, GitHub-run test stage.
 - 25 Sep 2026, session 5: Bayesian model live as primary. Phase 3a calibration studied, not applied. Phase 3b corners and cards built and tested.
 - 26 Sep 2026, session 6: Phase 4 challengers, stacking, calibration revisited, tiers. Lang approved: Bayesian stays published, shadows and tiers live. Phase 5 news and Question Queue built, tested, and live.
+- 26 Sep 2026, session 6 (cont.): Phase 6 dashboard and static fixtures page built and tested; Pages off until Lang approves.
