@@ -622,6 +622,7 @@ It **may not** change a model's structure, its inputs, or the code, and it never
 - If a shadow model, the question queue, or the dashboard fails, the published forecast still locks.
 - Either way, a run that was not clean opens a "Daily run degraded" Issue with the details. A run that stops opens "Daily run failed".
 - If a locked match moves by more than 7 days, it locks again with the reason recorded, and the new lock is the one scored (PRD item 26b).
+- GitHub sometimes starts scheduled runs hours late, or drops them. Two backup times (12:41 and 18:41 Juba) run only if that day's run has not happened, so one dropped run cannot leave a match unlocked.
 
 ### 7.5 A test that said no
 

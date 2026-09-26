@@ -1,6 +1,6 @@
 # Checkpoint
 
-## Latest: 26 Sep 2026, Phase 7 built, tested, and deployed; sign-off waits on three scheduled daily runs
+## Latest: 26 Sep 2026, Phase 7 built, tested, and deployed; sign-off waits on three clean scheduled days (27 to 29 Sep)
 
 ### Done this session
 - Phases 4, 5, 6 approved and live. GitHub Pages on: https://langsimon77.github.io/football-predictor/ (first deploy passed).
@@ -13,24 +13,24 @@
 ### Phase 7 acceptance checks
 | Check | Result |
 |---|---|
-| Three consecutive clean daily runs | **Pending.** The schedule has run once (25 Sep, success, started 09:45 UTC: GitHub delayed it five hours). Manual live runs today passed. Check the 26, 27, 28 Sep scheduled runs. |
+| Three consecutive clean daily runs | **Not yet met.** Scheduled runs so far: 25 Sep (success, started 5 hours late); 26 Sep (never started: GitHub dropped it). Manual live runs on 25 and 26 Sep passed. Backup schedules added (10:41, 16:41 UTC) with a same-day guard. Check 27, 28, 29 Sep. |
 | Ledger rows locked 24 to 48 hours before kickoff | GitHub replay, 17 to 19 Sep: all 160 on-time rows locked 30.8 to 38.3 hours before kickoff. The only late locks (2 matches) kicked off on the replay's first day, with no earlier run. The real ledger's first locks are on 8 Oct. |
 | Failure path tested by forcing an error | Yes. Forced crash: run failed, Issue #3 opened. Forced Bayesian failure: both leagues fell back to the last good posterior, run finished, "degraded" Issue #4 opened. Both closed. |
 | Weekly and monthly runs | Dry runs on GitHub passed (runs 36228987459, 36228990835). |
 | Streamlit Cloud deploy | Done: https://football-predictor-hvplshfcfv7vsqqkaplmbq.streamlit.app/ (deployed by Lang; four pages checked with live data). |
 
 ### Known weaknesses
-- GitHub can start the daily schedule hours late (five hours on 25 Sep). Locks stay correct (the window is measured from the actual start), but Juba-time deadlines slip.
+- GitHub can start the daily schedule hours late (25 Sep) or drop it (26 Sep). Backup schedules cover a dropped run; Juba-time question deadlines can still slip.
 - Stack weight fit is ill-conditioned; a steadier fit was tested and not adopted under the pre-set rule (`reports/stack_steadiness.md`).
 - No free source of penalties or line-ups for the miss audit.
 
 ### Open questions for Lang
-1. None open. Phase 7 sign-off waits only on three clean scheduled daily runs (26 to 28 Sep).
+1. None open. Phase 7 sign-off waits on three clean scheduled days (27 to 29 Sep).
 
 ### Next actions
 | Action | Owner |
 |---|---|
-| Check the scheduled daily runs of 26, 27, 28 Sep; then Phase 7 sign-off. | Claude, next session |
+| Check the scheduled daily runs of 27, 28, 29 Sep (main or backup); then ask Lang to sign off Phase 7. | Claude, next session |
 | First question Issue Wed 7 Oct; first locks Thu 8 Oct; first weekly report Mon 12 Oct. | Automatic |
 | Phase 8: live season (weekly reports, miss audit, drift). | After Phase 7 sign-off |
 

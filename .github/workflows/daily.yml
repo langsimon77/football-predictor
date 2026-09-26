@@ -2,7 +2,11 @@ name: Daily predictions
 
 on:
   schedule:
-    - cron: "41 4 * * *"  # 04:41 UTC = 06:41 Juba. Off the hour: GitHub delays on-the-hour jobs.
+    - cron: "41 4 * * *"   # 04:41 UTC = 06:41 Juba. Off the hour: GitHub delays on-the-hour jobs.
+    # Backups: GitHub can delay or drop scheduled runs (25 Sep ran 5 hours late; the
+    # 26 Sep run never started). A backup does nothing if today's run already committed.
+    - cron: "41 10 * * *"
+    - cron: "41 16 * * *"
   workflow_dispatch:
     inputs:
       dry_run:
@@ -24,7 +28,31 @@ concurrency:
   cancel-in-progress: false  # never interrupt a run that may be writing the ledger
 
 jobs:
+  guard:
+    # A scheduled run skips itself when today's daily run has already committed.
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          skip=false
+          if [ "$EVENT" = "schedule" ]; then
+            today=$(date -u +%F)
+            if gh api "repos/${{ github.repository }}/commits?sha=main&since=${today}T00:00:00Z&per_page=100" \
+                 --jq '.[].commit.message' | grep -q "^Daily run ${today}"; then
+              skip=true
+              echo "Today's daily run already committed; this scheduled run does nothing."
+            fi
+          fi
+          echo "skip=$skip" >> "$GITHUB_OUTPUT"
+
   daily:
+    needs: guard
+    if: needs.guard.outputs.skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
