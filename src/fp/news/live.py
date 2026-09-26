@@ -25,7 +25,7 @@ from fp.news.impact import TeamNews
 
 log = logging.getLogger(__name__)
 
-NEWS_LIVE = False  # switched on only after Lang approves Phase 5
+NEWS_LIVE = True  # Lang approved Phase 5 on 26 Sep 2026
 ANSWERS = ROOT / "data" / "manual" / "answers.yaml"
 UNANSWERED = TeamNews("unanswered")
 

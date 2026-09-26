@@ -561,4 +561,6 @@ Whenever news moves a forecast, the run also locks the same forecast without new
 - A club left unticked, or "don't know", is a data flag: the match locks without that club's news and its tiers are capped at Medium. The ledger lists the unanswered questions.
 - Each run also reads the manager of every club playing in the next 72 hours from Wikipedia. A new name opens a "Manager check" question. Until you answer "no", the club carries a manager-change flag for 30 days, which also caps its tiers at Medium.
 
-The spec gives two versions of the unanswered rule: "the tier drops one level" (S6) and "a data flag" (S7). I used the flag, the same as every other data problem. With one flag, High becomes Medium and Medium stays Medium.
+The spec gives two versions of the unanswered rule: "the tier drops one level" (S6) and "a data flag" (S7). We use the flag, the same as every other data problem (your decision, 26 Sep 2026). With one flag, High becomes Medium and Medium stays Medium.
+
+You switched the queue on and accepted the effect sizes on 26 Sep 2026. A self-test on GitHub opened a test Issue (#2), ticked it as the bot, read the ticks back through the trust rule, and closed it [V: workflow runs 36225539559 and 36225611381].

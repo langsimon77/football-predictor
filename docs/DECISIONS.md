@@ -93,3 +93,7 @@ Append only. Newest at the bottom.
 | 26 Sep 2026 | Ticks count only in Issues opened by the bot or the owner and edited only by them. | PRD Q3: anyone can open an Issue in a public repository. | Made |
 | 26 Sep 2026 | Manager changes: Wikipedia infobox for clubs playing in the next 72 hours; a new name becomes a "Manager check" question and a 30-day tier flag unless Lang answers no. Seeded 26 Sep 2026 with all 40 current clubs. | PRD item 18; Wikipedia allowed with a named User-Agent (DATA_SOURCES). | Made |
 | 26 Sep 2026 | Stack and tier disagreement use the no-news Bayesian forecast. | Matches the backtest that set the stack weights; answering a question can never lower a tier through disagreement. | Made |
+| 26 Sep 2026 | Approved: Question Queue live (`NEWS_LIVE` on). First Issue Wed 7 Oct. | Lang: "yes". | Made |
+| 26 Sep 2026 | Approved: news effect sizes accepted as Assumptions; the news-on against news-off test after 10 gameweeks decides. | Lang: "accept". | Made |
+| 26 Sep 2026 | Approved: unanswered questions stay a tier flag (S7). | Lang: "keep". | Made |
+| 26 Sep 2026 | Queue self-test on GitHub with the bot token passed (Issue #2: open, tick, trust rule, read back, close). GitHub's open-Issue list can lag a few seconds after an Issue is opened; harmless, since answers are read a day later. | Workflow runs 36225539559 and 36225611381. | Made |
