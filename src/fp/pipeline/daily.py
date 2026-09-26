@@ -48,7 +48,7 @@ from fp.publish import site
 from fp.validate import freshness
 from fp.validate.leakage import LOCK_MAX_HOURS, LOCK_MIN_HOURS, RUN_TIME_UTC, known_as_of
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("fp.pipeline.daily")  # stable name, also when run with -m
 
 REPORT = ROOT / "reports" / "latest.md"
 DC_MODEL = "dc_mle_v0"
@@ -73,7 +73,7 @@ class ProblemLog(logging.Handler):
     """Collects warnings and errors from the pipeline, so a run that locked with a
     fallback still reports it (spec S10: degraded runs open an Issue)."""
 
-    SOURCES = ("fp.pipeline", "fp.news", "fp.publish")
+    SOURCES = ("fp.pipeline", "fp.news", "fp.publish", "__main__")
 
     def __init__(self) -> None:
         super().__init__(level=logging.WARNING)
