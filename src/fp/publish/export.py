@@ -71,9 +71,16 @@ class RunView:
 
 
 def _primary(rows: pd.DataFrame) -> pd.DataFrame:
+    """One row per match: the primary model's latest lock (a re-lock after a moved
+    kickoff replaces the original for display and scoring, PRD item 26b)."""
     rows = rows[rows["model_name"].isin(PRIMARY_ORDER)].copy()
     rows["rank"] = rows["model_name"].map({m: i for i, m in enumerate(PRIMARY_ORDER)})
-    return rows.sort_values("rank").drop_duplicates("match_id").drop(columns="rank")
+    if "lock_utc" in rows:
+        rows = rows.sort_values(["rank", "lock_utc"], ascending=[True, False],
+                                na_position="last")
+    else:
+        rows = rows.sort_values("rank")
+    return rows.drop_duplicates("match_id").drop(columns="rank")
 
 
 def window(fixtures: pd.DataFrame, now: pd.Timestamp) -> set[str]:
@@ -224,7 +231,9 @@ def performance(view: RunView) -> pd.DataFrame:
     if view.ledger.empty or view.results.empty:
         return pd.DataFrame()
     res = view.results.drop_duplicates("match_id", keep="last").set_index("match_id")
-    rows = view.ledger[view.ledger["match_id"].isin(res.index)].copy()
+    latest = view.ledger.sort_values("lock_utc").drop_duplicates(["match_id", "model_name"],
+                                                                  keep="last")
+    rows = latest[latest["match_id"].isin(res.index)].copy()
     if rows.empty:
         return pd.DataFrame()
     rows["home_goals"] = rows["match_id"].map(res["home_goals"])

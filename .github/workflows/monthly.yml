@@ -1,0 +1,90 @@
+name: Monthly review
+
+# 1st of each month, 06:00 UTC: calibration check (report only), model card
+# live-record refresh, and a keep-alive for the scheduled workflows (spec S10).
+
+on:
+  schedule:
+    - cron: "0 6 1 * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run: print the report, commit nothing"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  issues: write
+  actions: write  # re-enable the scheduled workflows (keep-alive)
+
+concurrency:
+  group: monthly
+  cancel-in-progress: false
+
+jobs:
+  monthly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10.2.0  # no floating major tag exists
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install locked dependencies
+        run: uv sync --frozen
+
+      - name: Restore raw data cache
+        uses: actions/cache/restore@v6
+        with:
+          path: data/raw
+          key: raw-${{ github.run_id }}
+          restore-keys: raw-
+
+      - name: Monthly review
+        env:
+          GH_TOKEN: ${{ github.token }}  # opens an Issue only if calibration passes
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            uv run python -m fp.pipeline.monthly --dry-run
+          else
+            uv run python -m fp.pipeline.monthly
+          fi
+
+      - name: Keep the scheduled workflows enabled
+        if: env.DRY_RUN != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for wf in daily.yml weekly.yml monthly.yml; do gh workflow enable "$wf"; done
+
+      - name: No banned dash characters
+        run: uv run python scripts/check_dashes.py
+
+      - name: Commit and push the monthly report
+        if: env.DRY_RUN != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for path in docs/monthly docs/MODEL_CARD.md data/calibration/monthly_check.json; do
+            [ -e "$path" ] && git add "$path"
+          done
+          if ! git diff --cached --quiet; then
+            git commit -m "Monthly review $(date -u +%Y-%m)"
+            git pull --rebase
+            git push
+          fi
+
+      - name: Open an issue if the run failed
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "Monthly run failed: $(date -u +%F)" \
+            --body "The monthly run failed. Log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

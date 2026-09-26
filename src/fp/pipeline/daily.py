@@ -63,6 +63,25 @@ PRIMARY_MODEL = BAYES_MODEL
 BAYES_PARAMS = bayes_dc.BayesParams(use_sot=True, sampler="numpyro")
 LEAGUES = ("EPL", "LaLiga")
 PROMOTED_FLAG_GAMES = 6
+RELOCK_DAYS = 7
+# Failure-path test (Phase 7): set by FP_FORCE_FAIL, honoured only on dry runs.
+# "bayes" fails the Bayesian diagnostics so the run falls back; "crash" stops the run.
+FORCE_FAIL = ""
+
+
+class ProblemLog(logging.Handler):
+    """Collects warnings and errors from the pipeline, so a run that locked with a
+    fallback still reports it (spec S10: degraded runs open an Issue)."""
+
+    SOURCES = ("fp.pipeline", "fp.news", "fp.publish")
+
+    def __init__(self) -> None:
+        super().__init__(level=logging.WARNING)
+        self.lines: list[str] = []
+
+    def emit(self, record: logging.LogRecord) -> None:
+        if record.name.startswith(self.SOURCES):
+            self.lines.append(f"{record.levelname}: {record.getMessage()}")
 
 
 @dataclass
@@ -109,6 +128,8 @@ def fit_league(matches: pd.DataFrame, fixtures: pd.DataFrame, league: str, now: 
         priors = promoted_priors(promo, teams_by_season, second_tier, league, season)
         post = bayes_dc.fit_checked(known, now, sorted(teams_by_season[season]), priors,
                                     BAYES_PARAMS)
+        if FORCE_FAIL == "bayes":
+            post.diagnostics = {**post.diagnostics, "rhat_max": 9.0, "forced": True}
         log.info("%s Bayesian fit %.1fs %s", league, post.seconds, post.diagnostics)
         if post.ok:
             posterior_store.save(post, league, now, store)
@@ -131,14 +152,26 @@ def prior_promoted(teams_by_season: dict[int, set[str]], season: int) -> set[str
 
 def candidates(fixtures: pd.DataFrame, now: pd.Timestamp, existing: pd.DataFrame
                ) -> pd.DataFrame:
-    """Unlocked matches with a confirmed kickoff in (now, now + 48 h]."""
+    """Unlocked matches with a confirmed kickoff in (now, now + 48 h]. A locked match
+    whose kickoff moved by more than 7 days locks again, with the reason recorded
+    (spec S10); scoring then uses the latest lock (PRD item 26b)."""
     window = fixtures[
         fixtures["time_confirmed"]
         & (fixtures["kickoff_utc"] > now)
         & (fixtures["kickoff_utc"] <= now + pd.Timedelta(hours=LOCK_MAX_HOURS))
     ].copy()
-    done = set(existing["match_id"]) if len(existing) else set()
-    window = window[~window["match_id"].isin(done)]
+    window["relock_reason"] = None
+    if len(existing) and not {"lock_utc", "kickoff_utc"} <= set(existing.columns):
+        window = window[~window["match_id"].isin(set(existing["match_id"]))]
+    elif len(existing):
+        last = (existing.sort_values("lock_utc").drop_duplicates("match_id", keep="last")
+                .set_index("match_id")["kickoff_utc"])
+        locked_at = window["match_id"].map(last)
+        moved = locked_at.notna() & ((window["kickoff_utc"] - locked_at).abs()
+                                     > pd.Timedelta(days=RELOCK_DAYS))
+        window.loc[moved, "relock_reason"] = [
+            f"kickoff moved from {pd.Timestamp(k):%Y-%m-%d %H:%M} UTC" for k in locked_at[moved]]
+        window = window[locked_at.isna() | moved]
     window["late_lock"] = window["kickoff_utc"] - now < pd.Timedelta(hours=LOCK_MIN_HOURS)
     return window
 
@@ -167,7 +200,8 @@ def build_rows(cands: pd.DataFrame, models: dict[str, LeagueModels], now: pd.Tim
             "match_id": r.match_id, "league": r.league, "season": r.season,
             "home_id": r.home_id, "away_id": r.away_id, "kickoff_utc": r.kickoff_utc,
             "lock_utc": now, "as_of_utc": now, "model_version": version,
-            "code_dirty": dirty, "late_lock": bool(r.late_lock), "relock_reason": None,
+            "code_dirty": dirty, "late_lock": bool(r.late_lock),
+            "relock_reason": getattr(r, "relock_reason", None),
             "tiers": "{}", "news_adjustments": "[]", "unanswered_questions": "[]",
         }
         goals = dc.markets(m.dc_fit.score_matrix(home, away))
@@ -314,7 +348,9 @@ def write_report(ledger_frame: pd.DataFrame, results: pd.DataFrame, now: pd.Time
     if upcoming.empty:
         lines.append("| none | | | | | | | | | | | |")
 
-    scored = ledger_frame.merge(results, on="match_id") if len(results) else None
+    latest = ledger_frame.sort_values("lock_utc").drop_duplicates(
+        ["match_id", "model_name"], keep="last")
+    scored = latest.merge(results, on="match_id") if len(results) else None
     if scored is not None and len(scored):
         lines += ["", "## Scored so far", "",
                   "Lower RPS is better; 0 is perfect.", "",
@@ -367,8 +403,12 @@ class Context:
 
 
 def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataFrame:
+    if FORCE_FAIL == "crash":
+        raise RuntimeError("forced failure (FP_FORCE_FAIL=crash) for the failure-path test")
     existing = ledger.load(ctx.ledger_path)
     report = freshness.check(known_as_of(ctx.matches, now), ctx.fixtures, now=now)
+    if report.stale:
+        log.warning("stale source: %s", report.summary())
     season = int(ctx.fixtures["season"].max())
     cands = candidates(ctx.fixtures, now, existing)
     # Refit every run, lock day or not (spec S5.6 step 1). This keeps the fallback
@@ -485,7 +525,19 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--read-issues", action="store_true",
                         help="with --with-news: read the question Issues on GitHub")
     args = parser.parse_args(argv)
+    global FORCE_FAIL
+    FORCE_FAIL = os.environ.get("FP_FORCE_FAIL", "") if args.dry_run else ""
+    problems = ProblemLog()
+    logging.getLogger().addHandler(problems)
+    try:
+        return _main(args)
+    finally:
+        out = os.environ.get("FP_PROBLEMS_FILE")
+        if out:
+            Path(out).write_text("\n".join(problems.lines), encoding="utf-8")
 
+
+def _main(args: argparse.Namespace) -> int:
     data_pipeline.main(skip_download=args.offline)
     matches = pd.read_parquet(build.PROCESSED / "matches.parquet")
     second_tier = pd.read_parquet(build.PROCESSED / "second_tier.parquet")

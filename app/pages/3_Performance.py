@@ -155,6 +155,24 @@ else:
                     "under 15%. Whether the model itself is wrong is judged over many matches "
                     "(the calibration chart), never from one (PRD item 12).")
 
+drift_file = lib.REPO / "data" / "audit" / "drift.json"
+if drift_file.exists():
+    st.subheader("Drift monitor")
+    drift = json.loads(drift_file.read_text(encoding="utf-8"))
+    checks = pd.DataFrame(drift["checks"])
+    if checks["flagged"].any():
+        st.error("Drift flagged: " + ", ".join(checks.loc[checks["flagged"], "market"]))
+    st.dataframe(checks[["market", "n", "live_gap", "baseline_gap", "p_holm", "note"]],
+                 hide_index=True)
+    lib.caption(f"Last four gameweeks against the backtest norm, from the weekly run of "
+                f"{drift['date']}.",
+                "Each market compares the published model with a simple benchmark on the "
+                "same matches (Elo for home, draw, away; league base rates for the "
+                "over/under lines). The gap is published minus benchmark: negative means "
+                "the published model is better. A market is flagged when its recent gap is "
+                "worse than the backtest norm by more than chance, after a Holm correction "
+                "for testing four markets at once (PRD item 11).")
+
 stack_file = lib.REPO / "data" / "stacking" / "stack_1x2.json"
 if stack_file.exists():
     st.subheader("Ensemble weights")
@@ -165,6 +183,18 @@ if stack_file.exists():
     fig.update_layout(height=260, margin=dict(l=0, r=0, t=10, b=0),
                       xaxis=dict(tickformat=".0%", range=[0, 0.6]))
     lib.chart(fig)
+    history_file = lib.REPO / "data" / "stacking" / "history.csv"
+    if history_file.exists():
+        hist = pd.read_csv(history_file)
+        wcols = [c for c in hist.columns if c.startswith("w_")]
+        if len(hist) > 1:
+            fig = go.Figure()
+            for c in wcols:
+                fig.add_scatter(x=hist["date"], y=hist[c], mode="lines+markers", name=c[2:])
+            fig.update_layout(height=280, margin=dict(l=0, r=0, t=10, b=0),
+                              yaxis=dict(tickformat=".0%"), legend=dict(orientation="h", y=-0.3))
+            lib.chart(fig)
+            st.caption("Stack weights after each weekly run.")
     lib.caption("Weight of each model in the shadow stack; the published forecast is the "
                 "Bayesian model.", "Fitted on the 2021/22 and 2022/23 backtest with a 5% "
                 "floor per model. From Phase 7 the weekly run may move each weight by at most "

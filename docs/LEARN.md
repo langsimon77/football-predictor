@@ -594,3 +594,31 @@ Every chart has a one-line caption saying what it shows, and an "Explain this" n
 
 - A single match proves nothing. A 70% favourite loses 3 times in 10. Judge the model on the calibration chart and the running scores, never on last night's upset.
 - Early-season numbers swing. Differences between models smaller than about 0.01 in RPS need a full season to mean anything.
+
+## Chapter 7: The system runs itself, within limits
+
+### 7.1 Three clocks
+
+| Run | When (Juba time) | What it does |
+|---|---|---|
+| Daily | 06:41 | Refresh data, record results, refit, ask tomorrow's questions, lock matches 24 to 48 hours out, rebuild the dashboard and the fixtures page. |
+| Weekly | Monday 08:00 | Score the week, audit the biggest misses, check for drift, re-weight the shadow stack, write `docs/weekly/<date>.md`. |
+| Monthly | 1st, 08:00 | Calibration check, refresh the model card's live record, keep the schedules switched on. |
+
+### 7.2 What the system may change by itself, and what it may not
+
+It **may** update numbers inside approved models: team ratings every day (the Bayesian refit), and the shadow stack's weights every week, by at most 10 points, never below 5%, and only after 60 scored live matches. Each weekly change is logged in `data/stacking/history.csv` with the evidence behind it.
+
+It **may not** change a model's structure, its inputs, or the code, and it never applies a calibration map to live forecasts. Those become proposals: an Issue for you, and a row in `docs/MODEL_CHANGELOG.md` marked "awaiting Lang".
+
+### 7.3 Watching for trouble
+
+- **Drift monitor.** For each market it compares the published model with a simple benchmark on the same matches, so luck on a given weekend cancels out: Elo for home, draw, away; league base rates for the over/under lines. Over the last four gameweeks, if the published model does worse than its backtest norm by more than chance, the market is flagged and you get an Issue. With four markets tested every week, a plain "2 standard errors" rule would cry wolf about once every two months; the Holm correction keeps false alarms rare (PRD item 11).
+- **Miss audit.** Every week, the five biggest surprises per league get causes tagged from data: a red card, an unanswered news question, news applied, or an upset. Only causes we control can trigger a proposed fix, and only if they keep recurring more than usual. Nobody can control a red card.
+
+### 7.4 When something breaks
+
+- If the Bayesian fit fails its checks, the run locks from the last good fit and marks the rows degraded. It never publishes a forecast from a failed fit.
+- If a shadow model, the question queue, or the dashboard fails, the published forecast still locks.
+- Either way, a run that was not clean opens a "Daily run degraded" Issue with the details. A run that stops opens "Daily run failed".
+- If a locked match moves by more than 7 days, it locks again with the reason recorded, and the new lock is the one scored (PRD item 26b).

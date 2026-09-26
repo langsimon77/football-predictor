@@ -40,14 +40,19 @@ def _weights(theta: np.ndarray, floor: float) -> np.ndarray:
     return floor + (1 - k * floor) * free
 
 
-def fit(probs: dict[str, np.ndarray], y: np.ndarray, floor: float = FLOOR) -> Stack:
+def fit(probs: dict[str, np.ndarray], y: np.ndarray, floor: float = FLOOR,
+        sample_weight: np.ndarray | None = None) -> Stack:
+    """Weights with the lowest (optionally weighted) mean log loss. sample_weight
+    lets recent matches count more (PRD item 10: time decay)."""
     models = list(probs)
     stacked = np.stack([probs[m] for m in models])        # (models, n, 3)
     chosen = stacked[:, np.arange(len(y)), y]              # (models, n)
+    sw = np.ones(len(y)) if sample_weight is None else np.asarray(sample_weight, dtype=float)
+    sw = sw / sw.sum()
 
     def loss(theta: np.ndarray) -> float:
         p = _weights(theta, floor) @ chosen
-        return float(-np.mean(np.log(np.clip(p, 1e-12, 1))))
+        return float(-np.sum(sw * np.log(np.clip(p, 1e-12, 1))))
 
     res = minimize(loss, np.zeros(len(models) - 1), method="Nelder-Mead",
                    options={"maxiter": 20000, "xatol": 1e-7, "fatol": 1e-9})

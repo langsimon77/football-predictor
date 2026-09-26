@@ -9,6 +9,11 @@ on:
         description: "Dry run: compute everything, lock nothing, commit nothing"
         type: boolean
         default: true
+      force_error:
+        description: "Failure-path test (dry runs only): none, bayes (diagnostics fail), crash"
+        type: choice
+        options: [none, bayes, crash]
+        default: none
 
 permissions:
   contents: write  # commit the ledger and report
@@ -60,6 +65,8 @@ jobs:
         env:
           FOOTBALL_DATA_ORG_TOKEN: ${{ secrets.FOOTBALL_DATA_ORG_TOKEN }}
           GH_TOKEN: ${{ github.token }}  # Question Queue: read ticks, open and close Issues
+          FP_FORCE_FAIL: ${{ github.event_name == 'workflow_dispatch' && inputs.force_error != 'none' && inputs.force_error || '' }}
+          FP_PROBLEMS_FILE: ${{ runner.temp }}/problems.txt
         run: |
           if [ "$DRY_RUN" = "true" ]; then
             uv run python -m fp.pipeline.daily --dry-run
@@ -99,6 +106,24 @@ jobs:
         uses: actions/upload-pages-artifact@v5
         with:
           path: site
+
+      - name: Open an issue if the run locked with a fallback or skipped a step
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PROBLEMS: ${{ runner.temp }}/problems.txt
+        run: |
+          if [ -s "$PROBLEMS" ]; then
+            {
+              echo "The daily run finished, but not cleanly. Forecasts were locked from the last good model where needed and marked degraded."
+              echo
+              echo '```'
+              cat "$PROBLEMS"
+              echo '```'
+              echo
+              echo "Log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            } > "$RUNNER_TEMP/issue.md"
+            gh issue create --title "Daily run degraded: $(date -u +%F)" --body-file "$RUNNER_TEMP/issue.md"
+          fi
 
       - name: Open an issue if the run failed
         if: failure()

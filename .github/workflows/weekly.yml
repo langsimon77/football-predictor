@@ -1,0 +1,82 @@
+name: Weekly review
+
+# Monday 06:00 UTC (08:00 Juba): miss audit, drift monitor, shadow-stack
+# re-weight, and docs/weekly/<date>.md (spec S10, S5.6).
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run: print the report, commit nothing"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: weekly
+  cancel-in-progress: false
+
+jobs:
+  weekly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10.2.0  # no floating major tag exists
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install locked dependencies
+        run: uv sync --frozen
+
+      - name: Restore raw data cache
+        uses: actions/cache/restore@v6
+        with:
+          path: data/raw
+          key: raw-${{ github.run_id }}
+          restore-keys: raw-
+
+      - name: Weekly review
+        env:
+          GH_TOKEN: ${{ github.token }}  # opens an Issue only if drift is flagged
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            uv run python -m fp.pipeline.weekly --dry-run
+          else
+            uv run python -m fp.pipeline.weekly
+          fi
+
+      - name: No banned dash characters
+        run: uv run python scripts/check_dashes.py
+
+      - name: Commit and push the weekly report
+        if: env.DRY_RUN != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for path in docs/weekly data/stacking data/audit; do
+            [ -e "$path" ] && git add "$path"
+          done
+          if ! git diff --cached --quiet; then
+            git commit -m "Weekly review $(date -u +%F)"
+            git pull --rebase
+            git push
+          fi
+
+      - name: Open an issue if the run failed
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "Weekly run failed: $(date -u +%F)" \
+            --body "The weekly run failed. Log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
