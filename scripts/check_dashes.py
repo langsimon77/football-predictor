@@ -11,7 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 BANNED = {chr(0x2014): "em dash", chr(0x2013): "en dash"}
-SUFFIXES = {".md", ".py", ".toml", ".yml", ".yaml", ".csv", ".html"}
+SUFFIXES = {".md", ".py", ".toml", ".yml", ".yaml", ".csv", ".html", ".json", ".txt"}
 SKIP_DIRS = {".venv", ".git", "data/raw", "data/interim", ".pytest_cache", ".ruff_cache"}
 EXEMPT = {ROOT / "docs" / "SPEC.md"}
 

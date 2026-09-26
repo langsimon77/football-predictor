@@ -14,6 +14,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 import yaml
@@ -108,23 +109,26 @@ def record_answers(state: NewsState, locked_ids: list[str], now: pd.Timestamp,
 
 def after_lock(state: NewsState, fixtures: pd.DataFrame, locked_ids: list[str],
                ledger_ids: set[str], fits: dict[str, dc.DCFit], names: dict[str, str],
-               now: pd.Timestamp, dry_run: bool, use_github: bool) -> str | None:
-    """Ask tomorrow's questions and tidy up. Returns the Issue body it would post."""
+               now: pd.Timestamp, dry_run: bool, use_github: bool) -> dict | None:
+    """Ask tomorrow's questions and tidy up. Returns the Issue it opened (or would
+    open in a dry run): title, body, and number."""
     manager_qs = [queue.ManagerQuestion(t, new, old, now)
                   for t, old, new in state.manager_changes]
     window = queue.to_ask(fixtures, now, state.asked)
     team_qs = queue.rank(window, fits)[:max(queue.MAX_QUESTIONS - len(manager_qs), 0)]
-    body = None
+    opened: dict[str, Any] | None = None
     if team_qs or manager_qs:
         title, body = queue.render(team_qs, manager_qs, names, now)
+        opened = {"title": title, "body": body, "number": None,
+                  "deadline_utc": f"{now + pd.Timedelta(days=1):%Y-%m-%dT%H:%MZ}"}
         if dry_run or not use_github:
             log.info("would open %r with %d match and %d manager questions", title,
                      len(team_qs), len(manager_qs))
         else:
-            number = github.create_issue(title, body)
-            log.info("opened Issue #%d: %s", number, title)
+            opened["number"] = github.create_issue(title, body)
+            log.info("opened Issue #%d: %s", opened["number"], title)
     if dry_run:
-        return body
+        return opened
     record_answers(state, locked_ids, now)
     managers.save(state.manager_log)
     if use_github:
@@ -138,4 +142,4 @@ def after_lock(state: NewsState, fixtures: pd.DataFrame, locked_ids: list[str],
                                    f"All matches in this Issue locked by the run at "
                                    f"{now:%Y-%m-%d %H:%M} UTC. Answers used are in "
                                    "`data/manual/answers.yaml`.")
-    return body
+    return opened

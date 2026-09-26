@@ -1,0 +1,11 @@
+[theme]
+# Neutral theme; each viewer can switch light or dark in Settings (spec S9).
+base = "light"
+primaryColor = "#0072B2"
+font = "sans serif"
+
+[client]
+toolbarMode = "viewer"
+
+[server]
+headless = true

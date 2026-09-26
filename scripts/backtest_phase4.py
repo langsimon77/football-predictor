@@ -48,6 +48,7 @@ OUT_FIG = ROOT / "reports" / "figures" / "phase4_reliability.png"
 OUT_STACK = ROOT / "data" / "stacking" / "stack_1x2.json"
 OUT_CAL = ROOT / "data" / "calibration" / "stack_1x2.json"
 OUT_TIERS = ROOT / "data" / "tiers" / "thresholds.json"
+OUT_APP = ROOT / "app" / "data" / "backtest.parquet"
 COUNT_MARKETS = {  # file stem, outcome columns, lines
     "corners": ("corners_total_poisson", ("home_corners", "away_corners"),
                 (8.5, 9.5, 10.5, 11.5)),
@@ -374,6 +375,13 @@ def main(argv: list[str] | None = None) -> int:
                       probs(common, "stack"), yc)
     second_look = diff_row("equal weights minus bdc", probs(common, "equal"),
                            probs(common, "bdc"), yc)
+
+    # The test-season table the dashboard's Performance page shows (static, committed).
+    cols = ["match_id", "league", "season", "kickoff_utc", "outcome"] + [
+        f"{m}_{k}" for m in ("base", "elo", "dc", "bdc", "stack", "mkt_avg_pre", "mkt_sharp")
+        for k in OUTCOMES]
+    OUT_APP.parent.mkdir(parents=True, exist_ok=True)
+    t.reindex(columns=cols).to_parquet(OUT_APP, index=False)
 
     # 4. Calibration on the stack: method chosen on the cross-fitted tuning forecasts.
     first, second = (s["season"] == TUNE[0]).to_numpy(), (s["season"] == TUNE[1]).to_numpy()

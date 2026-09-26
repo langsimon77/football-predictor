@@ -1,0 +1,8 @@
+# Streamlit Community Cloud installs only these: the app reads precomputed files
+# and never imports the modelling package. Versions match uv.lock.
+streamlit==1.64.0
+plotly==7.1.0
+pandas==3.0.6
+pyarrow==25.0.1
+numpy==2.5.3
+scipy==1.18.1

@@ -16,7 +16,7 @@ test:
 	$(UV) run pytest
 
 lint:
-	$(UV) run ruff check src tests scripts
+	$(UV) run ruff check src tests scripts app
 	$(UV) run python scripts/check_dashes.py
 
 typecheck:

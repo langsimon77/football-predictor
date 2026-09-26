@@ -43,6 +43,8 @@ from fp.news import impact
 from fp.news import live as news_live
 from fp.pipeline import counts_live, shadows
 from fp.pipeline import data as data_pipeline
+from fp.publish import export as publish
+from fp.publish import site
 from fp.validate import freshness
 from fp.validate.leakage import LOCK_MAX_HOURS, LOCK_MIN_HOURS, RUN_TIME_UTC, known_as_of
 
@@ -360,6 +362,8 @@ class Context:
     with_tiers: bool = False
     with_news: bool = False
     use_github: bool = False
+    publish_dir: Path | None = None
+    site_dir: Path | None = None
 
 
 def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataFrame:
@@ -400,21 +404,70 @@ def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataF
     ledger_ids = set(existing["match_id"]) if len(existing) else set()
     if len(new) and not dry_run:
         existing = ledger.append(new, ctx.ledger_path)
+    questions: list[dict] = []
     if news is not None:
         try:
-            body = news_live.after_lock(
+            opened = news_live.after_lock(
                 news, ctx.fixtures, sorted(set(cands["match_id"])), ledger_ids,
                 {lg: models[lg].dc_fit for lg in LEAGUES}, _short_names(), now, dry_run,
                 ctx.use_github)
-            if dry_run and body:
-                print(body)
+            if dry_run and opened:
+                print(opened["body"])
+            questions = question_list(news, opened)
         except Exception:
             log.exception("question queue failed after locking")
     results = (record_results(ctx.matches, ctx.fixtures, existing, now, ctx.results_path)
                if not dry_run else pd.DataFrame())
     if ctx.report_path is not None and not dry_run:
         write_report(existing, results, now, ctx.report_path)
+    if ctx.publish_dir is not None and not dry_run:
+        try:  # the dashboard never blocks the ledger
+            publish_run(ctx, now, existing, results, models, counts, news, report.stale,
+                        questions)
+        except Exception:
+            log.exception("dashboard export failed")
     return new
+
+
+def question_list(news: news_live.NewsState, opened: dict | None) -> list[dict]:
+    """Open question Issues for the dashboard's read-only Questions page."""
+    out = []
+    for issue in news.issues:
+        out.append({"title": issue["title"], "number": issue["number"],
+                    "url": issue.get("html_url"), "body": issue.get("body") or "",
+                    "created_utc": issue.get("created_at")})
+    if opened:
+        out.append({"title": opened["title"], "number": opened["number"], "url": None,
+                    "body": opened["body"], "created_utc": None,
+                    "deadline_utc": opened["deadline_utc"]})
+    return out
+
+
+def publish_run(ctx: Context, now: pd.Timestamp, locked: pd.DataFrame, results: pd.DataFrame,
+                models: dict[str, LeagueModels], counts: dict | None,
+                news: news_live.NewsState | None, stale: bool, questions: list[dict]) -> None:
+    """Provisional forecasts for unlocked matches in the window, then the
+    dashboard files and the static page. Nothing here touches the ledger."""
+    fx = ctx.fixtures
+    soon = fx[fx["time_confirmed"] & (fx["kickoff_utc"] > now)
+              & fx["match_id"].isin(publish.window(fx, now))]
+    done = set(locked["match_id"]) if len(locked) else set()
+    prov = soon[~soon["match_id"].isin(done)].assign(late_lock=False)
+    features = (rolling.features_for_fixtures(soon, ctx.matches, now)
+                if counts is not None and len(soon) else None)
+    referees = known_referees(ctx.referee_appointments, now)
+    rows = build_rows(prov, models, now, stale, counts, features, referees, news)
+    if ctx.with_tiers and len(rows):
+        rows = shadows.add_tiers(rows, PRIMARY_MODEL)
+    assert ctx.publish_dir is not None
+    view = publish.RunView(
+        now=now, ledger=locked, results=results, provisional=rows, matches=ctx.matches,
+        fixtures=fx, models=models, counts=counts, features=features, referees=referees,
+        manager_flags=news.manager_flags if news is not None else set(),
+        names=_short_names(), questions=questions, model_version=model_version()[0])
+    table = publish.export(view, ctx.publish_dir)
+    if ctx.site_dir is not None:
+        site.write(table, now, ctx.site_dir, ctx.publish_dir)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -455,6 +508,10 @@ def main(argv: list[str] | None = None) -> int:
         with_tiers=shadows.TIERS_LIVE,
         with_news=(news_live.NEWS_LIVE or args.with_news) and not replay,
         use_github=(news_live.NEWS_LIVE or args.read_issues) and not replay,
+        publish_dir=(None if args.dry_run else args.ledger.parent / "app_data" if replay
+                     else publish.OUT),
+        site_dir=(None if args.dry_run else args.ledger.parent / "site" if replay
+                  else site.SITE),
     )
 
     if replay:

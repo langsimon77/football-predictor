@@ -21,3 +21,10 @@ data/processed/
 
 # Last good Bayesian posteriors: carried between runs by the Actions cache.
 data/posteriors/
+
+# Dashboard files are rebuilt by every daily run and published with the static
+# page; only the slowly growing ratings history is committed (PRD item 25).
+app/data/*
+!app/data/ratings_history.csv
+!app/data/backtest.parquet
+site/

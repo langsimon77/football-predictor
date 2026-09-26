@@ -277,6 +277,25 @@ def _pmf(mu: np.ndarray, alpha: np.ndarray | None, k: np.ndarray) -> np.ndarray:
     return nbinom.pmf(k[None, :], n, n / (n + mu[:, None]))
 
 
+def match_eta(post: CountPosterior, row: dict) -> np.ndarray:
+    """Log expected total per draw for a match-level target, before any referee
+    effect: intercept, both clubs' effects, and the match covariates."""
+    d = post.draws
+    idx = {t: i for i, t in enumerate(post.teams)}
+    spec = MATCH_COVARIATES[post.target]
+    x = np.array([np.nan_to_num(_z([row[k]], post.scales[k]))[0] for k in spec["continuous"]]
+                 + [float(row[k]) for k in spec["binary"]])
+    return (d["intercept"] + d["disc"][:, idx[row["home"]]] + d["disc"][:, idx[row["away"]]]
+            + d["b"] @ x)
+
+
+def pmf_from_eta(eta: np.ndarray, alpha: np.ndarray | None, target: str) -> np.ndarray:
+    """Posterior predictive pmf of the total from log-mean draws."""
+    k = np.arange(MAX_COUNT[target] + 1)
+    pmf = _pmf(np.exp(eta), alpha, k).mean(axis=0)
+    return pmf / pmf.sum()
+
+
 def predict(post: CountPosterior, row: dict, rng: np.random.Generator | None = None) -> dict:
     """Posterior predictive for one match. row holds the same fields as the training
     rows (for corners: both sides' gap and shots; for cards: home, away, referee...).
@@ -303,11 +322,7 @@ def predict(post: CountPosterior, row: dict, rng: np.random.Generator | None = N
             total[:, j] = (home_pmf[:, : j + 1] * away_pmf[:, j::-1]).sum(axis=1)
         extra = {"exp_home": float(mus[0].mean()), "exp_away": float(mus[1].mean())}
     else:
-        spec = MATCH_COVARIATES[post.target]
-        x = np.array([np.nan_to_num(_z([row[k]], post.scales[k]))[0] for k in spec["continuous"]]
-                     + [float(row[k]) for k in spec["binary"]])
-        eta = (d["intercept"] + d["disc"][:, idx[row["home"]]] + d["disc"][:, idx[row["away"]]]
-               + d["b"] @ x)
+        eta = match_eta(post, row)
         ref_known = False
         if "ref" in d:
             name = row.get("referee")

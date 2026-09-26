@@ -564,3 +564,33 @@ Whenever news moves a forecast, the run also locks the same forecast without new
 The spec gives two versions of the unanswered rule: "the tier drops one level" (S6) and "a data flag" (S7). We use the flag, the same as every other data problem (your decision, 26 Sep 2026). With one flag, High becomes Medium and Medium stays Medium.
 
 You switched the queue on and accepted the effect sizes on 26 Sep 2026. A self-test on GitHub opened a test Issue (#2), ticked it as the bot, read the ticks back through the trust rule, and closed it [V: workflow runs 36225539559 and 36225611381].
+
+## Chapter 6: Seeing the forecasts
+
+### 6.1 Two front doors
+
+- **The fixtures page** (GitHub Pages) is one small file, about 19 KB, with no downloads beyond itself [V: measured locally]. It lists the next matches with a bar for home, draw, and away, expected goals, corners, and yellows, the tier, and any news. It should open in about a second on a 4G phone in Juba [E: one request of 19 KB]. It follows your phone's light or dark setting.
+- **The dashboard** (Streamlit) has seven pages for digging deeper. It is slower to open, especially after a quiet night, when the free host puts it to sleep and waking takes half a minute or more [E, PRD item Q4]. That is why the fixtures page exists.
+
+Both read only files the daily run already computed. Nothing is fitted when you open a page.
+
+### 6.2 The seven pages
+
+1. **Fixtures.** Every match in the next 8 days, or the next round after an international break. Filters for league, day, market, and tier; Juba time or UTC; CSV download.
+2. **Match deep-dive.** The scoreline table, goals, corners, and yellows distributions with the betting lines marked, what every model says, the five strongest reasons behind the forecast, news, the referee, and how sure the model is.
+3. **Team ratings.** Each club's attack and defence with 80% ranges, their path over the season, and 10,000 simulated finishes: title, top four, relegation.
+4. **Performance.** The live record against base rates, Elo, and the market; calibration; how each tier did; the biggest misses with their causes tagged; the stack weights; and the three-season backtest for context.
+5. **What-if.** A sandbox: take starters out, remove home advantage, change the EPL referee, and see the forecast move. It never touches the ledger.
+6. **Questions.** Today's Question Queue, read-only, with a button to answer on GitHub.
+7. **Methods.** This document, the model card, and the changelog, with anything awaiting your approval flagged at the top.
+
+### 6.3 Provisional and locked
+
+A match shows as **Provisional** until it locks 24 to 48 hours before kickoff. A provisional forecast updates every morning as results and your answers arrive; a locked one never changes. Only locked forecasts are scored (PRD item 26a).
+
+### 6.4 Reading a chart honestly
+
+Every chart has a one-line caption saying what it shows, and an "Explain this" note on the method. Two habits help:
+
+- A single match proves nothing. A 70% favourite loses 3 times in 10. Judge the model on the calibration chart and the running scores, never on last night's upset.
+- Early-season numbers swing. Differences between models smaller than about 0.01 in RPS need a full season to mean anything.
