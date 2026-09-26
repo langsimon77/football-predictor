@@ -41,18 +41,26 @@ def _weights(theta: np.ndarray, floor: float) -> np.ndarray:
 
 
 def fit(probs: dict[str, np.ndarray], y: np.ndarray, floor: float = FLOOR,
-        sample_weight: np.ndarray | None = None) -> Stack:
+        sample_weight: np.ndarray | None = None, anchor: np.ndarray | None = None,
+        pull: float = 0.0) -> Stack:
     """Weights with the lowest (optionally weighted) mean log loss. sample_weight
-    lets recent matches count more (PRD item 10: time decay)."""
+    lets recent matches count more (PRD item 10: time decay). With pull > 0, the
+    loss adds pull * sum((w - anchor)^2), a gentle pull towards `anchor` (usually
+    the current weights) that steadies an ill-conditioned fit."""
     models = list(probs)
     stacked = np.stack([probs[m] for m in models])        # (models, n, 3)
     chosen = stacked[:, np.arange(len(y)), y]              # (models, n)
     sw = np.ones(len(y)) if sample_weight is None else np.asarray(sample_weight, dtype=float)
     sw = sw / sw.sum()
 
+    centre = None if anchor is None else np.asarray(anchor, dtype=float)
+
     def loss(theta: np.ndarray) -> float:
-        p = _weights(theta, floor) @ chosen
-        return float(-np.sum(sw * np.log(np.clip(p, 1e-12, 1))))
+        w = _weights(theta, floor)
+        value = -np.sum(sw * np.log(np.clip(w @ chosen, 1e-12, 1)))
+        if pull > 0 and centre is not None:
+            value += pull * np.sum((w - centre) ** 2)
+        return float(value)
 
     res = minimize(loss, np.zeros(len(models) - 1), method="Nelder-Mead",
                    options={"maxiter": 20000, "xatol": 1e-7, "fatol": 1e-9})

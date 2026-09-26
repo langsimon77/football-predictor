@@ -53,3 +53,12 @@ def test_no_move_before_enough_live_predictions():
     current = np.array([0.5, 0.5])
     new = stacking.guarded_update(current, np.array([0.1, 0.9]), n_scored=59)
     assert np.allclose(new, current)
+
+
+def test_pull_keeps_weights_near_the_anchor():
+    probs, y = world()
+    anchor = np.array([0.2, 0.4, 0.4])
+    free = stacking.fit(probs, y)
+    held = stacking.fit(probs, y, anchor=anchor, pull=10.0)
+    assert np.abs(held.weights - anchor).sum() < np.abs(free.weights - anchor).sum()
+    assert held.weights.sum() == pytest.approx(1.0)

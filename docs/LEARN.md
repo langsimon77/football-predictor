@@ -622,3 +622,11 @@ It **may not** change a model's structure, its inputs, or the code, and it never
 - If a shadow model, the question queue, or the dashboard fails, the published forecast still locks.
 - Either way, a run that was not clean opens a "Daily run degraded" Issue with the details. A run that stops opens "Daily run failed".
 - If a locked match moves by more than 7 days, it locks again with the reason recorded, and the new lock is the one scored (PRD item 26b).
+
+### 7.5 A test that said no
+
+The stack's weights jumped around when refitted on one season. A fix was to pull each weekly fit gently towards the current weights. Before running the test, the rule was written down: adopt only if accuracy is no worse *and* the weights become at least twice as steady on two measures [V: `docs/DECISIONS.md`, 26 Sep 2026].
+
+On the three test seasons, the pulled fit was slightly more accurate and five times less jumpy from week to week. But on the second measure, how far the weights move when every input is nudged by one part in a million, it was not better (0.009 against 0.006, both tiny) [V: `reports/stack_steadiness.md`]. So the answer is no, and the live run keeps the plain fit.
+
+Why keep a rule that a good-looking result just failed? Because a rule bent after seeing the numbers stops protecting you. Deciding the test first is what makes the answer believable, in football forecasting as in reservoir studies. The 10-point weekly cap already limits any swing, and the stack is a shadow model, so the cost of saying no is small.

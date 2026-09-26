@@ -21,12 +21,11 @@
 
 ### Known weaknesses
 - GitHub can start the daily schedule hours late (five hours on 25 Sep). Locks stay correct (the window is measured from the actual start), but Juba-time deadlines slip.
-- Stack weight fit is ill-conditioned; a steadier fit is proposed (MODEL_CHANGELOG).
+- Stack weight fit is ill-conditioned; a steadier fit was tested and not adopted under the pre-set rule (`reports/stack_steadiness.md`).
 - No free source of penalties or line-ups for the miss audit.
 
 ### Open questions for Lang
 1. Deploy the dashboard on Streamlit Cloud (steps in the session summary); send the app address.
-2. Approve testing a steadier stack fit before the weights can first move (late October)?
 
 ### Next actions
 | Action | Owner |
