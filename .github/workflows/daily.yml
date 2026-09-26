@@ -3,8 +3,8 @@ name: Daily predictions
 on:
   schedule:
     - cron: "41 4 * * *"   # 04:41 UTC = 06:41 Juba. Off the hour: GitHub delays on-the-hour jobs.
-    # Backups: GitHub can delay or drop scheduled runs (25 Sep ran 5 hours late; the
-    # 26 Sep run never started). A backup does nothing if today's run already committed.
+    # Backups: GitHub delays scheduled runs (25 and 26 Sep both started about 5 hours
+    # late) and may drop them. A backup does nothing if today's run already committed.
     - cron: "41 10 * * *"
     - cron: "41 16 * * *"
   workflow_dispatch:
