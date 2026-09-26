@@ -4,7 +4,7 @@ Uses a made-up match, so the daily run can never act on it, and closes the Issue
 at the end. Run by .github/workflows/queue_selftest.yml with the bot's token,
 the same path the daily run uses.
 
-    uv run python scripts/queue_selftest.py
+    uv run python scripts/queue_selftest.py [--issue N]
 """
 
 from __future__ import annotations
@@ -19,25 +19,34 @@ from fp.news.impact import TeamNews
 MATCH = "TEST_2627_home_club_away_club"
 
 
-def main() -> int:
+def get(number: int) -> dict:
+    return github._api(f"repos/{github.repo()}/issues/{number}")
+
+
+def main(argv: list[str] | None = None) -> int:
+    """With --issue N, reuse an earlier test Issue (no new email); else open one."""
+    args = argv if argv is not None else sys.argv[1:]
     now = pd.Timestamp.now(tz="UTC")
     q = queue.TeamNewsQuestion(MATCH, "EPL", now + pd.Timedelta(days=2), "home_club",
                                "away_club", 0.04)
     _, body = queue.render([q], [], {"home_club": "Home Club", "away_club": "Away Club"}, now)
-    title = f"{queue.TITLE_PREFIX}TEST of the Question Queue, please ignore"
-    number = github.create_issue(title, body)
-    print(f"opened #{number}")
+    if args[:1] == ["--issue"]:
+        number = int(args[1])
+        assert get(number)["title"].startswith(queue.TITLE_PREFIX + "TEST"), "not a test Issue"
+        print(f"reusing #{number}")
+    else:
+        title = f"{queue.TITLE_PREFIX}TEST of the Question Queue, please ignore"
+        number = github.create_issue(title, body)
+        print(f"opened #{number}")
     ok = False
     try:
-        found = [i for i in github.open_issues(queue.TITLE_PREFIX) if i["number"] == number]
-        assert found, "new Issue not listed"
         ticked = "\n".join(line.replace("- [ ]", "- [x]")
                            if f"fp:{MATCH}:home:2 -->" in line
                            or f"fp:{MATCH}:away:threat -->" in line else line
                            for line in body.splitlines())
         github._api("-X", "PATCH", f"repos/{github.repo()}/issues/{number}", "-f",
                     f"body={ticked}")
-        issue = [i for i in github.open_issues(queue.TITLE_PREFIX) if i["number"] == number][0]
+        issue = get(number)
         edits = github.editors(number)
         author = str(issue["user"]["login"])
         print(f"author {author}, edits by {edits}")
@@ -49,8 +58,9 @@ def main() -> int:
         ok = True
         print("ticks read back correctly")
     finally:
-        github.close_issue(number, "Self-test finished: " + ("passed." if ok else "FAILED."))
-        print(f"closed #{number}")
+        if get(number)["state"] == "open":
+            github.close_issue(number, "Self-test finished: " + ("passed." if ok else "FAILED."))
+            print(f"closed #{number}")
     return 0 if ok else 1
 
 

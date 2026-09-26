@@ -6,6 +6,11 @@ name: Question Queue self-test
 
 on:
   workflow_dispatch:
+    inputs:
+      issue:
+        description: "Reuse this earlier test Issue number (blank opens a new one)"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -29,4 +34,10 @@ jobs:
       - name: Round trip
         env:
           GH_TOKEN: ${{ github.token }}
-        run: uv run python scripts/queue_selftest.py
+          ISSUE: ${{ inputs.issue }}
+        run: |
+          if [ -n "$ISSUE" ]; then
+            uv run python scripts/queue_selftest.py --issue "$ISSUE"
+          else
+            uv run python scripts/queue_selftest.py
+          fi
