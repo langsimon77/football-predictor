@@ -39,7 +39,7 @@ from fp.models import bayes_dc, elo, posterior_store
 from fp.models import dixon_coles as dc
 from fp.models.priors import PromotedPrior, season_teams
 from fp.models.promotion import PromotionModel, fit_promotion_model, promoted_priors
-from fp.pipeline import counts_live
+from fp.pipeline import counts_live, shadows
 from fp.pipeline import data as data_pipeline
 from fp.validate import freshness
 from fp.validate.leakage import LOCK_MAX_HOURS, LOCK_MIN_HOURS, RUN_TIME_UTC, known_as_of
@@ -221,6 +221,8 @@ MODEL_LABELS = {
     BAYES_MODEL: "Bayesian Dixon-Coles with shots on target",
     DC_MODEL: "fast maximum-likelihood Dixon-Coles",
     ELO_MODEL: "Elo",
+    shadows.STACK_MODEL: "stacked ensemble (shadow)",
+    **{v: f"{k.replace('_', ' ')} (shadow)" for k, v in shadows.CHALLENGER_MODELS.items()},
 }
 
 
@@ -247,13 +249,15 @@ def write_report(ledger_frame: pd.DataFrame, results: pd.DataFrame, now: pd.Time
         "",
         f"Updated {now.tz_convert(juba):%a %d %b %Y, %H:%M} Juba time. Primary model: "
         f"`{PRIMARY_MODEL}` ({MODEL_LABELS[PRIMARY_MODEL]}). Probabilities are locked and "
-        "never edited. The range after the home-win chance is the model's 80% interval.",
+        "never edited. The range after the home-win chance is the model's 80% interval. "
+        "Tier: how far to trust the home, draw, away forecast, then over 2.5 goals "
+        "(High, Medium, Low; see `docs/LEARN.md` chapter 4).",
         "",
         "## Locked, not yet played",
         "",
-        "| Kickoff (Juba) | Match | Home (80% range) | Draw | Away | Over 2.5 | BTTS | "
+        "| Kickoff (Juba) | Match | Home (80% range) | Draw | Away | Tier | Over 2.5 | BTTS | "
         "Exp. goals | Exp. corners | Exp. yellows | Flags |",
-        "|---|---|---|---|---|---|---|---|---|---|---|",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for r in upcoming.itertuples():
         flags = [f.split(":")[0] for f in json.loads(str(r.flags))
@@ -269,14 +273,16 @@ def write_report(ledger_frame: pd.DataFrame, results: pd.DataFrame, now: pd.Time
             lo, hi = intervals["p_home"]
             home += f" ({lo:.0%} to {hi:.0%})"
         kickoff = cast(pd.Timestamp, r.kickoff_utc).tz_convert(juba)
+        tier_map = json.loads(str(r.tiers)) if isinstance(r.tiers, str) else {}
+        tier = ", ".join(tier_map[k] for k in ("1x2", "over_2_5") if k in tier_map)
         lines.append(
             f"| {kickoff:%a %d %b %H:%M} | {short[r.home_id]} v {short[r.away_id]} | {home} | "
-            f"{r.p_draw:.0%} | {r.p_away:.0%} | {r.p_over_2_5:.0%} | {r.p_btts:.0%} | "
+            f"{r.p_draw:.0%} | {r.p_away:.0%} | {tier} | {r.p_over_2_5:.0%} | {r.p_btts:.0%} | "
             f"{r.exp_goals_home:.1f} to {r.exp_goals_away:.1f} | {corners} | {yellows} | "
             f"{', '.join(flags) or 'none'} |"
         )
     if upcoming.empty:
-        lines.append("| none | | | | | | | | | | |")
+        lines.append("| none | | | | | | | | | | | |")
 
     scored = ledger_frame.merge(results, on="match_id") if len(results) else None
     if scored is not None and len(scored):
@@ -316,6 +322,8 @@ class Context:
     store: Path = posterior_store.STORE
     with_counts: bool = False
     referee_appointments: pd.DataFrame | None = None
+    with_shadows: bool = False
+    with_tiers: bool = False
 
 
 def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataFrame:
@@ -337,6 +345,19 @@ def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataF
             fixture_features = rolling.features_for_fixtures(cands, ctx.matches, now)
             referees = known_referees(ctx.referee_appointments, now)
     new = build_rows(cands, models, now, report.stale, counts, fixture_features, referees)
+    if ctx.with_shadows and len(cands):
+        try:  # shadows never block the published forecast
+            challengers = shadows.fit_challengers(ctx.matches, now)
+            feats = shadows.fixture_features(cands, ctx.matches, ctx.fixtures, now, models,
+                                             fixture_features)
+            new = shadows.add_shadows(new, challengers, feats)
+        except Exception:
+            log.exception("shadow models failed; locking without them")
+    if ctx.with_tiers and len(new):
+        try:
+            new = shadows.add_tiers(new, PRIMARY_MODEL)
+        except Exception:
+            log.exception("tiers failed; locking without them")
     log.info("%s: %d matches to lock", now, len(cands))
     if len(new) and not dry_run:
         existing = ledger.append(new, ctx.ledger_path)
@@ -377,6 +398,8 @@ def main(argv: list[str] | None = None) -> int:
         store=(args.ledger.parent / "posteriors" if replay else posterior_store.STORE),
         with_counts=counts_live.COUNTS_LIVE or args.with_counts,
         referee_appointments=pd.read_parquet(build.PROCESSED / "referee_appointments.parquet"),
+        with_shadows=shadows.SHADOWS_LIVE,
+        with_tiers=shadows.TIERS_LIVE,
     )
 
     if replay:

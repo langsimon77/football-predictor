@@ -340,7 +340,8 @@ def main(argv: list[str] | None = None) -> int:
     put(s, "stack_weekly", weekly[test], rows=np.flatnonzero(test))
     stacking_json = {"models": st.models, "weights": [round(float(w), 4) for w in st.weights],
                      "floor": st.floor, "fitted_on": "2021/22 and 2022/23 walk-forward predictions",
-                     "n_matches": int(tune.sum()), "use": False}
+                     "n_matches": int(tune.sum()),
+                     "use": "shadow: logged daily, not published (Lang, 26 Sep 2026)"}
     OUT_STACK.parent.mkdir(parents=True, exist_ok=True)
     OUT_STACK.write_text(json.dumps(stacking_json, indent=2) + "\n", encoding="utf-8")
 
@@ -454,14 +455,15 @@ def main(argv: list[str] | None = None) -> int:
             parts[stage] = (p.max(1), width, dis, top == y, surprise, surprise - entropy,
                             frame["flag_promoted"].to_numpy())
         fav, width, dis = parts["tuning"][:3]
-        th = tiers.fit(f"1x2_{fc}", fav, width, dis,
+        th = tiers.fit("1x2" if fc == "bdc" else f"1x2_{fc}", fav, width, dis,
                        basis=f"{fc} forecasts, 2021/22 and 2022/23"
                              + (" (stack cross-fitted)" if fc == "stack" else ""))
         assert th.width_max is not None and th.disagree_max is not None
         all_thresholds.append(th)
         tiers_1x2[fc] = {}
         for stage, (fav, width, dis, hit, sur, exc, flag) in parts.items():
-            tier = tiers.assign(th, fav, flag.astype(int), width=width, disagree=dis)
+            tier = tiers.assign(th, fav, np.zeros(len(fav), dtype=int), width=width,
+                                disagree=dis)
             tiers_1x2[fc][stage] = tier_rows(f"1X2 {fc}", tier, fav, hit, sur, exc)
             evidence += [evidence_row(f"{fc}: wide interval", stage, width > th.width_max, exc),
                          evidence_row(f"{fc}: stack and Bayesian disagree", stage,
@@ -469,41 +471,53 @@ def main(argv: list[str] | None = None) -> int:
                          evidence_row(f"{fc}: promoted club, under 6 games", stage, flag, exc)]
     th_by = {th.market: th for th in all_thresholds}
 
-    # 7. Tiers for over/under lines.
+    # 7. Tiers for over/under lines. Flags follow the rule Lang approved on 26 Sep
+    # 2026: the promoted-club flag is shown but never caps a tier. The only flag
+    # with history is the unknown referee for cards.
     ou_tier_rows: dict[str, list[dict]] = {"tuning": [], "test": []}
     ou_evidence = []
-    goals_parts = {}
-    for stage, mask in (("tuning", tune), ("test", test)):
-        frame = s[mask]
-        happened = (frame["home_goals"] + frame["away_goals"]).to_numpy() > 2.5
-        iv = frame["bdc_intervals"].map(json.loads)
-        width = np.array([d["p_over_2_5"][1] - d["p_over_2_5"][0] for d in iv])
-        goals_parts[stage] = (*binary_parts(frame["bdc_over_2_5"].to_numpy(), happened), width,
-                              frame["flag_promoted"].to_numpy().astype(int))
-    th_goals = tiers.fit("goals_over_2_5", goals_parts["tuning"][0], goals_parts["tuning"][4],
-                         basis="dc_bayes_v1, 2021/22 and 2022/23")
-    all_thresholds.append(th_goals)
-    for stage, (fav, hit, sur, exc, width, flags) in goals_parts.items():
-        tier = tiers.assign(th_goals, fav, flags, width=width)
-        ou_tier_rows[stage] += tier_rows("goals over 2.5", tier, fav, hit, sur, exc)
-        if stage == "test":
-            ou_evidence.append(evidence_row("goals over 2.5: promoted club, under 6 games",
-                                            stage, flags.astype(bool), exc))
+    goal_lines = {"over_1_5": 1.5, "over_2_5": 2.5, "over_3_5": 3.5, "btts": None}
+    goal_probs = pd.DataFrame([{k: dc.markets(np.asarray(flat, dtype=float).reshape(11, 11))[
+        f"p_{k}"] for k in goal_lines} for flat in s["bdc_matrix"]], index=s.index)
+    for market, line in goal_lines.items():
+        parts = {}
+        for stage, mask in (("tuning", tune), ("test", test)):
+            frame = s[mask]
+            if line is None:
+                happened = ((frame["home_goals"] > 0) & (frame["away_goals"] > 0)).to_numpy()
+            else:
+                happened = (frame["home_goals"] + frame["away_goals"]).to_numpy() > line
+            iv = frame["bdc_intervals"].map(json.loads)
+            width = np.array([d[f"p_{market}"][1] - d[f"p_{market}"][0] for d in iv])
+            parts[stage] = (*binary_parts(goal_probs.loc[mask, market].to_numpy(), happened),
+                            width, frame["flag_promoted"].to_numpy())
+        th = tiers.fit(market, parts["tuning"][0], parts["tuning"][4],
+                       basis="dc_bayes_v1, 2021/22 and 2022/23")
+        all_thresholds.append(th)
+        label = market.replace("_", " ").replace(" 1 5", " 1.5").replace(" 2 5", " 2.5") \
+            .replace(" 3 5", " 3.5")
+        label = "both teams score" if market == "btts" else f"goals {label}"
+        for stage, (fav, hit, sur, exc, width, promoted_flag) in parts.items():
+            tier = tiers.assign(th, fav, np.zeros(len(fav), dtype=int), width=width)
+            ou_tier_rows[stage] += tier_rows(label, tier, fav, hit, sur, exc)
+            if stage == "test":
+                ou_evidence.append(evidence_row(f"{label}: promoted club, under 6 games",
+                                                stage, promoted_flag, exc))
     counts = count_markets(s)
     for market, frame in counts.items():
         is_tune = frame["season"].isin(TUNE).to_numpy()
+        prefix = "corners" if market == "corners" else "yellows"
         for line in COUNT_MARKETS[market][2]:
             col = f"p_over_{str(line).replace('.', '_')}"
             fav, hit, sur, exc = binary_parts(frame[col].to_numpy(),
                                               frame["total"].to_numpy() > line)
-            flags = frame["flag_promoted"].to_numpy().astype(int)
-            if market == "cards":
-                flags = flags + (~frame["referee_known"].to_numpy().astype(bool)).astype(int)
-            th = tiers.fit(f"{market}_over_{line}", fav[is_tune],
+            unknown = ~frame["referee_known"].to_numpy().astype(bool) if market == "cards" \
+                else np.zeros(len(frame), dtype=bool)
+            th = tiers.fit(f"{prefix}_over_{str(line).replace('.', '_')}", fav[is_tune],
                            basis=f"{COUNT_MARKETS[market][0]}_v1, 2021/22 and 2022/23")
             all_thresholds.append(th)
             for stage, sel in (("tuning", is_tune), ("test", ~is_tune)):
-                tier = tiers.assign(th, fav[sel], flags[sel])
+                tier = tiers.assign(th, fav[sel], unknown[sel].astype(int))
                 ou_tier_rows[stage] += tier_rows(f"{market} over {line}", tier, fav[sel],
                                                  hit[sel], sur[sel], exc[sel])
             ou_evidence.append(evidence_row(f"{market} over {line}: promoted club, under 6 games",
@@ -511,12 +525,14 @@ def main(argv: list[str] | None = None) -> int:
                                             exc[~is_tune]))
             if market == "cards":
                 epl_test = (~is_tune) & (frame["league"] == "EPL").to_numpy()
-                unknown = ~frame["referee_known"].to_numpy().astype(bool)
                 ou_evidence.append(evidence_row(f"cards over {line}: EPL referee unknown",
                                                 "test", unknown[epl_test], exc[epl_test]))
-    tiers.save(all_thresholds, OUT_TIERS, use=False,
-               rule="favoured probability sets the start; wide interval or disagreement drops "
-                    "one tier; one flag caps at Medium; two or more force Low")
+    tiers.save(all_thresholds, OUT_TIERS, use=True, version="tiers_v1",
+               approved="Lang, 26 Sep 2026",
+               rule="favoured probability sets the start; wide interval or ensemble "
+                    "disagreement drops one tier; one flag caps at Medium; two or more force "
+                    "Low. Flags: source failure, unknown referee (cards), unanswered key "
+                    "question, manager change. The promoted-club flag is shown, never counted.")
 
     # 8. Figure: reliability of the stack and of each 1X2 tier, test seasons.
     OUT_FIG.parent.mkdir(parents=True, exist_ok=True)
@@ -671,13 +687,13 @@ Over/under 2.5 against the market (test seasons, matches with odds):
 Two candidate published forecasts: the Bayesian primary (`bdc`, live now) and the
 stack. Each gets its own cut points from the tuning seasons:
 
-{table([asdict(th_by[k]) for k in ("1x2_bdc", "1x2_stack")])}
+{table([asdict(th_by[k]) for k in ("1x2", "1x2_stack")])}
 
 `high` and `low`: top quarter and bottom third of tuning favoured probabilities.
 `width_max` and `disagree_max`: widest or most disputed tenth of tuning forecasts;
-above either drops one tier. A promoted club with fewer than 6 league games caps
-the tier at Medium. Other flags (manager change, unanswered question, source
-failure) have no history and apply live only.
+above either drops one tier. Flags (source failure, unanswered question, manager
+change) have no history and apply live only. The promoted-club flag is shown but
+does not cap the tier (Lang, 26 Sep 2026; evidence below).
 
 `gap` = hit rate minus mean favoured probability (0 is honest; above 0 means the
 favourite won more often than promised). `excess_surprise` = log loss minus the
@@ -709,8 +725,7 @@ worse than promised.
 Favoured probability = the likelier side of the line. Cut points per line from
 the tuning seasons, same quantiles as above. Goals also use the 80% interval
 width. Cards count an unknown referee as a flag (all La Liga matches, most EPL
-Friday and Saturday matches), so with a promoted club early in the season a
-cards forecast has two flags and is Low.
+Friday and Saturday matches), which caps them at Medium.
 
 ### Hit rates clearly separated on the test seasons?
 

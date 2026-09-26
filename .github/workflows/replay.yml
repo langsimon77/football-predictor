@@ -1,0 +1,54 @@
+name: Replay daily runs
+
+# Runs the daily loop at 04:41 UTC on each day from START to END, using only data
+# known on each day, into a scratch ledger. Commits nothing: the scratch ledger,
+# report, and posteriors are uploaded as an artifact. Used to test pipeline
+# changes on GitHub's runner before they touch the real ledger.
+
+on:
+  workflow_dispatch:
+    inputs:
+      start:
+        description: "First day (YYYY-MM-DD)"
+        required: true
+      end:
+        description: "Last day (YYYY-MM-DD)"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10.2.0  # no floating major tag exists
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install locked dependencies
+        run: uv sync --frozen
+
+      - name: Restore raw data cache
+        uses: actions/cache/restore@v6
+        with:
+          path: data/raw
+          key: raw-${{ github.run_id }}
+          restore-keys: raw-
+
+      - name: Replay
+        env:
+          FOOTBALL_DATA_ORG_TOKEN: ${{ secrets.FOOTBALL_DATA_ORG_TOKEN }}
+          START: ${{ inputs.start }}
+          END: ${{ inputs.end }}
+        run: uv run python -m fp.pipeline.daily --replay "$START" "$END" --ledger out/predictions.parquet
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: replay
+          path: out/
+          retention-days: 30

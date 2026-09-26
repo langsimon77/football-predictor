@@ -26,6 +26,7 @@ TIERS = ("Low", "Medium", "High")
 HIGH_QUANTILE = 0.75     # top quarter of tuning forecasts starts High
 LOW_QUANTILE = 1 / 3     # bottom third starts Low
 TAIL_QUANTILE = 0.90     # widest or most disputed tenth drops one tier
+EPS = 1e-9               # a value equal to a cut point, give or take rounding, counts as equal
 
 
 @dataclass
@@ -55,11 +56,11 @@ def assign(th: Thresholds, favoured: np.ndarray, n_flags: np.ndarray,
            width: np.ndarray | None = None, disagree: np.ndarray | None = None) -> np.ndarray:
     """Tier name for every forecast."""
     favoured = np.asarray(favoured, dtype=float)
-    level = np.where(favoured >= th.high, 2, np.where(favoured < th.low, 0, 1))
+    level = np.where(favoured >= th.high - EPS, 2, np.where(favoured < th.low - EPS, 0, 1))
     demote = np.zeros(len(favoured), dtype=bool)
     for values, limit in ((width, th.width_max), (disagree, th.disagree_max)):
         if values is not None and limit is not None:
-            demote |= np.nan_to_num(np.asarray(values, dtype=float), nan=-np.inf) > limit
+            demote |= np.nan_to_num(np.asarray(values, dtype=float), nan=-np.inf) > limit + EPS
     level = np.maximum(level - demote, 0)
     n_flags = np.asarray(n_flags)
     level = np.where(n_flags >= 1, np.minimum(level, 1), level)

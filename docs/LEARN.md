@@ -472,14 +472,14 @@ Every match still gets a forecast. The tier is a label: how far to trust it.
 
 1. Favoured probability sets the starting tier. For home, draw, away that is the top probability. For an over/under line it is the chance of the likelier side. Cut points come from the tuning seasons: the top quarter starts High, the bottom third starts Low [A: the quarter and third are design choices].
 2. Uncertainty drops one tier: an 80% interval wider than 90% of tuning forecasts, or the stack and the Bayesian model disagreeing more than 90% of tuning forecasts.
-3. Data flags: one caps the tier at Medium; two force Low. Flags: promoted club with fewer than 6 league games, unknown referee (cards), manager change in the last 30 days, unanswered key question, source failure.
+3. Data flags: one caps the tier at Medium; two force Low. Flags: unknown referee (cards), manager change in the last 30 days, unanswered key question, source failure. A promoted club with fewer than 6 league games is shown in the flags column but does not count (see below).
 
-**Results for the Bayesian forecast, test seasons** [V: section 6 of the report]:
+**Results for the Bayesian forecast, test seasons, under the rule now live** [V: section 6 of the report]:
 
 | Tier | Share of matches | Promised (mean top probability) | Favourite won | 95% interval |
 |---|---|---|---|---|
-| High | 19% | 68% | 74% | 70% to 78% |
-| Medium | 42% | 53% | 54% | 51% to 57% |
+| High | 20% | 68% | 74% | 70% to 78% |
+| Medium | 41% | 53% | 53% | 50% to 56% |
 | Low | 39% | 42% | 43% | 39% to 46% |
 
 The three tiers are clearly apart: no interval overlaps the next. High wins more often than promised, the known timidity from chapter 2.
@@ -487,9 +487,9 @@ The three tiers are clearly apart: no interval overlaps the next. High wins more
 **The honest test (PRD item 13).** Separation by top probability is arithmetic: any sensible model shows it. The real question is whether the other inputs pick out forecasts that do worse than they promise. We measure "excess surprise": the log loss a forecast earned, minus the log loss it expected of itself. Zero means honest; above zero means worse than promised.
 
 - **Wide interval, disagreement:** no clear effect for the Bayesian forecast. For the stack, big disagreement with the Bayesian model does flag worse forecasts on the test seasons (+0.083, interval +0.012 to +0.154).
-- **Promoted club, early season:** the opposite of its purpose. Those forecasts did *better* than promised (−0.084, interval −0.154 to −0.010). The promoted-team prior from chapter 2 appears to handle them well. I recommend dropping this flag from the caps.
+- **Promoted club, early season:** the opposite of its purpose. Those forecasts did *better* than promised (−0.084, interval −0.154 to −0.010). The promoted-team prior from chapter 2 appears to handle them well. So it no longer caps a tier (your decision, 26 Sep 2026); it stays visible as a note.
 - **Unknown EPL referee:** cards over 3.5 forecasts without a known referee do worse than promised (+0.030, interval +0.009 to +0.049). The flag earns its place.
-- **Over/under lines:** forecasts sit between about 50% and 75%, so the tiers barely separate. Clearly separated on only 2 of 8 lines. Read an over/under High as "a bit surer", not "safe".
+- **Over/under lines:** forecasts sit between about 50% and 75%, so the tiers barely separate. Clearly separated on only 4 of 11 lines (over 1.5 and over 3.5 goals, over 8.5 corners, over 5.5 yellows). Read an over/under High as "a bit surer", not "safe".
 
 ### 4.6 Worked example: Arsenal v Leeds, locked Fri 9 Oct, 04:41 UTC
 
@@ -511,11 +511,15 @@ Tiers for the published Bayesian forecast:
 | Market | Favoured side | Tier | Why |
 |---|---|---|---|
 | 1X2 | Arsenal 62% | High | 62% is above the 58% cut; interval 14 points wide (limit 16); stack and Bayesian differ by 1 point (limit 7); no flags. |
-| Over/under 2.5 goals | Under, 56% | Medium | Between the 55% and 61% cuts. |
+| Over/under 2.5 goals | Under, 56% | Medium | Between the 55% and 61% cuts. Its interval (36% to 52%) sits right on the 16-point limit, so the live run's unrounded numbers decide whether it drops to Low. |
 | Over/under 9.5 corners | Over, 54% | Low | Below the 56% cut. |
 | Over/under 4.5 yellows | Under, 74% | Medium | Between the 60% and 76% cuts; the referee is unknown at lock (Saturday), which would cap it at Medium anyway. |
 
-### 4.7 What waits for your decision
+### 4.7 What you decided, and what runs now
 
-1. Keep the Bayesian model as the published forecast and log the stack and the four challengers as shadows (recommended), or publish the stack.
-2. Switch tiers on in the ledger, with or without the promoted-club flag (recommended: without).
+You approved both recommendations on 26 Sep 2026:
+
+1. The Bayesian model stays the published forecast. Every daily run also locks the four challengers and the stack as **shadow** rows (`ordered_logit_v1`, `multinomial_v1`, `random_forest_v1`, `xgboost_v1`, `stack_v1`). They are scored like every other row. At the end of 2026/27 we re-test the stack against the Bayesian model with the same strict rule.
+2. Every Bayesian row carries a tier for each market: home, draw, away; over 1.5, 2.5, 3.5 goals; both teams to score; four corners lines; three yellows lines. The report shows the home, draw, away tier and the over 2.5 tier.
+
+A check before switching on: for 40 recent matches, the daily run builds exactly the same 28 inputs as the backtest did [V: 26 Sep 2026]. So the live challengers see nothing the backtest did not.

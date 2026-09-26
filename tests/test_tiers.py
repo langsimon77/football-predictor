@@ -46,3 +46,9 @@ def test_fit_uses_quantiles_and_round_trips(tmp_path):
     assert th.disagree_max is None
     tiers.save([th], tmp_path / "t.json", fitted_on="test")
     assert tiers.load(tmp_path / "t.json")["1x2"] == th
+
+
+def test_values_on_a_cut_point_are_not_moved_by_rounding():
+    width = np.array([0.52 - 0.36])  # 0.16000000000000003 in floating point
+    got = tiers.assign(TH, np.array([0.60]), np.zeros(1), width=width)
+    assert got.tolist() == ["High"]
