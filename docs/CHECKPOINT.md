@@ -9,7 +9,8 @@
   2. Tiers fill the `tiers` column of every Bayesian row, for every market. The promoted-club flag is shown but not counted.
 - Live and backtest paths build identical challenger inputs (40 recent matches, all 28 features).
 - Local replay 17 to 19 Sep 2026: 22 matches, 8 rows each, chain verified, tiers on every Bayesian row, report shows them.
-- New `replay.yml` workflow to replay the daily loop on GitHub without committing.
+- New `replay.yml` workflow to replay the daily loop on GitHub without committing. GitHub replay 17 to 19 Sep (run 36223302828): same 176 rows, chain verified, shadows add about 80 s a day. XGBoost differs from the Mac by up to 0.016, so 1 of 22 1X2 tiers differed; live runs use GitHub's numbers.
+- GitHub dry run today (run 36223304870): passes, 0 matches to lock (international break).
 
 ### Phase 4 acceptance checks
 | Check | Result |

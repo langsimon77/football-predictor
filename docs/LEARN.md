@@ -493,7 +493,7 @@ The three tiers are clearly apart: no interval overlaps the next. High wins more
 
 ### 4.6 Worked example: Arsenal v Leeds, locked Fri 9 Oct, 04:41 UTC
 
-Every challenger was refitted on the 6,959 matches with results known at lock and fed this match's lock-time inputs: Elo gap +231 for Arsenal, 14 days' rest each, 5 league games played each, neither promoted [V: computed 26 Sep 2026 from results up to 20 Sep; Bayesian numbers from section 2.6].
+Every challenger was refitted on the 6,959 matches with results known at lock and fed this match's lock-time inputs: Elo gap +231 for Arsenal, 14 days' rest each, 5 league games played each, neither promoted [V: computed 26 Sep 2026 from results up to 20 Sep; Bayesian numbers from section 2.6]. XGBoost here ran on the Mac; GitHub's Linux runner, which makes the live forecasts, gave values up to 1.6 points different in a replay test, so the live stack can differ by about half a point.
 
 | Model | Arsenal | Draw | Leeds | Weight in stack |
 |---|---|---|---|---|
