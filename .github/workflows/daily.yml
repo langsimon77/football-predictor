@@ -118,6 +118,7 @@ jobs:
               echo
               echo '```'
               cat "$PROBLEMS"
+              echo
               echo '```'
               echo
               echo "Log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

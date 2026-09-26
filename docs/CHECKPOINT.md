@@ -1,39 +1,40 @@
 # Checkpoint
 
-## Latest: 26 Sep 2026, Phase 6 built and tested; awaiting Lang's go-live decision (GitHub Pages)
+## Latest: 26 Sep 2026, Phase 7 built and tested; two checks wait on the calendar and on Lang
 
 ### Done this session
-- Phases 4 and 5 approved and live (shadows, tiers, Question Queue; first Issue Wed 7 Oct).
-- Phase 6 built:
-  - `src/fp/publish/`: the daily run writes precomputed dashboard files (`app/data/`) and a static fixtures page (`site/`).
-  - `app/`: seven Streamlit pages (Fixtures, Match, Team ratings, Performance, What-if, Questions, Methods), reading only those files; own `requirements.txt`.
-  - `docs/MODEL_CARD.md`; LEARN chapter 6.
-  - Daily workflow: dashboard cache, ratings history committed, Pages deploy gated by the `PAGES_ENABLED` variable (off).
-- Tested: 5-day local replay (all seven pages load with no errors on a phone-sized screen; every chart captioned); GitHub one-day replay (run 36227565338) publishes every file; export takes seconds.
+- Phases 4, 5, 6 approved and live. GitHub Pages on: https://langsimon77.github.io/football-predictor/ (first deploy passed).
+- Phase 7 built:
+  - Weekly run (`weekly.yml`, Monday 06:00 UTC): scores, miss audit, drift monitor, guarded shadow-stack re-weight with logged evidence, `docs/weekly/<date>.md`.
+  - Monthly run (`monthly.yml`, 1st, 06:00 UTC): calibration check (report only), model card live record, schedule keep-alive.
+  - Failure handling: degraded runs open an Issue; forced failures on dry runs only; re-lock when a kickoff moves more than 7 days.
+  - Dashboard shows drift and stack-weight history. LEARN chapter 7.
 
-### Phase 6 acceptance checks
+### Phase 7 acceptance checks
 | Check | Result |
 |---|---|
-| Loads under 3 seconds on mobile | Static page: one 19 KB request, no other files, rendered in 18 ms locally [V]; about 1 second on 4G [E]. Streamlit cannot meet this from a cold start (PRD Q4); the static page is the fast door. |
-| Every chart captioned | Yes: every chart has a one-line caption and an "Explain this" note (checked on all seven pages). |
-| No em or en dashes | Yes: dash check covers the app, the page, and JSON. |
+| Three consecutive clean daily runs | **Pending.** The schedule has run once (25 Sep, success, started 09:45 UTC: GitHub delayed it five hours). Manual live runs today passed. Check the 26, 27, 28 Sep scheduled runs. |
+| Ledger rows locked 24 to 48 hours before kickoff | GitHub replay, 17 to 19 Sep: all 160 on-time rows locked 30.8 to 38.3 hours before kickoff. The only late locks (2 matches) kicked off on the replay's first day, with no earlier run. The real ledger's first locks are on 8 Oct. |
+| Failure path tested by forcing an error | Yes. Forced crash: run failed, Issue #3 opened. Forced Bayesian failure: both leagues fell back to the last good posterior, run finished, "degraded" Issue #4 opened. Both closed. |
+| Weekly and monthly runs | Dry runs on GitHub passed (runs 36228987459, 36228990835). |
+| Streamlit Cloud deploy | **Waiting for Lang** to sign in at share.streamlit.io. |
 
 ### Known weaknesses
-- The Streamlit app wakes slowly after a quiet night (free host).
-- Stack weights fitted on one season shift between reruns; Phase 7's weekly re-weight needs a steadier fit (to be proposed).
-- Ratings history starts on the first live run; no backfill.
+- GitHub can start the daily schedule hours late (five hours on 25 Sep). Locks stay correct (the window is measured from the actual start), but Juba-time deadlines slip.
+- Stack weight fit is ill-conditioned; a steadier fit is proposed (MODEL_CHANGELOG).
+- No free source of penalties or line-ups for the miss audit.
 
 ### Open questions for Lang
-1. Turn on GitHub Pages (publishes the fixtures page and dashboard files at https://langsimon77.github.io/football-predictor/)?
-2. Approve starting Phase 7 (weekly and monthly automation, Streamlit Cloud deploy)?
+1. Deploy the dashboard on Streamlit Cloud (steps in the session summary); send the app address.
+2. Approve testing a steadier stack fit before the weights can first move (late October)?
 
 ### Next actions
 | Action | Owner |
 |---|---|
-| Answer the two questions. | Lang |
-| On a yes to Pages: switch Pages to "GitHub Actions", set `PAGES_ENABLED`, check the first deploy. | Claude |
-| Streamlit Cloud: sign in at share.streamlit.io with GitHub and deploy `app/Home.py` (Phase 7; only Lang can create the account). | Lang, guided |
-| Tick the daily Issue from Wed 7 Oct. | Lang |
+| Streamlit Cloud sign-in and deploy. | Lang |
+| Check the scheduled daily runs of 26, 27, 28 Sep; then Phase 7 sign-off. | Claude, next session |
+| First question Issue Wed 7 Oct; first locks Thu 8 Oct; first weekly report Mon 12 Oct. | Automatic |
+| Phase 8: live season (weekly reports, miss audit, drift). | After Phase 7 sign-off |
 
 ### Working notes
 - XGBoost runs locally only when Python is started directly with scikit-learn's OpenMP library: `DYLD_LIBRARY_PATH=$PWD/.venv/lib/python3.12/site-packages/sklearn/.dylibs .venv/bin/python ...`. `uv run` drops the variable. GitHub needs nothing special.
@@ -51,3 +52,4 @@
 - 25 Sep 2026, session 5: Bayesian model live as primary. Phase 3a calibration studied, not applied. Phase 3b corners and cards built and tested.
 - 26 Sep 2026, session 6: Phase 4 challengers, stacking, calibration revisited, tiers. Lang approved: Bayesian stays published, shadows and tiers live. Phase 5 news and Question Queue built, tested, and live.
 - 26 Sep 2026, session 6 (cont.): Phase 6 dashboard and static fixtures page built and tested; Pages off until Lang approves.
+- 26 Sep 2026, session 6 (cont.): Pages on; Phase 7 weekly, monthly, failure handling built and tested on GitHub.
