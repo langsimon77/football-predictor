@@ -19,7 +19,8 @@ from fp import ROOT
 
 SITE = ROOT / "site"
 JUBA = "Africa/Juba"
-DASHBOARD_URL = ""  # set once the Streamlit app is deployed (Phase 7)
+# Streamlit Community Cloud, deployed by Lang on 26 Sep 2026.
+DASHBOARD_URL = "https://football-predictor-hvplshfcfv7vsqqkaplmbq.streamlit.app/"
 
 CSS = """
 :root{--bg:#fff;--fg:#1b1b1b;--muted:#5f5f5f;--line:#e3e3e3;--card:#fafafa;

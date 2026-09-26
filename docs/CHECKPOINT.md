@@ -1,6 +1,6 @@
 # Checkpoint
 
-## Latest: 26 Sep 2026, Phase 7 built and tested; two checks wait on the calendar and on Lang
+## Latest: 26 Sep 2026, Phase 7 built, tested, and deployed; sign-off waits on three scheduled daily runs
 
 ### Done this session
 - Phases 4, 5, 6 approved and live. GitHub Pages on: https://langsimon77.github.io/football-predictor/ (first deploy passed).
@@ -17,7 +17,7 @@
 | Ledger rows locked 24 to 48 hours before kickoff | GitHub replay, 17 to 19 Sep: all 160 on-time rows locked 30.8 to 38.3 hours before kickoff. The only late locks (2 matches) kicked off on the replay's first day, with no earlier run. The real ledger's first locks are on 8 Oct. |
 | Failure path tested by forcing an error | Yes. Forced crash: run failed, Issue #3 opened. Forced Bayesian failure: both leagues fell back to the last good posterior, run finished, "degraded" Issue #4 opened. Both closed. |
 | Weekly and monthly runs | Dry runs on GitHub passed (runs 36228987459, 36228990835). |
-| Streamlit Cloud deploy | **Waiting for Lang** to sign in at share.streamlit.io. |
+| Streamlit Cloud deploy | Done: https://football-predictor-hvplshfcfv7vsqqkaplmbq.streamlit.app/ (deployed by Lang; four pages checked with live data). |
 
 ### Known weaknesses
 - GitHub can start the daily schedule hours late (five hours on 25 Sep). Locks stay correct (the window is measured from the actual start), but Juba-time deadlines slip.
@@ -25,12 +25,11 @@
 - No free source of penalties or line-ups for the miss audit.
 
 ### Open questions for Lang
-1. Deploy the dashboard on Streamlit Cloud (steps in the session summary); send the app address.
+1. None open. Phase 7 sign-off waits only on three clean scheduled daily runs (26 to 28 Sep).
 
 ### Next actions
 | Action | Owner |
 |---|---|
-| Streamlit Cloud sign-in and deploy. | Lang |
 | Check the scheduled daily runs of 26, 27, 28 Sep; then Phase 7 sign-off. | Claude, next session |
 | First question Issue Wed 7 Oct; first locks Thu 8 Oct; first weekly report Mon 12 Oct. | Automatic |
 | Phase 8: live season (weekly reports, miss audit, drift). | After Phase 7 sign-off |

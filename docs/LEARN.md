@@ -569,8 +569,8 @@ You switched the queue on and accepted the effect sizes on 26 Sep 2026. A self-t
 
 ### 6.1 Two front doors
 
-- **The fixtures page** (GitHub Pages) is one small file, about 19 KB, with no downloads beyond itself [V: measured locally]. It lists the next matches with a bar for home, draw, and away, expected goals, corners, and yellows, the tier, and any news. It should open in about a second on a 4G phone in Juba [E: one request of 19 KB]. It follows your phone's light or dark setting.
-- **The dashboard** (Streamlit) has seven pages for digging deeper. It is slower to open, especially after a quiet night, when the free host puts it to sleep and waking takes half a minute or more [E, PRD item Q4]. That is why the fixtures page exists.
+- **The fixtures page** (GitHub Pages, https://langsimon77.github.io/football-predictor/) is one small file, about 19 KB, with no downloads beyond itself [V: measured locally]. It lists the next matches with a bar for home, draw, and away, expected goals, corners, and yellows, the tier, and any news. It should open in about a second on a 4G phone in Juba [E: one request of 19 KB]. It follows your phone's light or dark setting.
+- **The dashboard** (Streamlit, https://football-predictor-hvplshfcfv7vsqqkaplmbq.streamlit.app/) has seven pages for digging deeper. It is slower to open, especially after a quiet night, when the free host puts it to sleep and waking takes half a minute or more [E, PRD item Q4]. That is why the fixtures page exists.
 
 Both read only files the daily run already computed. Nothing is fitted when you open a page.
 
