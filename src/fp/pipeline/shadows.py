@@ -43,8 +43,11 @@ SETTINGS: dict[str, dict[str, Any]] = {
 }
 STACK_FILE = ROOT / "data" / "stacking" / "stack_1x2.json"
 TIERS_FILE = ROOT / "data" / "tiers" / "thresholds.json"
-# Stack components that come from rows the daily run already builds.
+# Stack components that come from rows the daily run already builds. The Bayesian
+# component is the forecast without team news, as in the backtest that set the
+# weights; the no-news row exists only when news moved the forecast.
 LEDGER_COMPONENTS = {"elo": "elo_v0", "dc": "dc_mle_v0", "bdc": "dc_bayes_v1"}
+NO_NEWS = {"dc_bayes_v1": "dc_bayes_v1_nonews"}
 OUTCOMES = ["p_home", "p_draw", "p_away"]
 
 _train_cache: dict[tuple[int, pd.Timestamp], pd.DataFrame] = {}
@@ -114,7 +117,9 @@ def add_shadows(new: pd.DataFrame, challengers: dict[str, ml.Challenger],
         f = features[features["match_id"] == match_id]
         probs: dict[str, np.ndarray] = {}
         for key, model_name in LEDGER_COMPONENTS.items():
-            got = rows[rows["model_name"] == model_name]
+            got = rows[rows["model_name"] == NO_NEWS.get(model_name, "")]
+            if not len(got):
+                got = rows[rows["model_name"] == model_name]
             if len(got):
                 probs[key] = got[OUTCOMES].to_numpy(dtype=float)[0]
         for name, model in challengers.items():
@@ -136,11 +141,21 @@ def add_shadows(new: pd.DataFrame, challengers: dict[str, ml.Challenger],
 
 
 def tiers_for_row(row: dict, thresholds: dict[str, tiers.Thresholds],
-                  stack: np.ndarray | None) -> dict[str, str]:
-    """Tier for every market the row carries (spec S7, rule tiers_v1)."""
+                  stack: np.ndarray | None, reference: np.ndarray | None = None
+                  ) -> dict[str, str]:
+    """Tier for every market the row carries (spec S7, rule tiers_v1).
+
+    Flags counted, once each: source failure, unanswered key question, manager
+    change in the last 30 days, and for yellows an unknown referee. `reference` is
+    the forecast the stack is compared with: the one without team news, so that
+    answering a question can never lower a tier through disagreement."""
     flags = json.loads(str(row["flags"]))
     intervals = json.loads(row["intervals"]) if isinstance(row.get("intervals"), str) else {}
-    source_failure = int("stale_source" in flags)
+    unanswered = row.get("unanswered_questions")
+    general = (int("stale_source" in flags)
+               + int("unanswered_question" in flags
+                     or (isinstance(unanswered, str) and json.loads(unanswered) != []))
+               + int(any(str(f).startswith("manager_change:") for f in flags)))
     # La Liga referees are appointed after our lock; EPL ones only sometimes.
     referee_unknown = int(row["league"] != "EPL" or "referee_unknown" in flags)
     out = {"rule": TIERS_RULE}
@@ -152,9 +167,10 @@ def tiers_for_row(row: dict, thresholds: dict[str, tiers.Thresholds],
     p = np.array([row[c] for c in OUTCOMES], dtype=float)
     if np.isfinite(p).all():
         top = OUTCOMES[int(p.argmax())]
-        dis = np.array([0.5 * np.abs(stack - p).sum() if stack is not None else np.nan])
+        ref = p if reference is None else reference
+        dis = np.array([0.5 * np.abs(stack - ref).sum() if stack is not None else np.nan])
         out["1x2"] = str(tiers.assign(thresholds["1x2"], np.array([p.max()]),
-                                      np.array([source_failure]), width=width(top),
+                                      np.array([general]), width=width(top),
                                       disagree=dis)[0])
     for market, th in thresholds.items():
         if market.startswith("1x2"):
@@ -162,7 +178,7 @@ def tiers_for_row(row: dict, thresholds: dict[str, tiers.Thresholds],
         value = row.get(f"p_{market}")
         if value is None or not np.isfinite(value):
             continue
-        n_flags = source_failure + (referee_unknown if market.startswith("yellows_") else 0)
+        n_flags = general + (referee_unknown if market.startswith("yellows_") else 0)
         out[market] = str(tiers.assign(th, np.array([max(value, 1 - value)]),
                                        np.array([n_flags]), width=width(f"p_{market}"))[0])
     return out
@@ -173,9 +189,12 @@ def add_tiers(new: pd.DataFrame, primary_model: str) -> pd.DataFrame:
     thresholds = tiers.load(TIERS_FILE)
     new = new.copy()
     stacks = new[new["model_name"] == STACK_MODEL].set_index("match_id")
+    plain = new[new["model_name"] == NO_NEWS.get(primary_model, "")].set_index("match_id")
     for i in new.index[new["model_name"] == primary_model]:
         row = new.loc[i].to_dict()
         stack = (stacks.loc[row["match_id"], OUTCOMES].to_numpy(dtype=float)
                  if row["match_id"] in stacks.index else None)
-        new.loc[i, "tiers"] = json.dumps(tiers_for_row(row, thresholds, stack))
+        reference = (plain.loc[row["match_id"], OUTCOMES].to_numpy(dtype=float)
+                     if row["match_id"] in plain.index else None)
+        new.loc[i, "tiers"] = json.dumps(tiers_for_row(row, thresholds, stack, reference))
     return new

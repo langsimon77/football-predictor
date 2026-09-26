@@ -523,3 +523,42 @@ You approved both recommendations on 26 Sep 2026:
 2. Every Bayesian row carries a tier for each market: home, draw, away; over 1.5, 2.5, 3.5 goals; both teams to score; four corners lines; three yellows lines. The report shows the home, draw, away tier and the over 2.5 tier.
 
 A check before switching on: for 40 recent matches, the daily run builds exactly the same 28 inputs as the backtest did [V: 26 Sep 2026]. So the live challengers see nothing the backtest did not.
+
+## Chapter 5: Team news and the Question Queue
+
+### 5.1 Why you, not a scraper
+
+The spec wanted team news scraped automatically. The Phase 0 audit found no source we may use: the Fantasy Premier League terms forbid automated collection, Understat's robots.txt blocks everyone, laliga.com forbids reproduction, and API-Football's free plan does not cover 2026/27 [V: `docs/DATA_SOURCES.md`, decision D2]. So news comes from you, through the Question Queue. You approved this fallback in Phase 0.
+
+### 5.2 How a question reaches you
+
+Every daily run (06:41 Juba time) opens one GitHub Issue, "Questions for Lang: <date>", which GitHub emails to you. It asks about the matches that will lock at the *next* run, so you have about a day to tick. For each club you tick how many regular starters will miss the match (0, 1, 2, 3 or more), and whether the main goal threat is one of them. Each club has a search link for its team news.
+
+- At most 10 matches a day. When there are more, the ones where an answer would move the forecast most come first.
+- Nothing ticked for a club means "don't know". Two contradictory ticks also mean "don't know".
+- Only ticks in Issues the bot itself opened, and edited only by you or the bot, are read. Anyone can open an Issue in a public repository, but only you can edit the bot's Issues.
+- When all of an Issue's matches have locked, the run closes it and saves the answers it used in `data/manual/answers.yaml`.
+
+### 5.3 What an answer does
+
+Goals depend on two scoring rates: how many the home side should score, and how many the away side should. An answer scales them [A: sizes are Assumptions, with no player data to fit them]:
+
+| For each ... | Own scoring rate | Opponent's scoring rate |
+|---|---|---|
+| Regular starter out | −2.5% | +2.5% |
+| Main goal threat out (extra) | −6% | |
+
+No rate moves more than 12% either way (spec S6.3). Every market that comes from the scoreline table (home, draw, away, over/under, both teams score) moves with it. Corners and cards do not.
+
+**Example ticks, not real news** [V: `reports/phase5_dry_run.md`]: Chelsea with 3 or more starters out including the main goal threat would lose 7.5% + 6% = 13.5% of their scoring rate; the cap stops it at 12%. Bournemouth's rate rises 7.5%. Chelsea's win chance falls from 43% to 36%.
+
+### 5.4 Keeping score of the news itself
+
+Whenever news moves a forecast, the run also locks the same forecast without news, as a shadow row (`dc_bayes_v1_nonews`). After 10 gameweeks we compare the two on the same matches (spec S6.5). If the news version is not better, I will propose shrinking or dropping the effects. That test, not my guess, decides the sizes.
+
+### 5.5 Unanswered questions and manager changes lower the tier
+
+- A club left unticked, or "don't know", is a data flag: the match locks without that club's news and its tiers are capped at Medium. The ledger lists the unanswered questions.
+- Each run also reads the manager of every club playing in the next 72 hours from Wikipedia. A new name opens a "Manager check" question. Until you answer "no", the club carries a manager-change flag for 30 days, which also caps its tiers at Medium.
+
+The spec gives two versions of the unanswered rule: "the tier drops one level" (S6) and "a data flag" (S7). I used the flag, the same as every other data problem. With one flag, High becomes Medium and Medium stays Medium.

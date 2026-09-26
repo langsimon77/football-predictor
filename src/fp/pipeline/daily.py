@@ -39,6 +39,8 @@ from fp.models import bayes_dc, elo, posterior_store
 from fp.models import dixon_coles as dc
 from fp.models.priors import PromotedPrior, season_teams
 from fp.models.promotion import PromotionModel, fit_promotion_model, promoted_priors
+from fp.news import impact
+from fp.news import live as news_live
 from fp.pipeline import counts_live, shadows
 from fp.pipeline import data as data_pipeline
 from fp.validate import freshness
@@ -142,7 +144,8 @@ def candidates(fixtures: pd.DataFrame, now: pd.Timestamp, existing: pd.DataFrame
 def build_rows(cands: pd.DataFrame, models: dict[str, LeagueModels], now: pd.Timestamp,
                stale: bool, counts: dict[str, counts_live.LeagueCounts] | None = None,
                fixture_features: pd.DataFrame | None = None,
-               referees: dict[str, str] | None = None) -> pd.DataFrame:
+               referees: dict[str, str] | None = None,
+               news: news_live.NewsState | None = None) -> pd.DataFrame:
     version, dirty = model_version()
     rows = []
     for r in cands.itertuples():
@@ -156,6 +159,8 @@ def build_rows(cands: pd.DataFrame, models: dict[str, LeagueModels], now: pd.Tim
         for team in (home, away):
             if team in m.promoted and m.games_played.get(team, 0) < PROMOTED_FLAG_GAMES:
                 flags.append(f"promoted_lt{PROMOTED_FLAG_GAMES}:{team}")
+            if news is not None and team in news.manager_flags:
+                flags.append(f"manager_change:{team}")
         common = {
             "match_id": r.match_id, "league": r.league, "season": r.season,
             "home_id": r.home_id, "away_id": r.away_id, "kickoff_utc": r.kickoff_utc,
@@ -171,10 +176,32 @@ def build_rows(cands: pd.DataFrame, models: dict[str, LeagueModels], now: pd.Tim
             "top_scorelines": json.dumps(top), "flags": json.dumps(["fast_track_model", *flags]),
         })
         if m.bayes is not None and home in m.bayes.teams and away in m.bayes.teams:
-            b = bayes_dc.markets(m.bayes, home, away)
+            match_news = news.by_match.get(str(r.match_id)) if news is not None else None
+            scale, adjustments, unanswered = (1.0, 1.0), [], []
+            if match_news is not None:
+                home_scale, away_scale, _ = impact.scales(match_news.home, match_news.away)
+                scale = (home_scale, away_scale)
+                adjustments = [impact.record(match_news.home, match_news.away,
+                                             match_news.source)]
+                unanswered = match_news.unanswered(str(r.match_id))
+            b = bayes_dc.markets(m.bayes, home, away, scale=scale)
             b_top, b_iv = b.pop("top_scorelines"), b.pop("intervals")
             b.pop("matrix")
             b_flags = flags + (["posterior_fallback"] if m.bayes_fallback else [])
+            if scale != (1.0, 1.0):
+                b_flags.append("news_adjusted")
+                # The same forecast without news, kept to test whether news helps (S6.5).
+                plain = bayes_dc.markets(m.bayes, home, away)
+                p_top, p_iv = plain.pop("top_scorelines"), plain.pop("intervals")
+                plain.pop("matrix")
+                rows.append({
+                    **common, **plain, "prediction_id": f"{r.match_id}:{BAYES_MODEL}_nonews",
+                    "model_name": f"{BAYES_MODEL}_nonews", "degraded": m.bayes_fallback,
+                    "top_scorelines": json.dumps(p_top), "intervals": json.dumps(p_iv),
+                    "flags": json.dumps([*b_flags[:-1], "shadow", "no_news"]),
+                })
+            if unanswered:
+                b_flags.append("unanswered_question")
             if counts is not None and fixture_features is not None:
                 # Corners and cards ride on the primary row: one row, one full forecast.
                 c_cols, c_flags = counts_live.columns(
@@ -186,7 +213,8 @@ def build_rows(cands: pd.DataFrame, models: dict[str, LeagueModels], now: pd.Tim
                 **common, **b, "prediction_id": f"{r.match_id}:{BAYES_MODEL}",
                 "model_name": BAYES_MODEL, "degraded": m.bayes_fallback,
                 "top_scorelines": json.dumps(b_top), "intervals": json.dumps(b_iv),
-                "flags": json.dumps(b_flags),
+                "flags": json.dumps(b_flags), "news_adjustments": json.dumps(adjustments),
+                "unanswered_questions": json.dumps(unanswered),
             })
         e = m.curve.probs(m.tracker.gap(home, away))[0]
         rows.append({
@@ -298,6 +326,12 @@ def write_report(ledger_frame: pd.DataFrame, results: pd.DataFrame, now: pd.Time
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def _short_names() -> dict[str, str]:
+    from fp.teams import teams
+    frame = teams()
+    return dict(zip(frame["team_id"].astype(str), frame["short_name"].astype(str), strict=True))
+
+
 def known_referees(appointments: pd.DataFrame | None, now: pd.Timestamp) -> dict[str, str]:
     """EPL referee appointments our pipeline had actually seen by `now`."""
     if appointments is None or appointments.empty:
@@ -324,6 +358,8 @@ class Context:
     referee_appointments: pd.DataFrame | None = None
     with_shadows: bool = False
     with_tiers: bool = False
+    with_news: bool = False
+    use_github: bool = False
 
 
 def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataFrame:
@@ -344,7 +380,9 @@ def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataF
         if len(cands):
             fixture_features = rolling.features_for_fixtures(cands, ctx.matches, now)
             referees = known_referees(ctx.referee_appointments, now)
-    new = build_rows(cands, models, now, report.stale, counts, fixture_features, referees)
+    news = (news_live.gather(ctx.fixtures, now, ctx.use_github) if ctx.with_news else None)
+    new = build_rows(cands, models, now, report.stale, counts, fixture_features, referees,
+                     news)
     if ctx.with_shadows and len(cands):
         try:  # shadows never block the published forecast
             challengers = shadows.fit_challengers(ctx.matches, now)
@@ -359,8 +397,19 @@ def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataF
         except Exception:
             log.exception("tiers failed; locking without them")
     log.info("%s: %d matches to lock", now, len(cands))
+    ledger_ids = set(existing["match_id"]) if len(existing) else set()
     if len(new) and not dry_run:
         existing = ledger.append(new, ctx.ledger_path)
+    if news is not None:
+        try:
+            body = news_live.after_lock(
+                news, ctx.fixtures, sorted(set(cands["match_id"])), ledger_ids,
+                {lg: models[lg].dc_fit for lg in LEAGUES}, _short_names(), now, dry_run,
+                ctx.use_github)
+            if dry_run and body:
+                print(body)
+        except Exception:
+            log.exception("question queue failed after locking")
     results = (record_results(ctx.matches, ctx.fixtures, existing, now, ctx.results_path)
                if not dry_run else pd.DataFrame())
     if ctx.report_path is not None and not dry_run:
@@ -378,6 +427,10 @@ def main(argv: list[str] | None = None) -> int:
                         help="include the Bayesian model even before it is live")
     parser.add_argument("--with-counts", action="store_true",
                         help="include corners and cards even before they are live")
+    parser.add_argument("--with-news", action="store_true",
+                        help="include team news and the Question Queue before it is live")
+    parser.add_argument("--read-issues", action="store_true",
+                        help="with --with-news: read the question Issues on GitHub")
     args = parser.parse_args(argv)
 
     data_pipeline.main(skip_download=args.offline)
@@ -400,6 +453,8 @@ def main(argv: list[str] | None = None) -> int:
         referee_appointments=pd.read_parquet(build.PROCESSED / "referee_appointments.parquet"),
         with_shadows=shadows.SHADOWS_LIVE,
         with_tiers=shadows.TIERS_LIVE,
+        with_news=(news_live.NEWS_LIVE or args.with_news) and not replay,
+        use_github=(news_live.NEWS_LIVE or args.read_issues) and not replay,
     )
 
     if replay:

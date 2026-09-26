@@ -82,9 +82,12 @@ class Posterior:
         nu = np.exp(self.mu + self.att[:, a] + self.def_[:, h])
         return lam, nu
 
-    def score_matrices(self, home_id: str, away_id: str) -> np.ndarray:
-        """One scoreline matrix per posterior draw: shape (S, 11, 11)."""
+    def score_matrices(self, home_id: str, away_id: str,
+                       scale: tuple[float, float] = (1.0, 1.0)) -> np.ndarray:
+        """One scoreline matrix per posterior draw: shape (S, 11, 11). `scale`
+        multiplies the home and away scoring rates (team news, fp.news.impact)."""
         lam, nu = self.rates(home_id, away_id)
+        lam, nu = lam * scale[0], nu * scale[1]
         g = np.arange(MAX_GOALS + 1)
         m = poisson.pmf(g[None, :], lam[:, None])[:, :, None] * \
             poisson.pmf(g[None, :], nu[:, None])[:, None, :]
@@ -114,13 +117,14 @@ def _market_draws(mats: np.ndarray) -> dict[str, np.ndarray]:
     }
 
 
-def markets(post: Posterior, home_id: str, away_id: str, top_n: int = 5) -> dict:
+def markets(post: Posterior, home_id: str, away_id: str, top_n: int = 5,
+            scale: tuple[float, float] = (1.0, 1.0)) -> dict:
     """Posterior predictive markets plus 80% intervals.
 
     The point forecast averages the scoreline matrix over draws: the posterior
     predictive. Intervals are the 10th and 90th percentiles across draws.
     """
-    mats = post.score_matrices(home_id, away_id)
+    mats = post.score_matrices(home_id, away_id, scale)
     mean = mats.mean(axis=0)
     per_draw = _market_draws(mats)
     point: dict = {k: float(v[0]) for k, v in _market_draws(mean[None]).items()}
