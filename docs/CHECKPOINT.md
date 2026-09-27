@@ -35,6 +35,7 @@
 |---|---|
 | Check the scheduled daily runs of 27, 28, 29 Sep (main or backup); then ask Lang to sign off Phase 7. A one-time scheduled task (`phase7-daily-runs-check`, Tue 29 Sep 13:00 UTC, read-only) runs this check in the Claude app and reports. | Automatic, then Lang |
 | First question Issue Wed 7 Oct; first locks Thu 8 Oct; first weekly report Mon 12 Oct. | Automatic |
+| Refresh the Model Lab after the first locks: one-time task `refresh-model-lab-first-locks`, Thu 8 Oct 15:00 UTC; it publishes only if the 8 Oct locks are in the ledger. | Automatic, then Lang |
 | Phase 8: live season (weekly reports, miss audit, drift). | After Phase 7 sign-off |
 
 ### Working notes
