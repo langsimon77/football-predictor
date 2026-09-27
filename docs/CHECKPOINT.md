@@ -19,6 +19,9 @@
 | Weekly and monthly runs | Dry runs on GitHub passed (runs 36228987459, 36228990835). |
 | Streamlit Cloud deploy | Done: https://football-predictor-hvplshfcfv7vsqqkaplmbq.streamlit.app/ (deployed by Lang; four pages checked with live data). |
 
+### Model Lab
+- Interactive snapshot of every analysis: https://claude.ai/artifact/Kt9foBMJQ9uy1nbDohAFhH (private). Rebuild with `scripts/build_model_lab.py OUT.html --pages-dir DIR` (download fixtures.parquet, details.parquet, meta.json from the Pages site's data folder first), then republish to that address.
+
 ### Known weaknesses
 - GitHub starts the daily schedule about 5 hours late (25 and 26 Sep) and may drop it. Backup schedules cover a dropped run; Juba-time question deadlines can still slip.
 - Stack weight fit is ill-conditioned; a steadier fit was tested and not adopted under the pre-set rule (`reports/stack_steadiness.md`).
