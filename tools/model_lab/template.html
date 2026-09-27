@@ -815,7 +815,7 @@ tr.hl td:first-child { font-weight: 700; }
       kpi("Published model, test log loss", num(ll.bdc, 4), "Lower is better. Elo " + num(ll.elo, 4) + ", base rates " + num(ll.base, 4) + ".") +
       kpi("Gap to the closing market", signed(ll.bdc - ll.mkt_sharp, 4), "Friday market gap " + signed(ll.bdc - ll.mkt_pre, 4) + ". The market still knows more.") +
       kpi("High tier: favourite won", pct(tierRows[2].won, 0) + " <small>of " + tierRows[2].n + "</small>", "Promised " + pct(tierRows[2].promised, 0) + ". Medium " + pct(tierRows[1].won, 0) + ", Low " + pct(tierRows[0].won, 0) + ".") +
-      kpi("Next matches in the snapshot", String(up.length), locked + " locked, " + (up.length - locked) + " provisional. First real locks Thu 8 Oct.") +
+      kpi("Next matches in the snapshot", String(up.length), locked + " locked, " + (up.length - locked) + " provisional. " + (locked ? "Locked forecasts are final and will be scored." : "Nothing is locked yet; provisional forecasts update daily.")) +
       "</div>" +
       '<div class="grid-2">' +
       '<div class="panel"><h3>The ladder <span class="sub">home, draw, away; test seasons</span></h3><div class="chart-box h-360"><canvas id="ov-ladder"></canvas></div>' +
