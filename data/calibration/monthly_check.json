@@ -1,0 +1,35 @@
+{
+ "date": "2026-10-01",
+ "method": "dirichlet (beta calibration, 3 outcomes)",
+ "train_matches": 1000,
+ "held_out_matches": 380,
+ "held_out": "most recent 380 matches",
+ "log_loss_change": -0.00034421198088307786,
+ "ci_low": -0.0049076689345719324,
+ "ci_high": 0.004573204072145698,
+ "slope_raw": 1.0118025268509785,
+ "slope_calibrated": 0.8921401900120293,
+ "passes_strict_rule": false,
+ "weights": [
+  [
+   1.0769,
+   0.0102,
+   -0.09
+  ],
+  [
+   -0.0383,
+   1.0176,
+   0.029
+  ],
+  [
+   -0.0385,
+   -0.0278,
+   1.0611
+  ]
+ ],
+ "bias": [
+  -0.0299,
+  0.0554,
+  -0.0255
+ ]
+}

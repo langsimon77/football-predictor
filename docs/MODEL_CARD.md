@@ -54,3 +54,9 @@ Lower is better. Over/under 2.5 goals: log loss 0.6731 against 0.6647 for the cl
 ## How it changes
 
 Any change to model structure, features, or code that affects forecasts is proposed in `docs/MODEL_CHANGELOG.md` and waits for your approval. Locked forecasts are never edited: the ledger is hash-chained and append-only.
+
+<!-- live-record:start -->
+## Live record, 2026/27
+
+No locked forecast scored yet (as of 01 Oct 2026).
+<!-- live-record:end -->
