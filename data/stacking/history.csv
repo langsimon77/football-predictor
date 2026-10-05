@@ -1,2 +1,3 @@
 date,n_live,moved,loss_current,loss_target,loss_new,w_elo,w_dc,w_bdc,w_multinomial,w_ordered_logit,w_random_forest,w_xgboost,target_elo,target_dc,target_bdc,target_multinomial,target_ordered_logit,target_random_forest,target_xgboost
 2026-09-28,0,False,0.98591,0.98463,0.98591,0.05,0.05,0.05,0.3448,0.05,0.05,0.4052,0.05,0.05,0.3503,0.3997,0.05,0.05,0.05
+2026-10-05,0,False,0.98591,0.98463,0.98591,0.05,0.05,0.05,0.3448,0.05,0.05,0.4052,0.05,0.05,0.3505,0.3995,0.05,0.05,0.05
