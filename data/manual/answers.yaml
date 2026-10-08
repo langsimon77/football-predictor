@@ -1,1 +1,12 @@
-[]
+- question: LaLiga_2627_malaga_espanyol:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #5'
+  used_at_utc: 2026-10-08T11:35Z
+- question: LaLiga_2627_malaga_espanyol:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #5'
+  used_at_utc: 2026-10-08T11:35Z
