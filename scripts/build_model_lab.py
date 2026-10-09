@@ -32,6 +32,7 @@ from fp.teams import teams
 from fp.validate.leakage import known_as_of
 
 sys.path.insert(0, str(Path(__file__).parent))
+import audit_2026_10 as audit  # noqa: E402
 import stack_steadiness  # noqa: E402
 
 TEMPLATE = ROOT / "tools" / "model_lab" / "template.html"
@@ -162,7 +163,41 @@ def backtest_block(matches: pd.DataFrame, names: dict[str, int]) -> dict:
     }
 
 
-def upcoming_block(pages: Path, names: dict[str, int]) -> dict:
+def likely_score(mat: np.ndarray) -> tuple[str, float]:
+    i, j = np.unravel_index(int(np.argmax(mat)), mat.shape)
+    return f"{i}-{j}", round(float(mat[i, j]), 4)
+
+
+def news_lines(row, short: dict[str, str]) -> list[str]:
+    """Team news used in the forecast, in words (same rule as the fixtures page)."""
+    out = []
+    adj = json.loads(row.news_adjustments) if isinstance(row.news_adjustments, str) else []
+    for rec in adj:
+        for side, key in (("home", "scale_home_goals"), ("away", "scale_away_goals")):
+            change = rec[key] - 1
+            if abs(change) >= 0.005:
+                team = short.get(row.home_id if side == "home" else row.away_id, "")
+                out.append(f"{team} expected goals {'+' if change > 0 else '−'}"
+                           f"{abs(change) * 100:.0f}%")
+    if isinstance(row.unanswered_questions, str) and json.loads(row.unanswered_questions):
+        out.append("your question for this match is still unanswered")
+    return out
+
+
+def proposed_fix(r, proposal: audit.Shape | None) -> dict | None:
+    """What the proposed goals fix would show for this match. Not live."""
+    if proposal is None:
+        return None
+    m = audit.shaped(np.array([r.exp_goals_home]), np.array([r.exp_goals_away]), proposal)
+    mk = audit.markets(m)
+    score, score_p = likely_score(m[0])
+    return {"p": [round(float(v), 4) for v in mk["x12"][0]],
+            "o25": round(float(mk["over_2_5"][0]), 4), "btts": round(float(mk["btts"][0]), 4),
+            "score": score, "score_p": score_p}
+
+
+def upcoming_block(pages: Path, names: dict[str, int], short: dict[str, str],
+                   proposal: audit.Shape | None) -> dict:
     fx = pd.read_parquet(pages / "fixtures.parquet").sort_values("kickoff_utc")
     det = pd.read_parquet(pages / "details.parquet").set_index("match_id")
     rows = []
@@ -171,6 +206,7 @@ def upcoming_block(pages: Path, names: dict[str, int]) -> dict:
             continue
         d = det.loc[r.match_id]
         mat = np.asarray(d["matrix"], dtype=float).reshape(11, 11)
+        score, score_p = likely_score(mat)
         rows.append({
             "id": r.match_id, "lg": int(r.league == "LaLiga"), "h": names[r.home_id],
             "a": names[r.away_id], "kickoff": f"{pd.Timestamp(r.kickoff_utc):%Y-%m-%dT%H:%MZ}",
@@ -191,6 +227,11 @@ def upcoming_block(pages: Path, names: dict[str, int]) -> dict:
             if isinstance(d["corners_pmf"], (list, np.ndarray)) else None,
             "ypmf": milli(np.asarray(d["cards_pmf"])[:13])
             if isinstance(d["cards_pmf"], (list, np.ndarray)) else None,
+            "score": score, "score_p": score_p,
+            "c95": None if pd.isna(r.p_corners_over_9_5) else round(float(r.p_corners_over_9_5), 4),
+            "y45": None if pd.isna(r.p_yellows_over_4_5) else round(float(r.p_yellows_over_4_5), 4),
+            "news": news_lines(r, short),
+            "fix": proposed_fix(r, proposal),
         })
     return {"rows": rows, "meta": json.loads((pages / "meta.json").read_text())}
 
@@ -268,13 +309,25 @@ def evidence_block() -> dict:
     return {"cv": [{"model": r.model, "params": json.dumps(json.loads(r.params)),
                     "log_loss": round(float(r.log_loss), 5)} for r in cv.itertuples()],
             "stack": stack, "stack_by_season": per_season, "tiers": tiers,
-            "steadiness": paths}
+            "steadiness": paths, "audit": audit.panel() if audit.OUT_JSON.exists() else None}
+
+
+def check_fresh(pages_meta: dict) -> None:
+    """The ratings and simulator use the local data copy: it must not be older than
+    the published snapshot, or the tables and remaining fixtures are out of date."""
+    local = pd.Timestamp((PROCESSED / "matches.parquet").stat().st_mtime, unit="s", tz="UTC")
+    published = pd.Timestamp(pages_meta["generated_utc"])
+    if local < published - pd.Timedelta(hours=36):
+        raise SystemExit(f"local data from {local:%Y-%m-%d %H:%M} UTC is older than the published "
+                         f"snapshot ({published:%Y-%m-%d %H:%M} UTC). Run `make data` first, "
+                         "or pass --allow-stale.")
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("out", type=Path)
     ap.add_argument("--pages-dir", type=Path, required=True)
+    ap.add_argument("--allow-stale", action="store_true")
     args = ap.parse_args(argv)
     matches = pd.read_parquet(PROCESSED / "matches.parquet")
     fixtures = pd.read_parquet(PROCESSED / "fixtures.parquet")
@@ -283,13 +336,16 @@ def main(argv: list[str] | None = None) -> int:
     names = {t: i for i, t in enumerate(ids)}
     short = club.set_index("team_id")["short_name"].to_dict()
     meta = json.loads((args.pages_dir / "meta.json").read_text())
+    if not args.allow_stale:
+        check_fresh(meta)
     now = pd.Timestamp(meta["generated_utc"])
+    proposal = audit.proposal() if audit.OUT_JSON.exists() else None
     data = {
         "built": f"{pd.Timestamp.now(tz='UTC'):%Y-%m-%d %H:%M} UTC",
         "data_as_of": meta["generated_utc"], "model_version": meta["model_version"],
         "clubs": [short.get(t, t) for t in ids],
         "bt": backtest_block(matches, names),
-        "up": upcoming_block(args.pages_dir, names),
+        "up": upcoming_block(args.pages_dir, names, short, proposal),
         "sim": simulator_block(matches, fixtures, names, now),
         "ev": evidence_block(),
     }

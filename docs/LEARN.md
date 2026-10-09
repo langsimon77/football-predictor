@@ -491,7 +491,9 @@ The three tiers are clearly apart: no interval overlaps the next. High wins more
 - **Unknown EPL referee:** cards over 3.5 forecasts without a known referee do worse than promised (+0.030, interval +0.009 to +0.049). The flag earns its place.
 - **Over/under lines:** forecasts sit between about 50% and 75%, so the tiers barely separate. Clearly separated on only 4 of 11 lines (over 1.5 and over 3.5 goals, over 8.5 corners, over 5.5 yellows). Read an over/under High as "a bit surer", not "safe".
 
-### 4.6 Worked example: Arsenal v Leeds, locked Fri 9 Oct, 04:41 UTC
+### 4.6 Worked example: Arsenal v Leeds
+
+Written on 26 Sep 2026, before the match locked. I expected the lock on Fri 9 Oct at 04:41 UTC. It really locked on Thu 8 Oct at 11:35 UTC, 47 hours 54 minutes before kickoff, because GitHub started the run 7 hours late (see 8.5) [V: ledger].
 
 Every challenger was refitted on the 6,959 matches with results known at lock and fed this match's lock-time inputs: Elo gap +231 for Arsenal, 14 days' rest each, 5 league games played each, neither promoted [V: computed 26 Sep 2026 from results up to 20 Sep; Bayesian numbers from section 2.6]. XGBoost here ran on the Mac; GitHub's Linux runner, which makes the live forecasts, gave values up to 1.6 points different in a replay test, so the live stack can differ by about half a point.
 
@@ -514,6 +516,8 @@ Tiers for the published Bayesian forecast:
 | Over/under 2.5 goals | Under, 56% | Medium | Between the 55% and 61% cuts. Its interval (36% to 52%) sits right on the 16-point limit, so the live run's unrounded numbers decide whether it drops to Low. |
 | Over/under 9.5 corners | Over, 54% | Low | Below the 56% cut. |
 | Over/under 4.5 yellows | Under, 74% | Medium | Between the 60% and 76% cuts; the referee is unknown at lock (Saturday), which would cap it at Medium anyway. |
+
+What the real lock said (Thu 8 Oct): Bayesian 61.8%, 24.4%, 13.9%; stack 63.3%, 23.3%, 13.4%. Tiers: home, draw, away High; over 2.5 **Low**, because its interval came out at 36.0% to 52.3%, just over the 16-point limit, as the table warned it might [V: ledger].
 
 ### 4.7 What you decided, and what runs now
 
@@ -631,3 +635,60 @@ The stack's weights jumped around when refitted on one season. A fix was to pull
 On the three test seasons, the pulled fit was slightly more accurate and five times less jumpy from week to week. But on the second measure, how far the weights move when every input is nudged by one part in a million, it was not better (0.009 against 0.006, both tiny) [V: `reports/stack_steadiness.md`]. So the answer is no, and the live run keeps the plain fit.
 
 Why keep a rule that a good-looking result just failed? Because a rule bent after seeing the numbers stops protecting you. Deciding the test first is what makes the answer believable, in football forecasting as in reservoir studies. The 10-point weekly cap already limits any swing, and the stack is a shadow model, so the cost of saying no is small.
+
+## Chapter 8: A check-up, October 2026
+
+You asked me to look for errors in the models and for ways to make them more accurate. This chapter explains what I did, what I found, and what waits for your decision. The full numbers are in `reports/audit_2026_10.md`; the Model Lab shows them on its Tests and decisions page.
+
+### 8.1 What I checked
+
+Two kinds of problem: mistakes in the code, and weaknesses in the models.
+
+- **Code.** The lock window, the late-lock flag, result recording, team-news scaling, the confidence rule, the promoted-club starting points, and the Model Lab's own sums. None of these changes a published number wrongly [V].
+- **Models.** For each market I asked: across five past seasons, is the forecast too high, too low, too cautious, or too spread out?
+
+### 8.2 The main finding: goals are less random than the model assumes
+
+The main model gets each team's **average** right. Across five seasons, home sides scored about what it expected, and so did away sides [V].
+
+But it assumes goals are scattered like a Poisson count: once you know the average, the spread is fixed. Real goals are a little more regular than that. Teams fail to score less often than the model says (home sides 22% of the time against 25% forecast), and 0-0 is rarer (6% against 8%) [V]. In the last two seasons the effect grew [V].
+
+An engineering picture: suppose you size a separator from the average flow rate and assume the surges follow a fixed rule. If the real surges are smaller than the rule says, your average is right but your extremes are wrong. Here the "extremes" are blank scorelines.
+
+This one fact explains three weaknesses at once:
+
+1. **Too cautious about favourites.** When both sides' goals stay closer to their averages, the stronger side's edge shows up more reliably, and lucky draws and upsets are rarer. Forecasts of 70% or more won 82% of the time; the model had said 76% [V].
+2. **Too many 0-0s.**
+3. **Too few "both teams score".** It happened 55.9% of the time in the last three seasons; the model said 51.4% [V].
+
+### 8.3 The fix, and two tests
+
+The fix keeps the main model's expected goals and changes only how they turn into exact scores. It uses a count that can be less spread out than Poisson (called COM-Poisson), plus a small adjustment to the gap between the two sides. Four numbers, refitted every month from the model's own forecasts of the last two seasons.
+
+**Test 1, the usual one.** Seasons 2023/24 to 2025/26, never used for tuning. Home, draw, away improved by 0.0022 per match, and the whole 95% range was below zero [V]. That passes the strict rule.
+
+**But I tried six versions.** With six tries, one can pass by luck. A fair correction for six tries (Holm) said none was decisive on its own [V]. A forecaster who keeps trying ideas until one passes will always find a "winner".
+
+**Test 2, decided in advance.** So before looking, I wrote the rule into `data/audit/preregistration_2026_10.md`: two candidates, tested on 2018/19 and 2019/20, two seasons this study had never touched, with a stricter 97.5% range. GitHub replayed the main model on those seasons (196 weekly fits, all passed their checks) [V].
+
+Result: the monthly-refitted version passed again: home, draw, away improved by 0.0020 per match (range −0.0035 to −0.0006) [V]. The simpler "stretch only" version just missed (−0.0024, range −0.0051 to +0.0002) [V]. The other goal lines showed no clear change either way.
+
+How big is 0.002? About an eighth of our gap to the bookmakers' Friday prices [E]. Small, but real, and it costs nothing to run.
+
+### 8.4 What did not work
+
+For corners and yellow cards, I tried pulling each forecast part of the way towards the league average, in case the club effects were too strong. Corners: no difference. Yellows: clearly worse with the fixed version [V]. Both models stay as they are. Both were already well calibrated.
+
+### 8.5 A timing problem
+
+The daily run is scheduled for 04:41 UTC, but GitHub starts it 5 to 7 hours late: between 09:30 and 11:48 UTC in the last 14 days [V]. A match locks at the first run that is within 48 hours of kickoff. The early Saturday kickoff is 11:30 UTC (until the clocks change on 25 Oct). If Thursday's run starts before 11:30 and Friday's after, that match locks less than 24 hours before kickoff, breaking our own rule. In 2 of 13 recent day pairs this would have happened [V]. Arsenal v Leeds locked in time this week with 6 minutes to spare.
+
+The fix is simple: schedule the run at 00:41 UTC. With today's delays it would start around 05:00 to 07:30 UTC, far from any kickoff [E].
+
+### 8.6 What waits for you
+
+1. **Goals fix (`shape_v1`).** Live for all goal markets, with the old forecast kept as a background copy so we can compare live. Tier cut points and the early-warning norms would be recomputed by the same rules.
+2. **Earlier daily schedule.** 00:41 UTC main run; backups at 06:41 and 12:41 UTC.
+3. **Background models for provisional forecasts**, so a provisional confidence label uses the same checks as the locked one.
+
+Nothing here is live until you say yes.

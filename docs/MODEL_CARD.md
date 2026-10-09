@@ -45,7 +45,7 @@ Lower is better. Over/under 2.5 goals: log loss 0.6731 against 0.6647 for the cl
 ## Known limitations
 
 1. **Too timid.** Strong favourites win more often than the model says (calibration slope 1.23; 1 is perfect). No calibration map passed the strict test [V].
-2. **Behind the market** by about 0.014 in log loss even at the Friday snapshot [V].
+2. **Behind the market** by about 0.016 in log loss even at the Friday snapshot (0.9759 against 0.9601) [V].
 3. **No player data.** Team news is a count of missing starters, with effect sizes that are Assumptions [A], to be tested after 10 gameweeks.
 4. **Referees.** La Liga referees are named after our lock; EPL Friday and Saturday referees usually are too [V].
 5. **Over/under tiers** separate clearly on only 4 of 11 lines [V].

@@ -1,0 +1,862 @@
+{
+ "goals": [
+  {
+   "variant": "G1 shape, fixed",
+   "market": "1x2",
+   "published": 0.9745436670058505,
+   "change": -0.00023911950505156617,
+   "lo": -0.000957298718553541,
+   "hi": 0.0004693989537875612,
+   "p": 0.24525
+  },
+  {
+   "variant": "G1 shape, fixed",
+   "market": "over_1_5",
+   "published": 0.5135632160029024,
+   "change": -0.0008280226457820526,
+   "lo": -0.001217974735658916,
+   "hi": -0.00043422057988460157,
+   "p": 0.0
+  },
+  {
+   "variant": "G1 shape, fixed",
+   "market": "over_2_5",
+   "published": 0.6730266998313793,
+   "change": -0.0002088741308862525,
+   "lo": -0.00046478094558244327,
+   "hi": 5.828656456181188e-05,
+   "p": 0.058
+  },
+  {
+   "variant": "G1 shape, fixed",
+   "market": "over_3_5",
+   "published": 0.5999038084701638,
+   "change": 9.677878386207517e-05,
+   "lo": -6.492032040891656e-05,
+   "hi": 0.00025301109763648313,
+   "p": 0.88575
+  },
+  {
+   "variant": "G1 shape, fixed",
+   "market": "btts",
+   "published": 0.6854546503811244,
+   "change": -0.0007450809980000822,
+   "lo": -0.001135556886110779,
+   "hi": -0.0003224420418292593,
+   "p": 0.0
+  },
+  {
+   "variant": "G1 shape, fixed",
+   "market": "score",
+   "published": 2.885456846771452,
+   "change": -0.0029113836106325753,
+   "lo": -0.004553717924042326,
+   "hi": -0.0013253216932533301,
+   "p": 0.00025
+  },
+  {
+   "variant": "G1 shape, rolling",
+   "market": "1x2",
+   "published": 0.9745436670058505,
+   "change": -0.000918879630773899,
+   "lo": -0.0019634892318180085,
+   "hi": 0.00015202954660869437,
+   "p": 0.04725
+  },
+  {
+   "variant": "G1 shape, rolling",
+   "market": "over_1_5",
+   "published": 0.5135632160029024,
+   "change": -0.0014741559741846798,
+   "lo": -0.0029221655430901796,
+   "hi": 6.508524889026013e-06,
+   "p": 0.026
+  },
+  {
+   "variant": "G1 shape, rolling",
+   "market": "over_2_5",
+   "published": 0.6730266998313793,
+   "change": 5.258256526766615e-05,
+   "lo": -0.0006738131659204525,
+   "hi": 0.0007965696177862959,
+   "p": 0.5615
+  },
+  {
+   "variant": "G1 shape, rolling",
+   "market": "over_3_5",
+   "published": 0.5999038084701638,
+   "change": 0.00020464773674869742,
+   "lo": -0.00029684618492334896,
+   "hi": 0.0007012763209242703,
+   "p": 0.78525
+  },
+  {
+   "variant": "G1 shape, rolling",
+   "market": "btts",
+   "published": 0.6854546503811244,
+   "change": -0.0022033550430255056,
+   "lo": -0.004228237251333299,
+   "hi": -0.00021058554357378573,
+   "p": 0.0165
+  },
+  {
+   "variant": "G1 shape, rolling",
+   "market": "score",
+   "published": 2.885456846771452,
+   "change": -0.00751656190794653,
+   "lo": -0.011207447825937621,
+   "hi": -0.0038176483211191424,
+   "p": 0.0
+  },
+  {
+   "variant": "S1 stretch, fixed",
+   "market": "1x2",
+   "published": 0.9745436670058505,
+   "change": -0.00205623940057362,
+   "lo": -0.0037262745780557087,
+   "hi": -0.000459511431131398,
+   "p": 0.00725
+  },
+  {
+   "variant": "S1 stretch, fixed",
+   "market": "over_1_5",
+   "published": 0.5135632160029024,
+   "change": -0.0009955604052691732,
+   "lo": -0.0016530878351409465,
+   "hi": -0.00029412715903013724,
+   "p": 0.00375
+  },
+  {
+   "variant": "S1 stretch, fixed",
+   "market": "over_2_5",
+   "published": 0.6730266998313793,
+   "change": -0.0004261700452831319,
+   "lo": -0.0012393566378187915,
+   "hi": 0.0004115495450862211,
+   "p": 0.1515
+  },
+  {
+   "variant": "S1 stretch, fixed",
+   "market": "over_3_5",
+   "published": 0.5999038084701638,
+   "change": 8.748803860978043e-05,
+   "lo": -0.0006581877865336962,
+   "hi": 0.0008268890092536467,
+   "p": 0.5925
+  },
+  {
+   "variant": "S1 stretch, fixed",
+   "market": "btts",
+   "published": 0.6854546503811244,
+   "change": -9.065787066616792e-05,
+   "lo": -0.0004760941995605575,
+   "hi": 0.00029087779836260393,
+   "p": 0.31925
+  },
+  {
+   "variant": "S1 stretch, fixed",
+   "market": "score",
+   "published": 2.885456846771452,
+   "change": -0.0021538724739615833,
+   "lo": -0.004161019551109011,
+   "hi": -0.0001443989224304108,
+   "p": 0.016
+  },
+  {
+   "variant": "S1 stretch, rolling",
+   "market": "1x2",
+   "published": 0.9745436670058505,
+   "change": -0.0017494701692642247,
+   "lo": -0.003014165565718108,
+   "hi": -0.00045158582915750454,
+   "p": 0.00525
+  },
+  {
+   "variant": "S1 stretch, rolling",
+   "market": "over_1_5",
+   "published": 0.5135632160029024,
+   "change": -0.001161674829157183,
+   "lo": -0.001815211420373115,
+   "hi": -0.0004909951069130587,
+   "p": 0.00025
+  },
+  {
+   "variant": "S1 stretch, rolling",
+   "market": "over_2_5",
+   "published": 0.6730266998313793,
+   "change": -0.00037540173050086404,
+   "lo": -0.001062712647923541,
+   "hi": 0.00039342646419521585,
+   "p": 0.1605
+  },
+  {
+   "variant": "S1 stretch, rolling",
+   "market": "over_3_5",
+   "published": 0.5999038084701638,
+   "change": 9.31009172297963e-05,
+   "lo": -0.00047351699746233186,
+   "hi": 0.0007047253965868453,
+   "p": 0.6295
+  },
+  {
+   "variant": "S1 stretch, rolling",
+   "market": "btts",
+   "published": 0.6854546503811244,
+   "change": -0.00046324264800084867,
+   "lo": -0.0008933129110146408,
+   "hi": -4.812765449775912e-05,
+   "p": 0.01625
+  },
+  {
+   "variant": "S1 stretch, rolling",
+   "market": "score",
+   "published": 2.885456846771452,
+   "change": -0.002095683808337029,
+   "lo": -0.0036806747122756795,
+   "hi": -0.000397557766223126,
+   "p": 0.00825
+  },
+  {
+   "variant": "S1 stretch plus G1 shape, fixed",
+   "market": "1x2",
+   "published": 0.9745436670058505,
+   "change": -0.0022540253535801944,
+   "lo": -0.0040668967904837795,
+   "hi": -0.0003924286093703364,
+   "p": 0.0095
+  },
+  {
+   "variant": "S1 stretch plus G1 shape, fixed",
+   "market": "over_1_5",
+   "published": 0.5135632160029024,
+   "change": -0.001311925962236997,
+   "lo": -0.0021806217914485415,
+   "hi": -0.0004436103895304359,
+   "p": 0.00175
+  },
+  {
+   "variant": "S1 stretch plus G1 shape, fixed",
+   "market": "over_2_5",
+   "published": 0.6730266998313793,
+   "change": -0.000485125016082617,
+   "lo": -0.0014147397537113584,
+   "hi": 0.0004755006616596404,
+   "p": 0.16225
+  },
+  {
+   "variant": "S1 stretch plus G1 shape, fixed",
+   "market": "over_3_5",
+   "published": 0.5999038084701638,
+   "change": 0.0001565476470003496,
+   "lo": -0.0006053749242412358,
+   "hi": 0.0009062033032844338,
+   "p": 0.66475
+  },
+  {
+   "variant": "S1 stretch plus G1 shape, fixed",
+   "market": "btts",
+   "published": 0.6854546503811244,
+   "change": -0.0002662402195622181,
+   "lo": -0.0006751852545602005,
+   "hi": 0.00013965715520240476,
+   "p": 0.10825
+  },
+  {
+   "variant": "S1 stretch plus G1 shape, fixed",
+   "market": "score",
+   "published": 2.885456846771452,
+   "change": -0.0028854321738317687,
+   "lo": -0.005303040271759109,
+   "hi": -0.000514803209677677,
+   "p": 0.00825
+  },
+  {
+   "variant": "S1 stretch plus G1 shape, rolling",
+   "market": "1x2",
+   "published": 0.9745436670058505,
+   "change": -0.0022445425549569025,
+   "lo": -0.004125792514577647,
+   "hi": -0.00019781212266724253,
+   "p": 0.01425
+  },
+  {
+   "variant": "S1 stretch plus G1 shape, rolling",
+   "market": "over_1_5",
+   "published": 0.5135632160029024,
+   "change": -0.001765182108380378,
+   "lo": -0.0034298167331594845,
+   "hi": 3.150023822188205e-05,
+   "p": 0.028
+  },
+  {
+   "variant": "S1 stretch plus G1 shape, rolling",
+   "market": "over_2_5",
+   "published": 0.6730266998313793,
+   "change": -9.857949184822229e-05,
+   "lo": -0.0012464221236201172,
+   "hi": 0.0010990595459529594,
+   "p": 0.436
+  },
+  {
+   "variant": "S1 stretch plus G1 shape, rolling",
+   "market": "over_3_5",
+   "published": 0.5999038084701638,
+   "change": 0.0002632833284051859,
+   "lo": -0.0004926240602018548,
+   "hi": 0.0010429837206733955,
+   "p": 0.74375
+  },
+  {
+   "variant": "S1 stretch plus G1 shape, rolling",
+   "market": "btts",
+   "published": 0.6854546503811244,
+   "change": -0.0018963261028757366,
+   "lo": -0.0038570168101708696,
+   "hi": 0.0001169405746674271,
+   "p": 0.03075
+  },
+  {
+   "variant": "S1 stretch plus G1 shape, rolling",
+   "market": "score",
+   "published": 2.885456846771452,
+   "change": -0.007471789727932469,
+   "lo": -0.011371958896800502,
+   "hi": -0.003543013551212476,
+   "p": 0.0
+  }
+ ],
+ "holm": {
+  "S1 stretch, rolling": false,
+  "S1 stretch, fixed": false,
+  "S1 stretch plus G1 shape, fixed": false,
+  "S1 stretch plus G1 shape, rolling": false,
+  "G1 shape, rolling": false,
+  "G1 shape, fixed": false
+ },
+ "counts": [
+  {
+   "variant": "C1 corners towards league average, fixed",
+   "market": "count",
+   "change": 0.0005290589083829548,
+   "lo": -0.0010252461952508561,
+   "hi": 0.002073362676452068,
+   "p": 0.75275,
+   "published": 2.6144659553088507
+  },
+  {
+   "variant": "C1 corners towards league average, fixed",
+   "market": "over_8.5",
+   "change": 0.0005677980332678722,
+   "lo": -0.0005428335666713287,
+   "hi": 0.0016863478779649043,
+   "p": 0.8315,
+   "published": 0.6358465912637971
+  },
+  {
+   "variant": "C1 corners towards league average, fixed",
+   "market": "over_9.5",
+   "change": 0.0004100218100762804,
+   "lo": -0.0007841298942555353,
+   "hi": 0.0015884085230921576,
+   "p": 0.75275,
+   "published": 0.6788279966945943
+  },
+  {
+   "variant": "C1 corners towards league average, fixed",
+   "market": "over_10.5",
+   "change": -0.00032342619470950083,
+   "lo": -0.0015310832077539544,
+   "hi": 0.0008401128433369463,
+   "p": 0.28825,
+   "published": 0.6690132165241488
+  },
+  {
+   "variant": "C1 corners towards league average, fixed",
+   "market": "over_11.5",
+   "change": 0.00014771614426119776,
+   "lo": -0.0009968712580171878,
+   "hi": 0.0012597796563693948,
+   "p": 0.6095,
+   "published": 0.6031117709766247
+  },
+  {
+   "variant": "C1 corners towards league average, rolling",
+   "market": "count",
+   "change": 0.0007098527419708843,
+   "lo": -0.0007499094783738431,
+   "hi": 0.002124798584753364,
+   "p": 0.835,
+   "published": 2.6144659553088507
+  },
+  {
+   "variant": "C1 corners towards league average, rolling",
+   "market": "over_8.5",
+   "change": 0.00045222257887746805,
+   "lo": -0.0005786546220046315,
+   "hi": 0.0014869593189003956,
+   "p": 0.80075,
+   "published": 0.6358465912637971
+  },
+  {
+   "variant": "C1 corners towards league average, rolling",
+   "market": "over_9.5",
+   "change": 0.0007409847171107137,
+   "lo": -0.0003707558522172242,
+   "hi": 0.0018297977515609484,
+   "p": 0.9105,
+   "published": 0.6788279966945943
+  },
+  {
+   "variant": "C1 corners towards league average, rolling",
+   "market": "over_10.5",
+   "change": 0.0001441411338080427,
+   "lo": -0.0009500340258026277,
+   "hi": 0.001217329542568579,
+   "p": 0.59975,
+   "published": 0.6690132165241488
+  },
+  {
+   "variant": "C1 corners towards league average, rolling",
+   "market": "over_11.5",
+   "change": 0.0003831413797297083,
+   "lo": -0.0007087161697395645,
+   "hi": 0.0014450714382481338,
+   "p": 0.76375,
+   "published": 0.6031117709766247
+  },
+  {
+   "variant": "Y1 yellows towards league average, fixed",
+   "market": "count",
+   "change": 0.004403849728570155,
+   "lo": 0.0011157714558957677,
+   "hi": 0.007530741735408385,
+   "p": 0.99575,
+   "published": 2.1744979872904624
+  },
+  {
+   "variant": "Y1 yellows towards league average, fixed",
+   "market": "over_3.5",
+   "change": -1.1226012153081319e-06,
+   "lo": -0.0025682264567610078,
+   "hi": 0.0025630147683119806,
+   "p": 0.4935,
+   "published": 0.6533758941740154
+  },
+  {
+   "variant": "Y1 yellows towards league average, fixed",
+   "market": "over_4.5",
+   "change": 0.0017895209234192874,
+   "lo": -0.0009088038192280199,
+   "hi": 0.004445240483703498,
+   "p": 0.89975,
+   "published": 0.6659032597418818
+  },
+  {
+   "variant": "Y1 yellows towards league average, fixed",
+   "market": "over_5.5",
+   "change": 0.003260252854136339,
+   "lo": 0.0006605283421046035,
+   "hi": 0.0058605803695689525,
+   "p": 0.994,
+   "published": 0.5660038294030676
+  },
+  {
+   "variant": "Y1 yellows towards league average, rolling",
+   "market": "count",
+   "change": 0.0006164475309620099,
+   "lo": -0.0019028164295349387,
+   "hi": 0.0031247740084605286,
+   "p": 0.68525,
+   "published": 2.1744979872904624
+  },
+  {
+   "variant": "Y1 yellows towards league average, rolling",
+   "market": "over_3.5",
+   "change": -0.0006687438443192888,
+   "lo": -0.0027477731516807316,
+   "hi": 0.0012751379065060698,
+   "p": 0.263,
+   "published": 0.6533758941740154
+  },
+  {
+   "variant": "Y1 yellows towards league average, rolling",
+   "market": "over_4.5",
+   "change": -0.001254751979016306,
+   "lo": -0.0033750980283930396,
+   "hi": 0.0008806006937253665,
+   "p": 0.1225,
+   "published": 0.6659032597418818
+  },
+  {
+   "variant": "Y1 yellows towards league average, rolling",
+   "market": "over_5.5",
+   "change": 0.00035532335443382186,
+   "lo": -0.0016865424539166426,
+   "hi": 0.0024591598862270087,
+   "p": 0.63675,
+   "published": 0.5660038294030676
+  }
+ ],
+ "replication": [
+  {
+   "seasons": "2018/19 and 2019/20 (counts)",
+   "candidate": "Stretch only (fixed)",
+   "market": "1x2",
+   "n": 1520,
+   "published": 0.9704642752616528,
+   "change": -0.0024493982829990606,
+   "lo": -0.005132087421849012,
+   "hi": 0.00022543266219476196
+  },
+  {
+   "seasons": "2018/19 and 2019/20 (counts)",
+   "candidate": "Stretch only (fixed)",
+   "market": "over_1_5",
+   "n": 1520,
+   "published": 0.5427924193454705,
+   "change": 0.0005447980932524124,
+   "lo": -0.0005670400265233768,
+   "hi": 0.001702896680578812
+  },
+  {
+   "seasons": "2018/19 and 2019/20 (counts)",
+   "candidate": "Stretch only (fixed)",
+   "market": "over_2_5",
+   "n": 1520,
+   "published": 0.6777388387923959,
+   "change": 0.0006407685760384161,
+   "lo": -0.0007950979981045278,
+   "hi": 0.0021108676394415637
+  },
+  {
+   "seasons": "2018/19 and 2019/20 (counts)",
+   "candidate": "Stretch only (fixed)",
+   "market": "over_3_5",
+   "n": 1520,
+   "published": 0.5618931351099252,
+   "change": 0.0006944603760257801,
+   "lo": -0.0006107333307061117,
+   "hi": 0.0019722855381962326
+  },
+  {
+   "seasons": "2018/19 and 2019/20 (counts)",
+   "candidate": "Stretch only (fixed)",
+   "market": "btts",
+   "n": 1520,
+   "published": 0.6903112128751215,
+   "change": -2.5394304716403864e-05,
+   "lo": -0.00069330037560208,
+   "hi": 0.0006957237642124742
+  },
+  {
+   "seasons": "2018/19 and 2019/20 (counts)",
+   "candidate": "Stretch only (fixed)",
+   "market": "score",
+   "n": 1520,
+   "published": 2.8274287722072717,
+   "change": -0.00026393470646023055,
+   "lo": -0.0037495272699885067,
+   "hi": 0.0032088379143857646
+  },
+  {
+   "seasons": "2018/19 and 2019/20 (counts)",
+   "candidate": "Stretch plus shape (latest)",
+   "market": "1x2",
+   "n": 1520,
+   "published": 0.9704642752616528,
+   "change": -0.0020387711902147532,
+   "lo": -0.0035058218473995816,
+   "hi": -0.0005788745935321852
+  },
+  {
+   "seasons": "2018/19 and 2019/20 (counts)",
+   "candidate": "Stretch plus shape (latest)",
+   "market": "over_1_5",
+   "n": 1520,
+   "published": 0.5427924193454705,
+   "change": 0.000164076978623879,
+   "lo": -0.0027011642109667717,
+   "hi": 0.0031967086715863975
+  },
+  {
+   "seasons": "2018/19 and 2019/20 (counts)",
+   "candidate": "Stretch plus shape (latest)",
+   "market": "over_2_5",
+   "n": 1520,
+   "published": 0.6777388387923959,
+   "change": 0.0014255516366995695,
+   "lo": -6.132411605591607e-05,
+   "hi": 0.0029165508173707435
+  },
+  {
+   "seasons": "2018/19 and 2019/20 (counts)",
+   "candidate": "Stretch plus shape (latest)",
+   "market": "over_3_5",
+   "n": 1520,
+   "published": 0.5618931351099252,
+   "change": -0.00019606516396694092,
+   "lo": -0.001755808827370818,
+   "hi": 0.0014060025013266607
+  },
+  {
+   "seasons": "2018/19 and 2019/20 (counts)",
+   "candidate": "Stretch plus shape (latest)",
+   "market": "btts",
+   "n": 1520,
+   "published": 0.6903112128751215,
+   "change": 0.002006265471560857,
+   "lo": -0.0026637074770656482,
+   "hi": 0.0066574970819783
+  },
+  {
+   "seasons": "2018/19 and 2019/20 (counts)",
+   "candidate": "Stretch plus shape (latest)",
+   "market": "score",
+   "n": 1520,
+   "published": 2.8274287722072717,
+   "change": -0.004513361784685981,
+   "lo": -0.013721493414547125,
+   "hi": 0.0051623902905163456
+  },
+  {
+   "seasons": "2020/21, no crowds (reported only)",
+   "candidate": "Stretch only (fixed)",
+   "market": "1x2",
+   "n": 760,
+   "published": 1.0092052132870026,
+   "change": 0.0010466926673231164,
+   "lo": -0.0028171511637673213,
+   "hi": 0.005105935989510844
+  },
+  {
+   "seasons": "2020/21, no crowds (reported only)",
+   "candidate": "Stretch only (fixed)",
+   "market": "over_1_5",
+   "n": 760,
+   "published": 0.5754488885677708,
+   "change": 7.647609418767589e-05,
+   "lo": -0.0010008914687792709,
+   "hi": 0.001185884374445817
+  },
+  {
+   "seasons": "2020/21, no crowds (reported only)",
+   "candidate": "Stretch only (fixed)",
+   "market": "over_2_5",
+   "n": 760,
+   "published": 0.688656233834744,
+   "change": 0.001174538116440311,
+   "lo": -0.00041053808416034265,
+   "hi": 0.002880689116249723
+  },
+  {
+   "seasons": "2020/21, no crowds (reported only)",
+   "candidate": "Stretch only (fixed)",
+   "market": "over_3_5",
+   "n": 760,
+   "published": 0.5728336507532324,
+   "change": 0.0009894108096115922,
+   "lo": -0.00032451282062139766,
+   "hi": 0.0023951512731784203
+  },
+  {
+   "seasons": "2020/21, no crowds (reported only)",
+   "candidate": "Stretch only (fixed)",
+   "market": "btts",
+   "n": 760,
+   "published": 0.6939822320447293,
+   "change": 0.0007652944310711848,
+   "lo": -9.048188696359235e-05,
+   "hi": 0.0016118671866429996
+  },
+  {
+   "seasons": "2020/21, no crowds (reported only)",
+   "candidate": "Stretch only (fixed)",
+   "market": "score",
+   "n": 760,
+   "published": 2.8729682239554224,
+   "change": 0.003445038449535506,
+   "lo": -0.0015991148739266782,
+   "hi": 0.008709217834542801
+  },
+  {
+   "seasons": "2020/21, no crowds (reported only)",
+   "candidate": "Stretch plus shape (latest)",
+   "market": "1x2",
+   "n": 760,
+   "published": 1.0092052132870026,
+   "change": 0.0005738982598272327,
+   "lo": -0.0012097151273351352,
+   "hi": 0.002392943260803869
+  },
+  {
+   "seasons": "2020/21, no crowds (reported only)",
+   "candidate": "Stretch plus shape (latest)",
+   "market": "over_1_5",
+   "n": 760,
+   "published": 0.5754488885677708,
+   "change": 0.0017718643979682989,
+   "lo": -0.0019124987378910283,
+   "hi": 0.005801887075972649
+  },
+  {
+   "seasons": "2020/21, no crowds (reported only)",
+   "candidate": "Stretch plus shape (latest)",
+   "market": "over_2_5",
+   "n": 760,
+   "published": 0.688656233834744,
+   "change": 0.002021896956459597,
+   "lo": 0.00024763552836256747,
+   "hi": 0.003894272206203398
+  },
+  {
+   "seasons": "2020/21, no crowds (reported only)",
+   "candidate": "Stretch plus shape (latest)",
+   "market": "over_3_5",
+   "n": 760,
+   "published": 0.5728336507532324,
+   "change": 0.0013968347470664152,
+   "lo": -0.001009032783111639,
+   "hi": 0.0038619644382988294
+  },
+  {
+   "seasons": "2020/21, no crowds (reported only)",
+   "candidate": "Stretch plus shape (latest)",
+   "market": "btts",
+   "n": 760,
+   "published": 0.6939822320447293,
+   "change": 0.002657688944987344,
+   "lo": -0.0036335576837079513,
+   "hi": 0.00914679316177667
+  },
+  {
+   "seasons": "2020/21, no crowds (reported only)",
+   "candidate": "Stretch plus shape (latest)",
+   "market": "score",
+   "n": 760,
+   "published": 2.8729682239554224,
+   "change": 0.012243495419602112,
+   "lo": -0.0014320026052507817,
+   "hi": 0.026275153876072006
+  }
+ ],
+ "timing": {
+  "days": 14,
+  "earliest": "09:30",
+  "latest": "11:48",
+  "11:30": {
+   "late_pairs": 2,
+   "pairs": 13
+  },
+  "12:00": {
+   "late_pairs": 0,
+   "pairs": 13
+  },
+  "12:30": {
+   "late_pairs": 0,
+   "pairs": 13
+  }
+ },
+ "fitted": {
+  "G1 shape, fixed": {
+   "vh": 1.0523771843308634,
+   "va": 0.9650828550398634,
+   "rho": 0.006418818456869022,
+   "s": 0.0
+  },
+  "S1 stretch, fixed": {
+   "vh": 1.0,
+   "va": 1.0,
+   "rho": 0.00648038489968852,
+   "s": 0.09038673106989202
+  },
+  "S1 stretch plus G1 shape, fixed": {
+   "vh": 1.0563927509378959,
+   "va": 0.9645576857186874,
+   "rho": 0.006311992378884392,
+   "s": 0.09139041514093761
+  }
+ },
+ "latest": {
+  "vh": 1.274433018135727,
+  "va": 1.2232282488026804,
+  "rho": -0.002123547701994226,
+  "s": -0.04143070873779573,
+  "n": 1360
+ },
+ "breakdown": {
+  "S1 stretch, fixed": [
+   {
+    "group": "EPL",
+    "n": 1140,
+    "change": -0.0008861107391039532,
+    "lo": -0.003163164528568147,
+    "hi": 0.0015710317702820453
+   },
+   {
+    "group": "LaLiga",
+    "n": 1140,
+    "change": -0.0032263680620432857,
+    "lo": -0.005407734665261387,
+    "hi": -0.0009782390537248359
+   },
+   {
+    "group": "2023/24",
+    "n": 760,
+    "change": -0.0042732137108544245,
+    "lo": -0.007013923334450409,
+    "hi": -0.0015728030398720716
+   },
+   {
+    "group": "2024/25",
+    "n": 760,
+    "change": -0.001124537674163546,
+    "lo": -0.004057871890822385,
+    "hi": 0.002016165141445993
+   },
+   {
+    "group": "2025/26",
+    "n": 760,
+    "change": -0.0007709668167028879,
+    "lo": -0.0033487532362528557,
+    "hi": 0.0020098085767065016
+   }
+  ],
+  "S1 stretch plus G1 shape, rolling": [
+   {
+    "group": "EPL",
+    "n": 1140,
+    "change": -0.0014917968868478387,
+    "lo": -0.004045617549435262,
+    "hi": 0.0012239307145769963
+   },
+   {
+    "group": "LaLiga",
+    "n": 1140,
+    "change": -0.0029972882230659653,
+    "lo": -0.005767041452785967,
+    "hi": -0.0001632703096329189
+   },
+   {
+    "group": "2023/24",
+    "n": 760,
+    "change": -0.0035521828176714133,
+    "lo": -0.00649415229474685,
+    "hi": -0.0005739583881660743
+   },
+   {
+    "group": "2024/25",
+    "n": 760,
+    "change": -0.0013009730178890763,
+    "lo": -0.004768492924660145,
+    "hi": 0.002230664966843639
+   },
+   {
+    "group": "2025/26",
+    "n": 760,
+    "change": -0.0018804718293102172,
+    "lo": -0.005255009772968916,
+    "hi": 0.0015251252402287269
+   }
+  ]
+ }
+}

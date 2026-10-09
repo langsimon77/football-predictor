@@ -1,3 +1,5 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Football Predictor Lab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -362,6 +364,42 @@ tr.hl td:first-child { font-weight: 700; }
 .facts { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .facts li { display: grid; grid-template-columns: 110px 1fr; gap: 10px; font-size: 14px; }
 .facts li b { font-family: var(--mono); font-weight: 500; color: var(--ink); }
+.tech { font-family: var(--body); font-size: 11.5px; font-weight: 400; color: var(--muted); margin-left: 5px; letter-spacing: 0; text-transform: none; }
+.mname .tech { display: block; margin-left: 0; line-height: 1.2; }
+.glossary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 18px; margin: 0; }
+.glossary div { display: grid; gap: 2px; }
+.glossary dt { font-weight: 700; font-size: 14px; }
+.glossary dt .tech { margin-left: 6px; }
+.glossary dd { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+
+.gw-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; margin: 4px 0 0; }
+.gw-head h3 { font-family: var(--display); font-weight: 700; font-size: 26px; margin: 0; }
+.gw-head span { color: var(--muted); font-size: 13px; }
+.gw-day { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin: 6px 0 -4px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(330px, 100%), 1fr)); gap: 12px; }
+.pcard { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 8px; min-width: 0; }
+.pcard .row1 { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 12.5px; color: var(--ink-2); }
+.pcard .row1 .when { font-family: var(--mono); font-size: 12.5px; color: var(--ink); }
+.pcard .row1 .right { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+.lockpill { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-2); }
+.lockpill.on { border-color: var(--ink-2); color: var(--ink); }
+.pcard .teams { font-family: var(--display); font-weight: 700; font-size: 23px; line-height: 1.1; }
+.pcard .teams .v { font-family: var(--body); font-weight: 400; font-size: 14px; color: var(--muted); margin: 0 4px; }
+.pcard .verdict { font-size: 14px; color: var(--ink); }
+.pcard .three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; font-size: 12.5px; color: var(--ink-2); }
+.pcard .three b { display: block; font-family: var(--mono); font-size: 15px; color: var(--ink); font-weight: 500; }
+.pcard .three span:nth-child(2) { text-align: center; }
+.pcard .three span:nth-child(3) { text-align: right; }
+.pcard dl { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px 10px; margin: 0; font-size: 13px; align-items: center; }
+.pcard dt { color: var(--muted); }
+.pcard dd { margin: 0; color: var(--ink); }
+.pcard dd.t { text-align: right; }
+.pcard .fix { border-top: 1px dashed var(--line); padding-top: 6px; display: grid; gap: 4px; font-size: 12.5px; color: var(--ink-2); }
+.pcard .fix b { color: var(--ink); }
+.pcard .open { justify-self: start; border: 0; background: transparent; color: var(--accent); font-weight: 700; padding: 2px 0; cursor: pointer; font-size: 13px; }
+.banner { border: 1px solid var(--warn); background: color-mix(in srgb, var(--warn) 14%, var(--surface)); border-radius: 10px; padding: 8px 12px; font-size: 13.5px; }
+.findings { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 14px; }
+.findings li b { color: var(--ink); }
 
 @media (max-width: 1080px) {
   .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -376,6 +414,7 @@ tr.hl td:first-child { font-weight: 700; }
   .explorer { grid-template-columns: minmax(0, 1fr); }
   .match-list { max-height: 360px; }
   .grid-2, .grid-3 { grid-template-columns: minmax(0, 1fr); }
+  .glossary { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 520px) {
   .kpis { grid-template-columns: minmax(0, 1fr); }
@@ -396,17 +435,19 @@ tr.hl td:first-child { font-weight: 700; }
 
 <div class="shell">
   <nav class="rail" aria-label="Sections">
-    <button data-sec="overview"><b>Overview</b><span>Where the model stands</span></button>
-    <button data-sec="scoreboard"><b>Scoreboard</b><span>Every model, every market</span></button>
-    <button data-sec="explorer"><b>Match explorer</b><span>3,800 backtest matches and the next round</span></button>
-    <button data-sec="calibration"><b>Calibration and tiers</b><span>Is 70% really 70%?</span></button>
-    <button data-sec="ratings"><b>Ratings and simulator</b><span>Clubs and 2026/27 finishes</span></button>
-    <button data-sec="evidence"><b>Evidence</b><span>Tuning, stacking, news, drift</span></button>
-    <div class="note">A snapshot. Ask Claude to refresh the Model Lab for newer numbers.</div>
+    <button data-sec="overview"><b>Overview</b><span>How good is the model?</span></button>
+    <button data-sec="predictions"><b>Predictions</b><span>This gameweek, EPL and La Liga</span></button>
+    <button data-sec="scoreboard"><b>Scoreboard</b><span>Which model scores best?</span></button>
+    <button data-sec="explorer"><b>Match explorer</b><span>Any past match, or this gameweek</span></button>
+    <button data-sec="calibration"><b>Honesty and confidence</b><span>Does 70% happen 70% of the time?</span></button>
+    <button data-sec="ratings"><b>Club strength</b><span>Ratings and season simulator</span></button>
+    <button data-sec="evidence"><b>Tests and decisions</b><span>Why the model is built this way</span></button>
+    <div class="note">A snapshot, not live. Ask Claude to refresh the Model Lab for newer numbers.</div>
   </nav>
 
   <main id="main">
     <section class="section" id="sec-overview" hidden></section>
+    <section class="section" id="sec-predictions" hidden></section>
     <section class="section" id="sec-scoreboard" hidden></section>
     <section class="section" id="sec-explorer" hidden></section>
     <section class="section" id="sec-calibration" hidden></section>
@@ -466,21 +507,29 @@ tr.hl td:first-child { font-weight: 700; }
   P.stack = blend(STACK.weights);
   P.equal = blend(STACK.models.map(() => 1 / STACK.models.length));
 
+  // Plain names first; the technical name is shown small and grey beside it.
   const MODELS = {
-    bdc: { name: "Bayesian (published)", short: "Bayesian", color: "--s1" },
-    stack: { name: "Stack (shadow)", short: "Stack", color: "--s5" },
-    equal: { name: "Equal-weight blend", short: "Equal blend" },
-    multinomial: { name: "Multinomial", short: "Multinomial" },
-    ordered_logit: { name: "Ordered logit", short: "Ordered logit" },
-    random_forest: { name: "Random Forest", short: "Random Forest" },
-    xgboost: { name: "XGBoost", short: "XGBoost" },
-    dc: { name: "Fast Dixon-Coles", short: "Fast DC" },
-    elo: { name: "Elo", short: "Elo", color: "--s3" },
-    base: { name: "League base rates", short: "Base rates", color: "--neutral-series" },
-    mkt_pre: { name: "Market, Friday snapshot", short: "Market Fri", color: "--s4" },
-    mkt_sharp: { name: "Market, closing", short: "Market close", color: "--s2" },
-    model: { name: "Published count model", short: "Count model", color: "--s1" },
+    bdc: { name: "Main model (counts goals)", short: "Main model", tech: "Bayesian Dixon-Coles, published", color: "--s1" },
+    stack: { name: "Team of models", short: "Team of models", tech: "stacked ensemble, background only" , color: "--s5" },
+    equal: { name: "Simple average of models", short: "Simple average", tech: "equal-weight blend" },
+    multinomial: { name: "Simple learner", short: "Simple learner", tech: "multinomial regression" },
+    ordered_logit: { name: "Ladder learner", short: "Ladder learner", tech: "ordered logit" },
+    random_forest: { name: "Many-trees learner", short: "Many trees", tech: "Random Forest" },
+    xgboost: { name: "Boosted-trees learner", short: "Boosted trees", tech: "XGBoost" },
+    dc: { name: "Quick goals model", short: "Quick goals", tech: "Dixon-Coles, maximum likelihood" },
+    elo: { name: "Club rating points", short: "Rating points", tech: "Elo", color: "--s3" },
+    base: { name: "League averages", short: "League averages", tech: "base rates", color: "--neutral-series" },
+    mkt_pre: { name: "Bookmakers, Friday", short: "Bookmakers Fri", tech: "average odds, Friday snapshot", color: "--s4" },
+    mkt_sharp: { name: "Bookmakers, at kickoff", short: "Bookmakers close", tech: "Pinnacle closing odds", color: "--s2" },
+    model: { name: "Main model (counts corners or cards)", short: "Main model", tech: "Poisson for corners, negative binomial for yellows", color: "--s1" },
   };
+  // Model names in the live data files.
+  const LIVE_NAMES = { dc_bayes_v1: "bdc", dc_mle_v0: "dc", elo_v0: "elo", stack_v1: "stack", multinomial_v1: "multinomial", ordered_logit_v1: "ordered_logit", random_forest_v1: "random_forest", xgboost_v1: "xgboost" };
+  const NONEWS = { name: "Main model without team news", tech: "dc_bayes_v1_nonews" };
+  function nameHTML(m) {
+    const x = MODELS[m] || (m === "nonews" ? NONEWS : { name: m });
+    return esc(x.name) + (x.tech ? '<span class="tech">' + esc(x.tech) + "</span>" : "");
+  }
   const ORDER_1X2 = ["bdc", "stack", "equal", "multinomial", "ordered_logit", "random_forest", "xgboost", "dc", "elo", "base", "mkt_pre", "mkt_sharp"];
 
   function happenedFn(kind, line) {
@@ -493,11 +542,11 @@ tr.hl td:first-child { font-weight: 700; }
   [1.5, 2.5, 3.5].forEach(l => {
     const models = { bdc: "bdc_goals_" + l, base: "base_goals_" + l };
     if (l === 2.5) { models.mkt_pre = "mkt_pre_goals_2.5"; models.mkt_sharp = "mkt_sharp_goals_2.5"; }
-    MARKETS.push({ k: "goals_" + l, name: "Over " + l + " goals", type: "bin", models, happened: happenedFn("goals", l), tierKey: "over_" + String(l).replace(".", "_"), width: "goals_" + l, kind: "goals" });
+    MARKETS.push({ k: "goals_" + l, name: Math.ceil(l) + " or more goals (over " + l + ")", type: "bin", models, happened: happenedFn("goals", l), tierKey: "over_" + String(l).replace(".", "_"), width: "goals_" + l, kind: "goals" });
   });
   MARKETS.push({ k: "btts", name: "Both teams score", type: "bin", models: { bdc: "bdc_btts", base: "base_btts" }, happened: happenedFn("btts"), tierKey: "btts", width: "btts", kind: "goals" });
-  [8.5, 9.5, 10.5, 11.5].forEach(l => MARKETS.push({ k: "corners_" + l, name: "Over " + l + " corners", type: "bin", models: { model: "model_corners_" + l, base: "base_corners_" + l }, happened: happenedFn("corners", l), tierKey: "corners_over_" + String(l).replace(".", "_"), kind: "corners" }));
-  [3.5, 4.5, 5.5].forEach(l => MARKETS.push({ k: "yellows_" + l, name: "Over " + l + " yellows", type: "bin", models: { model: "model_yellows_" + l, base: "base_yellows_" + l }, happened: happenedFn("yellows", l), tierKey: "yellows_over_" + String(l).replace(".", "_"), kind: "yellows" }));
+  [8.5, 9.5, 10.5, 11.5].forEach(l => MARKETS.push({ k: "corners_" + l, name: Math.ceil(l) + " or more corners (over " + l + ")", type: "bin", models: { model: "model_corners_" + l, base: "base_corners_" + l }, happened: happenedFn("corners", l), tierKey: "corners_over_" + String(l).replace(".", "_"), kind: "corners" }));
+  [3.5, 4.5, 5.5].forEach(l => MARKETS.push({ k: "yellows_" + l, name: Math.ceil(l) + " or more yellow cards (over " + l + ")", type: "bin", models: { model: "model_yellows_" + l, base: "base_yellows_" + l }, happened: happenedFn("yellows", l), tierKey: "yellows_over_" + String(l).replace(".", "_"), kind: "yellows" }));
   const marketBy = k => MARKETS.find(m => m.k === k);
   const TH = {};
   (D.ev.tiers.thresholds || []).forEach(t => { TH[t.market] = t; });
@@ -644,7 +693,7 @@ tr.hl td:first-child { font-weight: 700; }
     }
     return a;
   }
-  const diagonal = { label: "Perfect calibration", data: [{ x: 0, y: 0 }, { x: 1, y: 1 }], type: "line", borderColor: () => css("--axis"), borderDash: [4, 4], borderWidth: 1.5, pointRadius: 0, pointHitRadius: 0 };
+  const diagonal = { label: "Perfectly honest", data: [{ x: 0, y: 0 }, { x: 1, y: 1 }], type: "line", borderColor: () => css("--axis"), borderDash: [4, 4], borderWidth: 1.5, pointRadius: 0, pointHitRadius: 0 };
 
   // Error bars and direct labels drawn by a small plugin.
   const whiskers = {
@@ -794,7 +843,7 @@ tr.hl td:first-child { font-weight: 700; }
 
   // ------------------------------------------------------------ header
   $("#version").textContent = "model " + (D.model_version || "").slice(0, 7);
-  $("#asof").textContent = "Snapshot built " + D.built + ". Live data as of the daily run of " + D.data_as_of.replace("T", " ").replace("Z", " UTC") + ". Backtests: 2021/22 to 2025/26.";
+  $("#asof").textContent = "Snapshot made " + D.built + ". This gameweek's forecasts come from the daily run of " + D.data_as_of.replace("T", " ").replace("Z", " UTC") + ". Past-season tests: 2021/22 to 2025/26.";
 
   // ============================================================ OVERVIEW
   renderers.overview = function () {
@@ -810,34 +859,47 @@ tr.hl td:first-child { font-weight: 700; }
     const locked = up.filter(r => r.locked).length;
     const ladder = ORDER_1X2.slice().sort((a, b) => ll[b] - ll[a]);
     sec.innerHTML =
-      '<div class="section-head"><h2>Where the model stands</h2><p>Every number on this page is computed in your browser from the embedded walk-forward forecasts: each past match was forecast using only what was known at its lock time. The test seasons (2023/24 to 2025/26, ' + idx.length.toLocaleString() + " matches with market prices) were scored once.</p></div>" +
+      '<div class="section-head"><h2>How good is the model?</h2><p>We replayed five past seasons as if they were live: each match was forecast using only what was known a day or two before kickoff. The last three seasons (2023/24 to 2025/26, ' + idx.length.toLocaleString() + " matches with bookmaker prices) were kept aside and scored once, so the model never learned from them. Every number here is worked out in your browser from those saved forecasts.</p></div>" +
       '<div class="kpis">' +
-      kpi("Published model, test log loss", num(ll.bdc, 4), "Lower is better. Elo " + num(ll.elo, 4) + ", base rates " + num(ll.base, 4) + ".") +
-      kpi("Gap to the closing market", signed(ll.bdc - ll.mkt_sharp, 4), "Friday market gap " + signed(ll.bdc - ll.mkt_pre, 4) + ". The market still knows more.") +
-      kpi("High tier: favourite won", pct(tierRows[2].won, 0) + " <small>of " + tierRows[2].n + "</small>", "Promised " + pct(tierRows[2].promised, 0) + ". Medium " + pct(tierRows[1].won, 0) + ", Low " + pct(tierRows[0].won, 0) + ".") +
-      kpi("Next matches in the snapshot", String(up.length), locked + " locked, " + (up.length - locked) + " provisional. " + (locked ? "Locked forecasts are final and will be scored." : "Nothing is locked yet; provisional forecasts update daily.")) +
+      kpi("Main model's surprise score", num(ll.bdc, 4), "Lower is better. Club rating points " + num(ll.elo, 4) + "; league averages " + num(ll.base, 4) + "; a blind guess 1.0986.") +
+      kpi("Behind the bookmakers by", signed(ll.bdc - ll.mkt_sharp, 4), "Against Friday prices: " + signed(ll.bdc - ll.mkt_pre, 4) + ". The bookmakers still know more, for example team news and line-ups.") +
+      kpi("High confidence: favourite won", pct(tierRows[2].won, 0) + " <small>of " + tierRows[2].n + "</small>", "The model promised " + pct(tierRows[2].promised, 0) + ". Medium won " + pct(tierRows[1].won, 0) + ", Low " + pct(tierRows[0].won, 0) + ".") +
+      kpi("This gameweek", String(up.length) + " <small>matches</small>", locked + " locked, " + (up.length - locked) + " still provisional. " + (locked ? "Locked forecasts are final and will be scored." : "Nothing is locked yet; provisional forecasts update daily.")) +
       "</div>" +
       '<div class="grid-2">' +
-      '<div class="panel"><h3>The ladder <span class="sub">home, draw, away; test seasons</span></h3><div class="chart-box h-360"><canvas id="ov-ladder"></canvas></div>' +
-      '<p class="caption">Mean log loss per forecast on the same ' + idx.length.toLocaleString() + " matches; shorter bars are better.</p>" +
-      explain("<p>Log loss is the average surprise: minus the natural log of the chance a forecast gave to what happened. A forecast that always said one third for each outcome would score 1.0986. The published Bayesian model sits with the machine-learning challengers, all within 0.005 of each other, clearly ahead of Elo on RPS and of base rates, and about 0.014 behind the bookmakers' Friday prices.</p>") +
+      '<div class="panel"><h3>Who forecasts best <span class="sub">home, draw, away; last three seasons</span></h3><div class="chart-box h-360"><canvas id="ov-ladder"></canvas></div>' +
+      '<p class="caption">Average surprise score per match on the same ' + idx.length.toLocaleString() + " matches. Shorter bars are better. Blue is the main model; orange bars are the bookmakers.</p>" +
+      explain("<p>The <b>surprise score</b> (log loss) asks: how much chance did the forecast give to what really happened? Giving the actual result a high chance scores low (good); calling it unlikely scores high (bad). A blind guess of one third for each result scores 1.0986. The main model sits level with the machine-learning models (all within 0.005), clearly ahead of league averages, and about 0.016 behind the bookmakers' Friday prices.</p>") +
       "</div>" +
-      '<div class="panel"><h3>How the pieces fit</h3>' +
+      '<div class="panel"><h3>How the system works</h3>' +
       '<ul class="facts">' +
-      fact("Data", "football-data.co.uk results, shots, corners, cards, and odds since 2016/17; openfootball and football-data.org fixtures.") +
-      fact("Published", "Bayesian Dixon-Coles for goals (with shots on target and promoted-team priors); Poisson for total corners; negative binomial for yellows.") +
-      fact("Shadows", "Elo, fast Dixon-Coles, four machine-learning challengers, and a 7-model stack: locked daily, never published.") +
-      fact("Lock", "Every forecast locks 24 to 48 hours before kickoff into a hash-chained ledger that can only grow.") +
-      fact("News", "Your daily Question Queue answers scale scoring rates, capped at 12%.") +
-      fact("Tiers", "High, Medium, Low per market from the favoured probability, interval width, model disagreement, and data flags.") +
+      fact("Data", "Results, shots, corners, cards and bookmaker odds since 2016/17 (football-data.co.uk); fixtures from openfootball and football-data.org. Odds are only used to judge the model, never to make forecasts.") +
+      fact("Goals", "The main model gives each club an attack and a defence strength, learned from goals and shots on target, with recent matches counting more. Newly promoted clubs start from their second-division form.") +
+      fact("Corners", "A count model for total corners, from each club's usual corner numbers, the strength gap and recent shots.") +
+      fact("Yellows", "A count model for total yellow cards, from each club's discipline, the referee (EPL only), how close the match should be, derbies and recent fouls.") +
+      fact("Locking", "Each forecast is locked 24 to 48 hours before kickoff in a record that can only grow, so nothing can be changed after the result.") +
+      fact("Team news", "Your answers to the daily question Issue (players missing) nudge the scoring rates, by at most 12%.") +
+      fact("Confidence", "Each forecast gets High, Medium or Low: how far to trust it, from how clear the favourite is, how sure the model is, and any data problems.") +
+      fact("Background", "Seven other models are locked and scored every day but never published. They show whether a different approach would do better.") +
       "</ul>" +
-      '<p class="caption">Where to go next: the Scoreboard compares any models on any market; the Match explorer shows single matches; the Calibration and tiers lab lets you move the tier cut points.</p>' +
-      "</div></div>";
+      "</div></div>" +
+      '<div class="panel"><h3>Words used in this lab</h3><dl class="glossary">' +
+      gloss("Surprise score", "log loss", "How much chance the forecast gave to what happened, turned into a penalty. Lower is better. It punishes confident misses hardest.") +
+      gloss("Closeness score", "RPS", "For home, draw, away only. Calling a draw when the home side won costs less than calling an away win. Lower is better.") +
+      gloss("Squared error", "Brier score", "The squared distance between the forecast and what happened (1 or 0). Lower is better.") +
+      gloss("Honest forecast", "calibration", "When the model says 70%, it happens about 70% of the time. A model can be honest and still not very sharp.") +
+      gloss("Too cautious", "timid, slope above 1", "Strong favourites win more often than the model says. The main model's known weakness.") +
+      gloss("Range of likely values", "95% bootstrap interval", "We re-draw the list of matches thousands of times to see how much a result could move by luck. If the whole range is below zero, the gain is real.") +
+      gloss("Strict rule", "adoption rule", "A change goes live only if its whole range of likely values shows a gain, and only after you approve it.") +
+      gloss("Locked or provisional", "ledger", "Locked forecasts are final and get scored. Provisional ones still update once a day until they lock.") +
+      gloss("Confidence", "tiers", "High, Medium or Low. High-confidence favourites won about three times in four in the test seasons.") +
+      gloss("Background model", "shadow", "Runs every day and is scored, but is never shown as the forecast.") +
+      "</dl></div>";
     const items = ladder.map(m => ({ m, v: ll[m] }));
     chart("ov-ladder", {
       type: "bar",
       data: {
-        labels: items.map(it => MODELS[it.m].name),
+        labels: items.map(it => MODELS[it.m].short),
         datasets: [{
           data: items.map(it => it.v),
           backgroundColor: items.map(it => it.m === "bdc" ? css("--s1") : (it.m.startsWith("mkt") ? css("--s2") : css("--neutral-series"))),
@@ -846,8 +908,8 @@ tr.hl td:first-child { font-weight: 700; }
       },
       options: baseOptions({
         indexAxis: "y",
-        scales: { x: { min: 0.94, max: 1.08, title: { display: true, text: "Mean log loss", color: css("--muted") } }, y: { grid: { display: false } } },
-        plugins: { tooltip: { callbacks: { label: c => " log loss " + c.raw.toFixed(4) } } },
+        scales: { x: { min: 0.94, max: 1.08, title: { display: true, text: "Average surprise score (lower is better)", color: css("--muted") } }, y: { grid: { display: false } } },
+        plugins: { tooltip: { callbacks: { title: c => MODELS[items[c[0].dataIndex].m].name + " (" + MODELS[items[c[0].dataIndex].m].tech + ")", label: c => " surprise score " + c.raw.toFixed(4) } } },
       }),
     });
   };
@@ -855,30 +917,143 @@ tr.hl td:first-child { font-weight: 700; }
     return '<div class="kpi"><div class="k-label">' + esc(label) + '</div><div class="k-value">' + value + '</div><div class="k-note">' + esc(note) + "</div></div>";
   }
   function fact(k, v) { return "<li><b>" + esc(k) + "</b><span>" + esc(v) + "</span></li>"; }
+  function gloss(term, tech, text) { return "<div><dt>" + esc(term) + '<span class="tech">' + esc(tech) + "</span></dt><dd>" + esc(text) + "</dd></div>"; }
+
+  // ============================================================ PREDICTIONS
+  // Juba is UTC+2 all year (no summer time), so the shift is fixed.
+  const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  function juba(iso) {
+    const d = new Date(Date.parse(iso) + 2 * 3600e3);
+    const two = v => String(v).padStart(2, "0");
+    return { day: DAYS[d.getUTCDay()] + " " + d.getUTCDate() + " " + MONTHS[d.getUTCMonth()], time: two(d.getUTCHours()) + ":" + two(d.getUTCMinutes()), key: d.toISOString().slice(0, 10) };
+  }
+  const TIER_LEVEL = t => ["Low", "Medium", "High"].indexOf(t);
+  function gameweek() {
+    // The current gameweek: the earliest round of each league in the snapshot.
+    const first = {};
+    D.up.rows.forEach(r => { if (!first[r.lg] || r.kickoff < first[r.lg].kickoff) first[r.lg] = r; });
+    return D.up.rows.filter(r => first[r.lg] && r.round === first[r.lg].round);
+  }
+  function verdict(r, p) {
+    const top = p.indexOf(Math.max(...p));
+    if (top === 1) return "A draw is the single likeliest result, but only just.";
+    const team = "<b>" + esc(D.clubs[top === 0 ? r.h : r.a]) + "</b>";
+    if (p[top] >= 0.6) return team + " are clear favourites.";
+    if (p[top] >= 0.45) return team + " are slight favourites.";
+    return "Too close to call: " + team + " shade it.";
+  }
+  const pr = { league: "both", sort: "time", fix: false };
+  renderers.predictions = function () {
+    const sec = $("#sec-predictions");
+    const gw = gameweek();
+    const locked = gw.filter(r => r.locked).length;
+    const high = gw.filter(r => r.tiers && r.tiers["1x2"] === "High").length;
+    const fav = gw.map(r => ({ r, p: Math.max(r.p[0], r.p[2]) / 1000, side: r.p[0] >= r.p[2] ? r.h : r.a })).sort((a, b) => b.p - a.p)[0];
+    const roundOf = lg => { const x = gw.find(r => r.lg === lg); return x ? x.round : ""; };
+    const hasFix = gw.some(r => r.fix);
+    sec.innerHTML =
+      '<div class="section-head"><h2>This gameweek</h2><p>Forecasts for the current gameweek: Premier League ' + esc(roundOf(0)) + " and La Liga " + esc(roundOf(1)) + ". Kickoff times are Juba time. <b>Locked</b> forecasts are final and will be scored; <b>provisional</b> ones still update at each daily run until they lock, 24 to 48 hours before kickoff.</p></div>" +
+      '<div class="kpis">' +
+      kpi("Matches", String(gw.length), "Premier League " + gw.filter(r => r.lg === 0).length + ", La Liga " + gw.filter(r => r.lg === 1).length + ".") +
+      kpi("Locked so far", locked + " <small>of " + gw.length + "</small>", locked === gw.length ? "Every forecast is final." : (gw.length - locked) + " will lock at the next daily runs.") +
+      kpi("High confidence", String(high), "Matches where the home, draw, away forecast is rated High.") +
+      kpi("Biggest favourite", fav ? esc(D.clubs[fav.side]) + " <small>" + pct(fav.p) + "</small>" : "none", fav ? "Against " + D.clubs[fav.side === fav.r.h ? fav.r.a : fav.r.h] + "." : "") +
+      "</div>" +
+      '<div class="panel"><div class="controls">' +
+      '<div class="ctl"><span class="lbl">League</span>' + segHTML("pr-league", [{ v: "both", label: "Both" }, { v: "0", label: "Premier League" }, { v: "1", label: "La Liga" }], pr.league) + "</div>" +
+      '<div class="ctl"><span class="lbl">Order</span>' + segHTML("pr-sort", [{ v: "time", label: "Kickoff" }, { v: "conf", label: "Clearest favourite" }, { v: "close", label: "Closest call" }], pr.sort) + "</div>" +
+      (hasFix ? '<label class="toggle"><input type="checkbox" id="pr-fix"' + (pr.fix ? " checked" : "") + "> Also show the proposed fix (not live)</label>" : "") +
+      "</div>" +
+      explain("<p>Each card shows the chances of a home win, a draw and an away win (blue, grey, red), the single most likely score, and the expected goals, corners and yellow cards. The likely score is only the best single guess: even the top score happens in only about one match in eight. <b>3 or more goals</b> is the over 2.5 line; <b>10 or more corners</b> is over 9.5; <b>5 or more yellow cards</b> is over 4.5. The badge on each line says how far to trust it: High, Medium or Low. It rates the likelier side, so <b>Both score 42%</b> with <b>High</b> means the model is fairly sure at least one side will not score. A newly promoted club early in the season, an unanswered team-news question, or an unknown referee all lower the confidence.</p>") +
+      "</div>" +
+      '<div id="pr-fix-note"></div><div id="pr-list" style="display:grid;gap:14px"></div>';
+    bindSeg("pr-league", v => { pr.league = v; draw(); });
+    bindSeg("pr-sort", v => { pr.sort = v; draw(); });
+    if (hasFix) $("#pr-fix").addEventListener("change", e => { pr.fix = e.target.checked; draw(); });
+    $("#pr-list").addEventListener("click", e => {
+      const b = e.target.closest("button.open");
+      if (!b) return;
+      ex.source = "up"; ex.sel = b.dataset.id; rendered.explorer = false;
+      show("explorer"); window.scrollTo({ top: 0 });
+    });
+    function line(label, value, tierKey, tiers) {
+      const t = tierKey && tiers[tierKey] ? tierBadge(TIER_LEVEL(tiers[tierKey])) : "";
+      return "<dt>" + label + "</dt><dd>" + value + '</dd><dd class="t">' + t + "</dd>";
+    }
+    function card(r) {
+      const p = r.p.map(v => v / 1000);
+      const when = juba(r.kickoff);
+      const tiers = r.tiers || {};
+      const home = esc(D.clubs[r.h]), away = esc(D.clubs[r.a]);
+      const g = r.goals;
+      let html = '<article class="pcard"><div class="row1"><span class="when">' + when.time + "</span><span>" + leagueName(r.lg) + '</span><span class="right"><span class="lockpill' + (r.locked ? " on" : "") + '">' + (r.locked ? "Locked" : "Provisional") + "</span>" + (tiers["1x2"] ? tierBadge(TIER_LEVEL(tiers["1x2"])) : "") + "</span></div>" +
+        '<div class="teams">' + home + '<span class="v">v</span>' + away + "</div>" +
+        '<div class="verdict">' + verdict(r, p) + "</div>" +
+        stackbar(p[0], p[1], p[2]) +
+        '<div class="three"><span>' + home + " win<b>" + pct(p[0]) + "</b></span><span>Draw<b>" + pct(p[1]) + "</b></span><span>" + away + " win<b>" + pct(p[2]) + "</b></span></div><dl>" +
+        line("Likely score", r.score ? "<b>" + esc(r.score) + "</b> <span class='ci'>(" + pct(r.score_p) + " chance)</span>" : "", null, tiers) +
+        line("Goals", home + " " + g.exp_home.toFixed(1) + ", " + away + " " + g.exp_away.toFixed(1) + "; 3 or more: <b>" + pct(g["over_2.5"]) + "</b>", "over_2_5", tiers) +
+        line("Both score", "<b>" + pct(g.btts) + "</b>", "btts", tiers) +
+        line("Corners", r.corners != null ? "about " + r.corners.toFixed(1) + "; 10 or more: <b>" + pct(r.c95) + "</b>" : "<span class='ci'>not available</span>", "corners_over_9_5", tiers) +
+        line("Yellow cards", r.yellows != null ? "about " + r.yellows.toFixed(1) + "; 5 or more: <b>" + pct(r.y45) + "</b>" : "<span class='ci'>not available</span>", "yellows_over_4_5", tiers) +
+        "</dl>";
+      if (r.news && r.news.length) html += '<div class="caption">Team news: ' + esc(r.news.join("; ")) + "</div>";
+      if (pr.fix && r.fix) {
+        const q = r.fix.p, d = k => Math.abs(q[k] - p[k]) < 0.005 ? "same" : signed((q[k] - p[k]) * 100, 0) + " pts";
+        html += '<div class="fix"><span><b>Proposed fix, not live:</b> ' + home + " win " + pct(q[0]) + " (" + d(0) + "), draw " + pct(q[1]) + " (" + d(1) + "), " + away + " win " + pct(q[2]) + " (" + d(2) + ").</span><span>3 or more goals " + pct(r.fix.o25) + "; both score " + pct(r.fix.btts) + "; likely score " + esc(r.fix.score) + ".</span></div>";
+      }
+      html += '<button type="button" class="open" data-id="' + esc(r.id) + '">See every model for this match</button></article>';
+      return html;
+    }
+    function draw() {
+      $("#pr-fix-note").innerHTML = pr.fix ? '<div class="banner"><b>Not live.</b> The fix lines show what the proposed change in Tests and decisions would do to these forecasts. The published forecasts stay as they are unless you approve it.</div>' : "";
+      const leagues = pr.league === "both" ? [0, 1] : [Number(pr.league)];
+      let out = "";
+      leagues.forEach(lg => {
+        let rs = gw.filter(r => r.lg === lg);
+        if (!rs.length) return;
+        const top = r => Math.max(...r.p);
+        if (pr.sort === "conf") rs.sort((a, b) => top(b) - top(a));
+        else if (pr.sort === "close") rs.sort((a, b) => top(a) - top(b));
+        else rs.sort((a, b) => a.kickoff.localeCompare(b.kickoff));
+        out += '<div class="gw-head"><h3>' + (lg === 0 ? "Premier League" : "La Liga") + "</h3><span>" + esc(rs[0].round || "") + ", " + rs.length + " matches, " + rs.filter(r => r.locked).length + " locked</span></div>";
+        if (pr.sort === "time") {
+          const days = [];
+          rs.forEach(r => { const k = juba(r.kickoff); if (!days.length || days[days.length - 1].key !== k.key) days.push({ key: k.key, day: k.day, rows: [] }); days[days.length - 1].rows.push(r); });
+          days.forEach(dd => { out += '<div class="gw-day">' + dd.day + '</div><div class="cards">' + dd.rows.map(card).join("") + "</div>"; });
+        } else {
+          out += '<div class="cards">' + rs.map(card).join("") + "</div>";
+        }
+      });
+      $("#pr-list").innerHTML = out || '<p class="caption">No matches in this snapshot.</p>';
+    }
+    draw();
+  };
 
   // ============================================================ SCOREBOARD
   const sb = { market: "1x2", leagues: [0, 1], seasons: TEST.slice(), metric: "log_loss", ref: "bdc", models: ORDER_1X2.slice() };
   renderers.scoreboard = function () {
     const sec = $("#sec-scoreboard");
     sec.innerHTML =
-      '<div class="section-head"><h2>Scoreboard</h2><p>Pick a market, leagues, seasons, and a reference model. Scores and 95% bootstrap intervals are computed on the matches every shown model priced. Paired differences compare two forecasts on the same matches, so luck cancels.</p></div>' +
+      '<div class="section-head"><h2>Which model scores best?</h2><p>Pick a market, the leagues and seasons, and a model to compare against. Every model is scored on exactly the same matches. Comparing two models match by match cancels out most of the luck, so small real differences can show up.</p></div>' +
       '<div class="panel"><div class="controls">' +
       '<div class="ctl"><label for="sb-market">Market</label><select id="sb-market">' + MARKETS.map(m => '<option value="' + m.k + '"' + (m.k === sb.market ? " selected" : "") + ">" + esc(m.name) + "</option>").join("") + "</select></div>" +
       '<div class="ctl"><span class="lbl">League</span>' + segHTML("sb-league", [{ v: "both", label: "Both" }, { v: "0", label: "EPL" }, { v: "1", label: "La Liga" }], "both") + "</div>" +
       '<div class="ctl"><span class="lbl">Seasons</span>' + chipsHTML("sb-seasons", ALL_SEASONS.map(s => ({ v: String(s), label: seasonLabel(s) })), sb.seasons.map(String)) + "</div>" +
-      '<div class="ctl"><span class="lbl">Score</span><div id="sb-metric-box"></div></div>' +
+      '<div class="ctl"><span class="lbl">Score type</span><div id="sb-metric-box"></div></div>' +
       '<div class="ctl"><label for="sb-ref">Compare against</label><select id="sb-ref"></select></div>' +
       "</div>" +
       '<div class="ctl"><span class="lbl">Models shown</span><div id="sb-models"></div></div></div>' +
       '<div class="panel"><h3 id="sb-title">Scores</h3><div class="table-wrap"><table id="sb-table"></table></div><p class="caption" id="sb-caption"></p>' +
-      explain("<p><b>Log loss</b> punishes confident misses hardest. <b>RPS</b> (ranked probability score, home, draw, away only) rewards putting probability near what happened, so calling a draw when the home side won costs less than calling an away win. <b>Brier</b> is the squared distance from the result. The interval is a 95% bootstrap interval: the match list is resampled 400 times. The difference column is paired, match by match, against the reference; if its whole interval sits below zero, that model is clearly better than the reference on these matches.</p>") +
+      explain("<p><b>Surprise score</b> (log loss) punishes confident misses hardest. <b>Closeness score</b> (RPS, home, draw, away only) gives partial credit for being near: calling a draw when the home side won costs less than calling an away win. <b>Squared error</b> (Brier) is the squared distance from the result. For all three, lower is better. The <b>range</b> is a 95% range of likely values: we re-draw the match list 400 times to see how far luck could move the score. The <b>difference</b> column compares each model with the one you picked, match by match. If its whole range is below zero, that model is clearly better on these matches; if the range crosses zero, we cannot tell them apart.</p>") +
       "</div>" +
       '<div class="grid-2">' +
-      '<div class="panel"><h3>Score by model</h3><div class="chart-box h-360"><canvas id="sb-bars"></canvas></div><p class="caption">Mean score per model; the reference model is highlighted. Lower is better.</p></div>' +
-      '<div class="panel"><h3>Running average over the seasons</h3><div id="sb-run-legend"></div><div class="chart-box h-360"><canvas id="sb-run"></canvas></div><p class="caption">Cumulative mean score in date order, up to five headline forecasts.</p>' +
-      explain("<p>Early points swing because a few surprising results dominate a short average. Lines that stay apart for hundreds of matches show a real difference; lines that cross often do not.</p>") +
+      '<div class="panel"><h3>Score by model</h3><div class="chart-box h-360"><canvas id="sb-bars"></canvas></div><p class="caption">Average score per model, with its range. The model you compare against is blue. Shorter is better.</p></div>' +
+      '<div class="panel"><h3>Running average, match by match</h3><div id="sb-run-legend"></div><div class="chart-box h-360"><canvas id="sb-run"></canvas></div><p class="caption">The average score so far, in date order, for up to five headline forecasts.</p>' +
+      explain("<p>The start of each line jumps about because a few shock results dominate a short average. Lines that stay apart for hundreds of matches show a real difference; lines that keep crossing do not.</p>") +
       "</div></div>" +
-      '<div class="panel"><h3>Season by season</h3><div class="table-wrap"><table id="sb-seasons-table"></table></div><p class="caption">Mean score for each season on its own; a model that wins one season and loses the next has no stable edge.</p></div>';
+      '<div class="panel"><h3>Season by season</h3><div class="table-wrap"><table id="sb-seasons-table"></table></div><p class="caption">Average score for each season on its own. A model that wins one season and loses the next has no steady edge.</p></div>';
     $("#sb-market").addEventListener("change", e => { sb.market = e.target.value; setupModels(); draw(); });
     bindSeg("sb-league", v => { sb.leagues = v === "both" ? [0, 1] : [Number(v)]; draw(); });
     bindChips("sb-seasons", vals => { sb.seasons = vals.map(Number); draw(); });
@@ -891,11 +1066,11 @@ tr.hl td:first-child { font-weight: 700; }
       const avail = available();
       const mk = marketBy(sb.market);
       if (mk.type !== "1x2" && sb.metric === "rps") sb.metric = "log_loss";
-      $("#sb-metric-box").innerHTML = segHTML("sb-metric", (mk.type === "1x2" ? [{ v: "log_loss", label: "Log loss" }, { v: "rps", label: "RPS" }, { v: "brier", label: "Brier" }] : [{ v: "log_loss", label: "Log loss" }, { v: "brier", label: "Brier" }]), sb.metric);
+      $("#sb-metric-box").innerHTML = segHTML("sb-metric", (mk.type === "1x2" ? [{ v: "log_loss", label: "Surprise" }, { v: "rps", label: "Closeness" }, { v: "brier", label: "Squared error" }] : [{ v: "log_loss", label: "Surprise" }, { v: "brier", label: "Squared error" }]), sb.metric);
       bindSeg("sb-metric", v => { sb.metric = v; draw(); });
       sb.models = avail.slice();
       if (avail.indexOf(sb.ref) < 0) sb.ref = avail[0];
-      $("#sb-ref").innerHTML = avail.map(m => '<option value="' + m + '"' + (m === sb.ref ? " selected" : "") + ">" + esc(MODELS[m].name) + "</option>").join("");
+      $("#sb-ref").innerHTML = avail.map(m => '<option value="' + m + '"' + (m === sb.ref ? " selected" : "") + ">" + esc(MODELS[m].name + " (" + MODELS[m].tech + ")") + "</option>").join("");
       $("#sb-models").innerHTML = chipsHTML("sb-model-chips", avail.map(m => ({ v: m, label: MODELS[m].short })), sb.models);
       bindChips("sb-model-chips", vals => { sb.models = vals; if (sb.models.indexOf(sb.ref) < 0) sb.models.push(sb.ref); draw(); });
     }
@@ -927,18 +1102,18 @@ tr.hl td:first-child { font-weight: 700; }
         const dci = m === sb.ref ? [NaN, NaN] : bootMean(diff, 400, 5);
         return { m, mean: mean(v), ci, diff: mean(diff), dci };
       }).sort((a, b) => a.mean - b.mean);
-      const metricName = { log_loss: "Log loss", rps: "RPS", brier: "Brier" }[sb.metric];
+      const metricName = { log_loss: "Surprise score", rps: "Closeness score", brier: "Squared error" }[sb.metric];
       $("#sb-title").textContent = mk.name + ": " + metricName;
       const maxV = Math.max(...res.map(r => r.mean)), minV = Math.min(...res.map(r => r.mean));
-      $("#sb-table").innerHTML = "<thead><tr><th>Model</th><th class='num'>Mean</th><th class='num'>95% interval</th><th class='num'>Minus " + esc(MODELS[sb.ref].short) + "</th><th class='num'>95% interval</th><th>Verdict</th><th class='bar-cell'></th></tr></thead><tbody>" +
+      $("#sb-table").innerHTML = "<thead><tr><th>Model</th><th class='num'>Average</th><th class='num'>Range (95%)</th><th class='num'>Difference from " + esc(MODELS[sb.ref].short) + "</th><th class='num'>Range (95%)</th><th>Verdict</th><th class='bar-cell'></th></tr></thead><tbody>" +
         res.map(r => {
-          let verdict = '<span class="status flag">reference</span>';
-          if (r.m !== sb.ref) verdict = r.dci[1] < 0 ? '<span class="status good">clearly better</span>' : r.dci[0] > 0 ? '<span class="status bad">clearly worse</span>' : '<span class="status flag">no clear difference</span>';
+          let verdict = '<span class="status flag">compared against</span>';
+          if (r.m !== sb.ref) verdict = r.dci[1] < 0 ? '<span class="status good">clearly better</span>' : r.dci[0] > 0 ? '<span class="status bad">clearly worse</span>' : '<span class="status flag">cannot tell apart</span>';
           const w = maxV > minV ? 12 + 88 * (r.mean - minV) / (maxV - minV) : 50;
-          return "<tr class='" + (r.m === sb.ref ? "ref" : "") + "'><td>" + esc(MODELS[r.m].name) + "</td><td class='num'>" + r.mean.toFixed(4) + "</td><td class='num ci'>" + r.ci[0].toFixed(4) + " to " + r.ci[1].toFixed(4) + "</td><td class='num'>" + (r.m === sb.ref ? "" : signed(r.diff, 4)) + "</td><td class='num ci'>" + (r.m === sb.ref ? "" : signed(r.dci[0], 4) + " to " + signed(r.dci[1], 4)) + "</td><td>" + verdict + "</td><td class='bar-cell'><div class='minibar" + (r.m === sb.ref ? "" : " muted") + "' style='width:" + w.toFixed(0) + "%'></div></td></tr>";
+          return "<tr class='" + (r.m === sb.ref ? "ref" : "") + "'><td>" + nameHTML(r.m) + "</td><td class='num'>" + r.mean.toFixed(4) + "</td><td class='num ci'>" + r.ci[0].toFixed(4) + " to " + r.ci[1].toFixed(4) + "</td><td class='num'>" + (r.m === sb.ref ? "" : signed(r.diff, 4)) + "</td><td class='num ci'>" + (r.m === sb.ref ? "" : signed(r.dci[0], 4) + " to " + signed(r.dci[1], 4)) + "</td><td>" + verdict + "</td><td class='bar-cell'><div class='minibar" + (r.m === sb.ref ? "" : " muted") + "' style='width:" + w.toFixed(0) + "%'></div></td></tr>";
         }).join("") + "</tbody>";
       const leagueTxt = sb.leagues.length === 2 ? "both leagues" : leagueName(sb.leagues[0]);
-      $("#sb-caption").textContent = idx.length.toLocaleString() + " matches (" + leagueTxt + "; " + sb.seasons.slice().sort().map(seasonLabel).join(", ") + ") priced by every shown model. Sorted best first.";
+      $("#sb-caption").textContent = idx.length.toLocaleString() + " matches (" + leagueTxt + "; " + sb.seasons.slice().sort().map(seasonLabel).join(", ") + ") that every shown model forecast. Best first. 2021/22 and 2022/23 were used to tune the models, so judge them on 2023/24 to 2025/26.";
       chart("sb-bars", {
         type: "bar",
         data: { labels: res.map(r => MODELS[r.m].short), datasets: [{ data: res.map(r => r.mean), backgroundColor: res.map(r => r.m === sb.ref ? css("--s1") : css("--neutral-series")), borderRadius: 4, borderSkipped: "start", barPercentage: 0.72, whiskers: res.map(r => ({ x: r.ci })) }] },
@@ -958,12 +1133,12 @@ tr.hl td:first-child { font-weight: 700; }
       chart("sb-run", {
         type: "line",
         data: { datasets },
-        options: baseOptions({ interaction: { mode: "index", intersect: false }, scales: { x: { type: "linear", title: { display: true, text: "Matches scored, in date order", color: css("--muted") } }, y: { title: { display: true, text: "Running mean " + metricName, color: css("--muted") } } }, plugins: { tooltip: { callbacks: { title: c => "After " + c[0].raw.x + " matches (" + BT.date[idx[c[0].raw.x - 1]] + ")", label: c => " " + c.dataset.label + ": " + c.raw.y.toFixed(4) } } } }),
+        options: baseOptions({ interaction: { mode: "index", intersect: false }, scales: { x: { type: "linear", title: { display: true, text: "Matches scored, in date order", color: css("--muted") } }, y: { title: { display: true, text: "Average " + metricName.toLowerCase() + " so far", color: css("--muted") } } }, plugins: { tooltip: { callbacks: { title: c => "After " + c[0].raw.x + " matches (" + BT.date[idx[c[0].raw.x - 1]] + ")", label: c => " " + c.dataset.label + ": " + c.raw.y.toFixed(4) } } } }),
       });
       const seasons = sb.seasons.slice().sort();
       let t = "<thead><tr><th>Model</th>" + seasons.map(s => "<th class='num'>" + seasonLabel(s) + "</th>").join("") + "</tr></thead><tbody>";
       res.forEach(r => {
-        t += "<tr class='" + (r.m === sb.ref ? "ref" : "") + "'><td>" + esc(MODELS[r.m].name) + "</td>";
+        t += "<tr class='" + (r.m === sb.ref ? "ref" : "") + "'><td>" + nameHTML(r.m) + "</td>";
         seasons.forEach(s => {
           const sub = [];
           idx.forEach((i, j) => { if (SS[i] === s) sub.push(sc[r.m][j]); });
@@ -982,13 +1157,13 @@ tr.hl td:first-child { font-weight: 700; }
   renderers.explorer = function () {
     const sec = $("#sec-explorer");
     sec.innerHTML =
-      '<div class="section-head"><h2>Match explorer</h2><p>Every backtest match with every model\'s forecast, the scoreline table, and what happened. Switch to the next round to see the 2026/27 forecasts.</p></div>' +
+      '<div class="section-head"><h2>Match explorer</h2><p>Pick any match from the five past seasons to see what every model said and what really happened. Or switch to this gameweek to see the 2026/27 forecasts in full.</p></div>' +
       '<div class="panel"><div class="controls">' +
-      '<div class="ctl"><span class="lbl">Matches</span>' + segHTML("ex-source", [{ v: "bt", label: "Backtest 2021 to 2026" }, { v: "up", label: "Next round 2026/27" }], ex.source) + "</div>" +
+      '<div class="ctl"><span class="lbl">Matches</span>' + segHTML("ex-source", [{ v: "bt", label: "Past seasons 2021 to 2026" }, { v: "up", label: "This gameweek 2026/27" }], ex.source) + "</div>" +
       '<div class="ctl"><label for="ex-q">Club</label><input type="search" id="ex-q" placeholder="Arsenal, Betis..." value="' + esc(ex.q) + '"></div>' +
-      '<div class="ctl"><label for="ex-season">Season</label><select id="ex-season"><option value="test">Test seasons</option><option value="all">All five</option>' + ALL_SEASONS.map(s => '<option value="' + s + '">' + seasonLabel(s) + "</option>").join("") + "</select></div>" +
+      '<div class="ctl"><label for="ex-season">Season</label><select id="ex-season"><option value="test">Last three (kept aside)</option><option value="all">All five</option>' + ALL_SEASONS.map(s => '<option value="' + s + '">' + seasonLabel(s) + "</option>").join("") + "</select></div>" +
       '<div class="ctl"><span class="lbl">League</span>' + segHTML("ex-league", [{ v: "both", label: "Both" }, { v: "0", label: "EPL" }, { v: "1", label: "La Liga" }], ex.league) + "</div>" +
-      '<div class="ctl"><label for="ex-sort">Sort</label><select id="ex-sort"><option value="date">Newest first</option><option value="surprise">Biggest surprise</option><option value="market">Bayesian vs market gap</option><option value="stack">Stack vs Bayesian gap</option></select></div>' +
+      '<div class="ctl"><label for="ex-sort">Sort</label><select id="ex-sort"><option value="date">Newest first</option><option value="surprise">Biggest shock</option><option value="market">Main model most unlike the bookmakers</option><option value="stack">Main model most unlike the team of models</option></select></div>' +
       "</div></div>" +
       '<div class="explorer"><div><div class="match-list" id="ex-list"></div><p class="list-note" id="ex-note"></p></div><div id="ex-detail" style="display:grid;gap:18px"></div></div>';
     $("#ex-season").value = ex.season;
@@ -1017,7 +1192,7 @@ tr.hl td:first-child { font-weight: 700; }
           const tier = r.tiers && r.tiers["1x2"] ? r.tiers["1x2"] : "";
           return '<button type="button" data-id="' + esc(r.id) + '" aria-current="' + (ex.sel === r.id) + '"><span class="teams">' + esc(D.clubs[r.h]) + " v " + esc(D.clubs[r.a]) + '</span><span class="tag">' + (r.locked ? "locked" : "provisional") + '</span><span class="meta">' + esc(r.kickoff.slice(0, 10)) + " &middot; " + leagueName(r.lg) + (tier ? " &middot; tier " + esc(tier) : "") + '</span><span class="tag">' + pct(r.p[0] / 1000) + " / " + pct(r.p[1] / 1000) + " / " + pct(r.p[2] / 1000) + "</span></button>";
         }).join("") || '<p class="list-note" style="padding:12px">No match.</p>';
-        $("#ex-note").textContent = upRows.length + " matches in the next round (data from " + D.data_as_of + ").";
+        $("#ex-note").textContent = upRows.length + " matches this gameweek (daily run of " + D.data_as_of.replace("T", " ").replace("Z", " UTC") + ").";
         if (!ex.sel && upRows.length) ex.sel = upRows[0].id;
         detail();
         return;
@@ -1034,10 +1209,10 @@ tr.hl td:first-child { font-weight: 700; }
       idx.sort((x, y) => key(y) - key(x));
       const shown = idx.slice(0, 300);
       box.innerHTML = shown.map(i => {
-        const tag = ex.sort === "surprise" ? "gave " + pct(P.bdc[3 * i + Y[i]]) : ex.sort === "market" ? "gap " + pct(key(i), 1) : ex.sort === "stack" ? "gap " + pct(key(i), 1) : pct(P.bdc[3 * i]) + " / " + pct(P.bdc[3 * i + 1]) + " / " + pct(P.bdc[3 * i + 2]);
+        const tag = ex.sort === "surprise" ? "gave it " + pct(P.bdc[3 * i + Y[i]]) : ex.sort === "market" ? "differs by " + pct(key(i), 1) : ex.sort === "stack" ? "differs by " + pct(key(i), 1) : pct(P.bdc[3 * i]) + " / " + pct(P.bdc[3 * i + 1]) + " / " + pct(P.bdc[3 * i + 2]);
         return '<button type="button" data-id="' + i + '" aria-current="' + (String(ex.sel) === String(i)) + '"><span class="teams">' + esc(D.clubs[BT.h[i]]) + " v " + esc(D.clubs[BT.a[i]]) + '</span><span class="score">' + HG[i] + "-" + AG[i] + '</span><span class="meta">' + BT.date[i] + " &middot; " + leagueName(LG[i]) + '</span><span class="tag">' + tag + "</span></button>";
       }).join("") || '<p class="list-note" style="padding:12px">No match.</p>';
-      $("#ex-note").textContent = "Showing " + shown.length + " of " + idx.length.toLocaleString() + " matches. Type a club name to narrow the list.";
+      $("#ex-note").textContent = "Showing " + shown.length + " of " + idx.length.toLocaleString() + " matches. Type a club name to narrow the list. The three numbers are the main model's home, draw, away chances.";
       if ((ex.sel == null || isNaN(Number(ex.sel))) && shown.length) ex.sel = String(shown[0]);
       detail();
     }
@@ -1051,43 +1226,43 @@ tr.hl td:first-child { font-weight: 700; }
       const models = ORDER_1X2.filter(m => isFinite(P[m][3 * i]));
       const heat = heatHTML(BT.mx.slice(49 * i, 49 * i + 49), HG[i], AG[i], D.clubs[BT.h[i]], D.clubs[BT.a[i]]);
       const flags = [];
-      if (PROMO[i]) flags.push("promoted club, under 6 games");
+      if (PROMO[i]) flags.push("newly promoted club, under 6 games played");
       if (REDS[i]) flags.push(REDS[i] + " red card" + (REDS[i] > 1 ? "s" : ""));
       box.innerHTML =
         '<div class="panel"><div class="label-tag">' + BT.date[i] + " &middot; " + leagueName(LG[i]) + " &middot; " + seasonLabel(SS[i]) + '</div><div class="score-big">' + esc(D.clubs[BT.h[i]]) + " " + HG[i] + "-" + AG[i] + " " + esc(D.clubs[BT.a[i]]) + "</div>" +
-        '<div class="pill-row">Result: <b>' + res + "</b> &middot; Tier (lab settings): " + tierBadge(t.lvl) + " &middot; Bayesian gave the result <b>" + pct(P.bdc[3 * i + Y[i]]) + "</b>" + (flags.length ? " &middot; <span class='ci'>" + esc(flags.join("; ")) + "</span>" : "") + "</div></div>" +
-        '<div class="panel"><h3>Every model <span class="sub">home, draw, away</span></h3>' + legendHTML([{ label: "Home win", color: css("--home") }, { label: "Draw", color: css("--draw") }, { label: "Away win", color: css("--away") }]) +
+        '<div class="pill-row">Result: <b>' + res + "</b> &middot; Confidence: " + tierBadge(t.lvl) + " &middot; The main model gave this result <b>" + pct(P.bdc[3 * i + Y[i]]) + "</b>" + (flags.length ? " &middot; <span class='ci'>" + esc(flags.join("; ")) + "</span>" : "") + "</div></div>" +
+        '<div class="panel"><h3>What every model said <span class="sub">home, draw, away</span></h3>' + legendHTML([{ label: "Home win", color: css("--home") }, { label: "Draw", color: css("--draw") }, { label: "Away win", color: css("--away") }]) +
         '<div class="model-rows">' + models.map(m => {
           const ph = P[m][3 * i], pd = P[m][3 * i + 1], pa = P[m][3 * i + 2];
-          return '<span class="mname">' + esc(MODELS[m].name) + "</span>" + stackbar(ph, pd, pa) + '<span class="got" title="Chance given to what happened">' + pct([ph, pd, pa][Y[i]]) + "</span>";
+          return '<span class="mname">' + nameHTML(m) + "</span>" + stackbar(ph, pd, pa) + '<span class="got" title="Chance given to what happened">' + pct([ph, pd, pa][Y[i]]) + "</span>";
         }).join("") + "</div>" +
-        '<p class="caption">Right-hand column: the chance each model gave to what actually happened.</p></div>' +
-        '<div class="grid-2"><div class="panel"><h3>Scoreline table <span class="sub">Bayesian, in %</span></h3>' + heat + '<p class="caption">Chance of each exact score; the actual score is outlined.</p>' +
-        explain("<p>The Bayesian model turns each side's scoring rate into a grid of exact scores. Summing the cells below the diagonal gives the home win chance; the diagonal gives the draw. Scores above 6 goals are counted in every market but not drawn.</p>") + "</div>" +
-        '<div class="panel"><h3>Every line <span class="sub">forecast against what happened</span></h3><div class="table-wrap">' + linesTable(i) + "</div></div></div>";
+        '<p class="caption">Right-hand column: the chance each model gave to what really happened. Higher is better.</p></div>' +
+        '<div class="grid-2"><div class="panel"><h3>Exact scores <span class="sub">main model, chance in %</span></h3>' + heat + '<p class="caption">The chance of each exact score; the real score is outlined.</p>' +
+        explain("<p>The main model works out how many goals each side should score, then turns that into a chance for every exact score. Adding up the cells where the home side scores more gives the home win chance; the diagonal gives the draw. Scores with 7 or more goals for one side are counted in every number but not drawn.</p>") + "</div>" +
+        '<div class="panel"><h3>Goals, corners and cards <span class="sub">forecast against what happened</span></h3><div class="table-wrap">' + linesTable(i) + "</div></div></div>";
     }
     function upDetail(box) {
       const r = D.up.rows.find(x => x.id === ex.sel);
       if (!r) { box.innerHTML = ""; return; }
-      const models = (r.models || []).map(m => ({ name: ({ dc_bayes_v1: "Bayesian (published)", dc_mle_v0: "Fast Dixon-Coles", elo_v0: "Elo", stack_v1: "Stack (shadow)", dc_bayes_v1_nonews: "Bayesian without news", multinomial_v1: "Multinomial", ordered_logit_v1: "Ordered logit", random_forest_v1: "Random Forest", xgboost_v1: "XGBoost" })[m.model] || m.model, p: [m.p_home, m.p_draw, m.p_away] }));
+      const models = (r.models || []).map(m => ({ html: m.model === "dc_bayes_v1_nonews" ? nameHTML("nonews") : LIVE_NAMES[m.model] ? nameHTML(LIVE_NAMES[m.model]) : esc(m.model), p: [m.p_home, m.p_draw, m.p_away] }));
       const tiers = r.tiers || {};
       const heat = heatHTML(r.mx, -1, -1, D.clubs[r.h], D.clubs[r.a]);
       box.innerHTML =
         '<div class="panel"><div class="label-tag">' + esc(r.kickoff.replace("T", " ").replace("Z", " UTC")) + " &middot; " + leagueName(r.lg) + " &middot; " + esc(r.round || "") + '</div><div class="score-big">' + esc(D.clubs[r.h]) + " v " + esc(D.clubs[r.a]) + "</div>" +
-        '<div class="pill-row">' + (r.locked ? "<b>Locked</b>" : "<b>Provisional</b>: updates daily until it locks") + " &middot; Tier: " + (tiers["1x2"] ? tierBadge(["Low", "Medium", "High"].indexOf(tiers["1x2"])) : "none") + " &middot; Expected goals " + r.goals.exp_home.toFixed(2) + " to " + r.goals.exp_away.toFixed(2) + "</div></div>" +
-        '<div class="panel"><h3>Every model <span class="sub">home, draw, away</span></h3>' + legendHTML([{ label: "Home win", color: css("--home") }, { label: "Draw", color: css("--draw") }, { label: "Away win", color: css("--away") }]) +
-        '<div class="model-rows">' + models.map(m => '<span class="mname">' + esc(m.name) + "</span>" + stackbar(m.p[0], m.p[1], m.p[2]) + '<span class="got"></span>').join("") + "</div>" +
-        '<p class="caption">Provisional forecasts carry only the three models the daily run computes before a lock; shadows are added at the lock.</p></div>' +
-        '<div class="grid-2"><div class="panel"><h3>Scoreline table <span class="sub">Bayesian, in %</span></h3>' + heat + "</div>" +
-        '<div class="panel"><h3>Top drivers</h3><ol class="drivers">' + (r.drivers || []).map(d => "<li>" + esc(d) + "</li>").join("") + "</ol>" +
-        '<div class="table-wrap"><table><thead><tr><th>Market</th><th class="num">Chance</th><th class="num">80% range</th><th>Tier</th></tr></thead><tbody>' +
-        [["over_1.5", "Over 1.5 goals", "p_over_1_5", "over_1_5"], ["over_2.5", "Over 2.5 goals", "p_over_2_5", "over_2_5"], ["over_3.5", "Over 3.5 goals", "p_over_3_5", "over_3_5"], ["btts", "Both teams score", "p_btts", "btts"]].map(x => {
+        '<div class="pill-row">' + (r.locked ? "<b>Locked</b>: final, will be scored" : "<b>Provisional</b>: updates daily until it locks") + " &middot; Confidence: " + (tiers["1x2"] ? tierBadge(["Low", "Medium", "High"].indexOf(tiers["1x2"])) : "none") + " &middot; Expected goals " + r.goals.exp_home.toFixed(2) + " to " + r.goals.exp_away.toFixed(2) + "</div></div>" +
+        '<div class="panel"><h3>What every model says <span class="sub">home, draw, away</span></h3>' + legendHTML([{ label: "Home win", color: css("--home") }, { label: "Draw", color: css("--draw") }, { label: "Away win", color: css("--away") }]) +
+        '<div class="model-rows">' + models.map(m => '<span class="mname">' + m.html + "</span>" + stackbar(m.p[0], m.p[1], m.p[2]) + '<span class="got"></span>').join("") + "</div>" +
+        '<p class="caption">Before a match locks, the daily run computes only the main model and two simple ones. The background models are added when it locks.</p></div>' +
+        '<div class="grid-2"><div class="panel"><h3>Exact scores <span class="sub">main model, chance in %</span></h3>' + heat + "</div>" +
+        '<div class="panel"><h3>What drives this forecast</h3><ol class="drivers">' + (r.drivers || []).map(d => "<li>" + esc(d) + "</li>").join("") + "</ol>" +
+        '<div class="table-wrap"><table><thead><tr><th>Market</th><th class="num">Chance</th><th class="num">Likely range</th><th>Confidence</th></tr></thead><tbody>' +
+        [["over_1.5", "2 or more goals", "p_over_1_5", "over_1_5"], ["over_2.5", "3 or more goals", "p_over_2_5", "over_2_5"], ["over_3.5", "4 or more goals", "p_over_3_5", "over_3_5"], ["btts", "Both teams score", "p_btts", "btts"]].map(x => {
           const iv = (r.intervals || {})[x[2]];
           return "<tr><td>" + x[1] + "</td><td class='num'>" + pct(r.goals[x[0]]) + "</td><td class='num ci'>" + (iv ? pct(iv[0]) + " to " + pct(iv[1]) : "") + "</td><td>" + (tiers[x[3]] ? tierBadge(["Low", "Medium", "High"].indexOf(tiers[x[3]])) : "") + "</td></tr>";
         }).join("") +
-        "<tr><td>Expected corners</td><td class='num'>" + (r.corners != null ? r.corners.toFixed(1) : "") + "</td><td></td><td></td></tr><tr><td>Expected yellows</td><td class='num'>" + (r.yellows != null ? r.yellows.toFixed(1) : "") + "</td><td></td><td></td></tr>" +
-        "</tbody></table></div></div></div>" +
-        (r.cpmf ? '<div class="grid-2"><div class="panel"><h3>Total corners</h3><div class="chart-box h-220"><canvas id="ex-cpmf"></canvas></div><p class="caption">Chance of each total; dotted lines mark 8.5 to 11.5.</p></div><div class="panel"><h3>Total yellows</h3><div class="chart-box h-220"><canvas id="ex-ypmf"></canvas></div><p class="caption">Chance of each total; dotted lines mark 3.5 to 5.5.</p></div></div>' : "");
+        "<tr><td>Expected corners</td><td class='num'>" + (r.corners != null ? r.corners.toFixed(1) : "") + "</td><td></td><td></td></tr><tr><td>Expected yellow cards</td><td class='num'>" + (r.yellows != null ? r.yellows.toFixed(1) : "") + "</td><td></td><td></td></tr>" +
+        "</tbody></table></div><p class='caption'>Likely range: the model is 80% sure the true chance lies in this range.</p></div></div>" +
+        (r.cpmf ? '<div class="grid-2"><div class="panel"><h3>Total corners</h3><div class="chart-box h-220"><canvas id="ex-cpmf"></canvas></div><p class="caption">The chance of each total. Dotted lines mark the 8.5 to 11.5 lines.</p></div><div class="panel"><h3>Total yellow cards</h3><div class="chart-box h-220"><canvas id="ex-ypmf"></canvas></div><p class="caption">The chance of each total. Dotted lines mark the 3.5 to 5.5 lines.</p></div></div>' : "");
       if (r.cpmf) {
         pmfChart("ex-cpmf", r.cpmf.map(v => v / 1000), [8.5, 9.5, 10.5, 11.5]);
         pmfChart("ex-ypmf", r.ypmf.map(v => v / 1000), [3.5, 4.5, 5.5]);
@@ -1117,7 +1292,7 @@ tr.hl td:first-child { font-weight: 700; }
     return h + '</div><p class="caption">Rows: ' + esc(home) + " goals. Columns: " + esc(away) + " goals.</p>";
   }
   function linesTable(i) {
-    let t = "<table><thead><tr><th>Line</th><th class='num'>Model</th><th class='num'>Base rate</th><th class='num'>Market</th><th>Happened</th><th>Tier</th></tr></thead><tbody>";
+    let t = "<table><thead><tr><th>Line</th><th class='num'>Main model</th><th class='num'>League average</th><th class='num'>Bookmakers</th><th>Happened?</th><th>Confidence</th></tr></thead><tbody>";
     MARKETS.filter(m => m.type === "bin").forEach(mk => {
       const key = mk.models.bdc || mk.models.model;
       const p = B[key][i];
@@ -1161,36 +1336,36 @@ tr.hl td:first-child { font-weight: 700; }
     const sec = $("#sec-calibration");
     const compOpts = ["stack", "elo", "multinomial", "ordered_logit", "random_forest", "xgboost", "dc", "mkt_pre", "base"];
     sec.innerHTML =
-      '<div class="section-head"><h2>Calibration and tiers</h2><p>When a forecast says 70%, does it happen 70% of the time? And do the confidence tiers really sort forecasts into groups you can lean on more or less? Move the cut points and watch the answer change.</p></div>' +
-      '<div class="panel"><h3>Reliability <span class="sub">home, draw, away</span></h3><div class="controls">' +
-      '<div class="ctl"><label for="cal-model">Third forecast</label><select id="cal-model">' + compOpts.map(m => '<option value="' + m + '">' + esc(MODELS[m].name) + "</option>").join("") + "</select></div>" +
-      '<div class="ctl"><span class="lbl">Outcome</span>' + segHTML("cal-outcome", [{ v: "all", label: "All three" }, { v: "0", label: "Home" }, { v: "1", label: "Draw" }, { v: "2", label: "Away" }], cal.outcome) + "</div>" +
+      '<div class="section-head"><h2>Honesty and confidence</h2><p>Two questions. First, is the model honest: when it says 70%, does it happen about 70% of the time? Second, do the High, Medium and Low labels really sort forecasts into groups you can trust more or less? Move the cut points and watch the answers change.</p></div>' +
+      '<div class="panel"><h3>Is the model honest? <span class="sub">home, draw, away</span></h3><div class="controls">' +
+      '<div class="ctl"><label for="cal-model">Also show</label><select id="cal-model">' + compOpts.map(m => '<option value="' + m + '">' + esc(MODELS[m].name) + "</option>").join("") + "</select></div>" +
+      '<div class="ctl"><span class="lbl">Result</span>' + segHTML("cal-outcome", [{ v: "all", label: "All three" }, { v: "0", label: "Home win" }, { v: "1", label: "Draw" }, { v: "2", label: "Away win" }], cal.outcome) + "</div>" +
       '<div class="ctl"><span class="lbl">Seasons</span>' + chipsHTML("cal-seasons", ALL_SEASONS.map(s => ({ v: String(s), label: seasonLabel(s) })), cal.seasons.map(String)) + "</div>" +
       '<div class="ctl"><span class="lbl">Groups</span>' + segHTML("cal-bins", [{ v: "5", label: "5" }, { v: "10", label: "10" }, { v: "15", label: "15" }], String(cal.bins)) + "</div>" +
-      '</div><div class="grid-2" style="align-items:start"><div><div id="cal-legend"></div><div class="chart-box h-440"><canvas id="cal-chart"></canvas></div><p class="caption">Each point groups forecasts of similar size: forecast chance across, how often it happened up. The dotted line is perfect.</p></div>' +
+      '</div><div class="grid-2" style="align-items:start"><div><div id="cal-legend"></div><div class="chart-box h-440"><canvas id="cal-chart"></canvas></div><p class="caption">Each point is a group of similar forecasts: the chance given (across) against how often it really happened (up). Points on the dotted line are honest. Points above it mean the model was too cautious.</p></div>' +
       '<div><div class="table-wrap"><table id="cal-table"></table></div>' +
-      explain("<p><b>Slope</b>: fit a line through five groups of home-win forecasts; 1 is honest, above 1 means too timid (favourites win more often than promised), below 1 too bold. <b>ECE</b> (expected calibration error): the average gap between forecast and frequency across ten bands, weighted by how many forecasts fall in each. The Bayesian model is too timid (slope about 1.2), which is why its High tier wins more often than it promises. The machine-learning challengers learn their probabilities straight from results and sit closer to 1.</p>") +
+      explain("<p><b>Slope</b>: draw a line through five groups of home-win forecasts. A slope of 1 is honest; above 1 means too cautious (favourites win more often than promised); below 1 means too bold. <b>Average gap</b> (expected calibration error): how far, on average, the forecast chance sits from what happened, across ten bands. The main model is too cautious (slope about 1.2): its strong favourites win more often than it says. The machine-learning models learn their chances straight from results, so they sit closer to 1. The proposed fix in Tests and decisions targets this.</p>") +
       "</div></div></div>" +
-      '<div class="panel"><h3>Tier lab <span class="sub">home, draw, away</span></h3><div class="controls">' +
-      '<div class="ctl"><span class="lbl">Forecast</span>' + segHTML("tl-forecast", [{ v: "bdc", label: "Bayesian (published)" }, { v: "stack", label: "Stack" }], tierState.forecast) + "</div>" +
-      '<div class="ctl"><span class="lbl">Seasons</span>' + segHTML("tl-stage", [{ v: "test", label: "Test 2023 to 2026" }, { v: "tune", label: "Tuning 2021 to 2023" }], cal.stage) + "</div>" +
-      sliderHTML("tl-high", "High from", 0.45, 0.8, 0.01, tierState.high, "pct") + sliderHTML("tl-low", "Low below", 0.34, 0.6, 0.01, tierState.low, "pct") +
-      sliderHTML("tl-width", "Widest interval", 0.08, 0.3, 0.005, tierState.width, "pts") + sliderHTML("tl-dis", "Most disagreement", 0.01, 0.2, 0.005, tierState.dis, "pts") +
+      '<div class="panel"><h3>Do the confidence labels work? <span class="sub">home, draw, away</span></h3><div class="controls">' +
+      '<div class="ctl"><span class="lbl">Forecast</span>' + segHTML("tl-forecast", [{ v: "bdc", label: "Main model" }, { v: "stack", label: "Team of models" }], tierState.forecast) + "</div>" +
+      '<div class="ctl"><span class="lbl">Seasons</span>' + segHTML("tl-stage", [{ v: "test", label: "Kept aside, 2023 to 2026" }, { v: "tune", label: "Tuning, 2021 to 2023" }], cal.stage) + "</div>" +
+      sliderHTML("tl-high", "High if favourite at least", 0.45, 0.8, 0.01, tierState.high, "pct") + sliderHTML("tl-low", "Low if favourite below", 0.34, 0.6, 0.01, tierState.low, "pct") +
+      sliderHTML("tl-width", "Most uncertainty allowed", 0.08, 0.3, 0.005, tierState.width, "pts") + sliderHTML("tl-dis", "Most disagreement allowed", 0.01, 0.2, 0.005, tierState.dis, "pts") +
       "</div><div class='controls'>" +
-      '<label class="toggle"><input type="checkbox" id="tl-usew"' + (tierState.useWidth ? " checked" : "") + "> Wide interval drops a tier</label>" +
-      '<label class="toggle"><input type="checkbox" id="tl-used"' + (tierState.useDis ? " checked" : "") + "> Stack and Bayesian disagreeing drops a tier</label>" +
-      '<label class="toggle"><input type="checkbox" id="tl-promo"' + (tierState.promoFlag ? " checked" : "") + "> Promoted club under 6 games caps at Medium</label>" +
-      '<button type="button" class="btn ghost" id="tl-reset">Reset to the live rule</button>' +
-      '</div><div class="grid-2" style="align-items:start"><div><div class="table-wrap"><table id="tl-table"></table></div><p class="caption" id="tl-verdict"></p></div><div><div class="chart-box h-300"><canvas id="tl-chart"></canvas></div><p class="caption">Promised (mean top chance) against won, per tier, with 95% intervals. Points on the dotted line are honest.</p></div></div>' +
-      explain("<p>The live rule (approved 26 Sep 2026): the top quarter of tuning forecasts starts High and the bottom third starts Low; a very wide interval or a big disagreement between the stack and the Bayesian model drops one tier; a missing answer, a manager change, or a source failure caps at Medium. The promoted-club flag is shown but not counted, because in the backtest those matches did better than promised, not worse. A good tier system has clearly separated win rates (intervals that do not overlap) and each tier close to honest. <b>Excess surprise</b> is the log loss a forecast earned minus the log loss it expected of itself: above zero means worse than promised.</p>") +
+      '<label class="toggle"><input type="checkbox" id="tl-usew"' + (tierState.useWidth ? " checked" : "") + "> A very unsure model drops one level</label>" +
+      '<label class="toggle"><input type="checkbox" id="tl-used"' + (tierState.useDis ? " checked" : "") + "> Main model and team of models disagreeing drops one level</label>" +
+      '<label class="toggle"><input type="checkbox" id="tl-promo"' + (tierState.promoFlag ? " checked" : "") + "> Newly promoted club (under 6 games) caps at Medium</label>" +
+      '<button type="button" class="btn ghost" id="tl-reset">Back to the live rule</button>' +
+      '</div><div class="grid-2" style="align-items:start"><div><div class="table-wrap"><table id="tl-table"></table></div><p class="caption" id="tl-verdict"></p></div><div><div class="chart-box h-300"><canvas id="tl-chart"></canvas></div><p class="caption">For each level: the chance the model promised its favourite (across) against how often the favourite really won (up), with a 95% range. Points on the dotted line are honest.</p></div></div>' +
+      explain("<p>The live rule (you approved it on 26 Sep 2026): the clearest quarter of favourites starts High and the least clear third starts Low. If the model is very unsure, or the main model and the team of models disagree a lot, the forecast drops one level. A data problem (an unanswered team-news question, a manager change in the last 30 days, or a source failure) caps it at Medium; two problems force Low. The newly promoted club flag is shown but not counted, because in past seasons those matches did better than promised, not worse. Good labels have clearly separated win rates (ranges that do not overlap). <b>Excess surprise</b> is the surprise score a forecast earned minus the one it expected of itself; above zero means it did worse than it promised.</p>") +
       "</div>" +
-      '<div class="panel"><h3>Tier lab <span class="sub">over and under lines</span></h3><div class="controls">' +
+      '<div class="panel"><h3>Do the confidence labels work? <span class="sub">goals, corners and cards lines</span></h3><div class="controls">' +
       '<div class="ctl"><label for="ou-market">Line</label><select id="ou-market">' + MARKETS.filter(m => m.type === "bin").map(m => '<option value="' + m.k + '"' + (m.k === cal.ouMarket ? " selected" : "") + ">" + esc(m.name) + "</option>").join("") + "</select></div>" +
-      '<div class="ctl"><span class="lbl">Seasons</span>' + segHTML("ou-stage", [{ v: "test", label: "Test" }, { v: "tune", label: "Tuning" }], cal.ouStage) + "</div>" +
-      sliderHTML("ou-high", "High from", 0.5, 0.95, 0.01, ouState.high, "pct") + sliderHTML("ou-low", "Low below", 0.5, 0.9, 0.01, ouState.low, "pct") +
-      '<label class="toggle"><input type="checkbox" id="ou-ref" checked> Unknown referee caps yellows at Medium</label>' +
-      '</div><div class="grid-2" style="align-items:start"><div><div class="table-wrap"><table id="ou-table"></table></div><p class="caption" id="ou-verdict"></p></div><div><div class="table-wrap"><table id="flag-table"></table></div><p class="caption">Do the flags pick out forecasts that do worse than they promise? Gap in excess surprise, flagged minus the rest, with a 95% interval.</p></div></div>' +
-      explain("<p>For an over or under line, the favoured probability is the chance of the likelier side. Over and under forecasts sit between about 50% and 75%, so tiers separate them far less than home, draw, away. In the backtest only 4 of 11 lines had clearly separated tiers. Yellows forecasts without a known referee get a flag: every La Liga match, and most EPL Friday and Saturday matches.</p>") +
+      '<div class="ctl"><span class="lbl">Seasons</span>' + segHTML("ou-stage", [{ v: "test", label: "Kept aside" }, { v: "tune", label: "Tuning" }], cal.ouStage) + "</div>" +
+      sliderHTML("ou-high", "High if likelier side at least", 0.5, 0.95, 0.01, ouState.high, "pct") + sliderHTML("ou-low", "Low if below", 0.5, 0.9, 0.01, ouState.low, "pct") +
+      '<label class="toggle"><input type="checkbox" id="ou-ref" checked> Unknown referee caps yellow cards at Medium</label>' +
+      '</div><div class="grid-2" style="align-items:start"><div><div class="table-wrap"><table id="ou-table"></table></div><p class="caption" id="ou-verdict"></p></div><div><div class="table-wrap"><table id="flag-table"></table></div><p class="caption">Do the warning flags pick out forecasts that do worse than they promise? Excess surprise of flagged matches minus the rest, with a 95% range.</p></div></div>' +
+      explain("<p>For a line such as 3 or more goals, the confidence starts from the chance of the likelier side (over or under). These chances mostly sit between 50% and 75%, so the labels separate them far less than home, draw, away. In past seasons only 4 of 11 lines had clearly separated levels. Yellow-card forecasts without a known referee get a warning flag: every La Liga match, and most EPL Friday and Saturday matches.</p>") +
       "</div>";
     $("#cal-model").value = cal.model;
     $("#cal-model").addEventListener("change", e => { cal.model = e.target.value; drawCal(); });
@@ -1263,9 +1438,9 @@ tr.hl td:first-child { font-weight: 700; }
       chart("cal-chart", {
         type: "scatter",
         data: { datasets },
-        options: baseOptions({ scales: { x: { min: 0, max: 1, title: { display: true, text: "Forecast chance", color: css("--muted") }, ticks: { callback: v => Math.round(v * 100) + "%" } }, y: { min: 0, max: 1, title: { display: true, text: "How often it happened", color: css("--muted") }, ticks: { callback: v => Math.round(v * 100) + "%" } } }, plugins: { tooltip: { filter: c => c.datasetIndex > 0, callbacks: { label: c => " " + c.dataset.label + ": said " + pct(c.raw.x, 1) + ", happened " + pct(c.raw.y, 1) + " (" + c.raw.n + " forecasts)" } } } }),
+        options: baseOptions({ scales: { x: { min: 0, max: 1, title: { display: true, text: "Chance the forecast gave", color: css("--muted") }, ticks: { callback: v => Math.round(v * 100) + "%" } }, y: { min: 0, max: 1, title: { display: true, text: "How often it happened", color: css("--muted") }, ticks: { callback: v => Math.round(v * 100) + "%" } } }, plugins: { tooltip: { filter: c => c.datasetIndex > 0, callbacks: { label: c => " " + c.dataset.label + ": said " + pct(c.raw.x, 1) + ", happened " + pct(c.raw.y, 1) + " (" + c.raw.n + " forecasts)" } } } }),
       });
-      $("#cal-table").innerHTML = "<thead><tr><th>Forecast</th><th class='num'>Slope</th><th class='num'>ECE</th><th class='num'>Log loss</th></tr></thead><tbody>" + tableRows.map(r => "<tr><td>" + esc(MODELS[r.m].name) + "</td><td class='num'>" + r.slope.toFixed(2) + "</td><td class='num'>" + r.ece.toFixed(4) + "</td><td class='num'>" + r.ll.toFixed(4) + "</td></tr>").join("") + "</tbody>";
+      $("#cal-table").innerHTML = "<thead><tr><th>Forecast</th><th class='num'>Slope</th><th class='num'>Average gap</th><th class='num'>Surprise score</th></tr></thead><tbody>" + tableRows.map(r => "<tr><td>" + nameHTML(r.m) + "</td><td class='num'>" + r.slope.toFixed(2) + "</td><td class='num'>" + r.ece.toFixed(4) + "</td><td class='num'>" + r.ll.toFixed(4) + "</td></tr>").join("") + "</tbody>";
     }
     function tierTable(recs, excessFn) {
       const out = [];
@@ -1278,7 +1453,7 @@ tr.hl td:first-child { font-weight: 700; }
       return out;
     }
     function tierTableHTML(tr) {
-      return "<thead><tr><th>Tier</th><th class='num'>Matches</th><th class='num'>Share</th><th class='num'>Promised</th><th class='num'>Won</th><th class='num'>95% interval</th><th class='num'>Excess surprise</th></tr></thead><tbody>" +
+      return "<thead><tr><th>Confidence</th><th class='num'>Matches</th><th class='num'>Share</th><th class='num'>Promised</th><th class='num'>Won</th><th class='num'>Range (95%)</th><th class='num'>Excess surprise</th></tr></thead><tbody>" +
         tr.map(r => r.n ? "<tr><td>" + tierBadge(r.l) + "</td><td class='num'>" + r.n + "</td><td class='num'>" + pct(r.share) + "</td><td class='num'>" + pct(r.promised, 1) + "</td><td class='num'>" + pct(r.won, 1) + "</td><td class='num ci'>" + pct(r.ci[0], 1) + " to " + pct(r.ci[1], 1) + "</td><td class='num'>" + (isFinite(r.excess) ? signed(r.excess, 3) : "") + "</td></tr>" : "<tr><td>" + tierBadge(r.l) + "</td><td class='num'>0</td><td colspan='5' class='ci'>no matches</td></tr>").join("") + "</tbody>";
     }
     function separated(tr) {
@@ -1302,7 +1477,7 @@ tr.hl td:first-child { font-weight: 700; }
       const tr = tierTable(recs, r => r.excess);
       $("#tl-table").innerHTML = tierTableHTML(tr);
       const sep = separated(tr);
-      $("#tl-verdict").innerHTML = (sep ? '<span class="status good">Win rates clearly separated</span>' : '<span class="status bad">Win rates overlap</span>') + " on " + idx.length.toLocaleString() + " matches (" + (cal.stage === "test" ? "test" : "tuning") + " seasons).";
+      $("#tl-verdict").innerHTML = (sep ? '<span class="status good">The levels clearly separate</span>' : '<span class="status bad">The levels overlap</span>') + " on " + idx.length.toLocaleString() + " matches (" + (cal.stage === "test" ? "seasons kept aside" : "tuning seasons") + ").";
       const pts = tr.filter(r => r.n).map(r => ({ x: r.promised, y: r.won, l: r.l, ci: r.ci }));
       chart("tl-chart", {
         type: "scatter",
@@ -1318,7 +1493,7 @@ tr.hl td:first-child { font-weight: 700; }
       const recs = idx.map(i => tierBin(i, mk, st)).filter(Boolean);
       const tr = tierTable(recs, r => r.excess);
       $("#ou-table").innerHTML = tierTableHTML(tr);
-      $("#ou-verdict").innerHTML = (separated(tr) ? '<span class="status good">Win rates clearly separated</span>' : '<span class="status bad">Win rates overlap</span>') + " on " + recs.length.toLocaleString() + " matches. Hit means the likelier side happened.";
+      $("#ou-verdict").innerHTML = (separated(tr) ? '<span class="status good">The levels clearly separate</span>' : '<span class="status bad">The levels overlap</span>') + " on " + recs.length.toLocaleString() + " matches. Won means the likelier side happened.";
       const flagRows = [];
       const all1 = rows({ leagues: [0, 1], seasons }).map(i => {
         const p = P.bdc, y = Y[i];
@@ -1332,14 +1507,14 @@ tr.hl td:first-child { font-weight: 700; }
         const ci = bootGap(a, b, 300, 29);
         return { n: a.length, gap: mean(a) - mean(b), ci };
       };
-      flagRows.push(["Promoted club, under 6 games (home, draw, away)", gap(all1.filter(r => PROMO[r.i]), all1.filter(r => !PROMO[r.i]))]);
+      flagRows.push(["Newly promoted club, under 6 games (home, draw, away)", gap(all1.filter(r => PROMO[r.i]), all1.filter(r => !PROMO[r.i]))]);
       const bin = idx.map(i => ({ i, r: tierBin(i, mk, st) })).filter(x => x.r).map(x => ({ i: x.i, ex: x.r.excess }));
-      flagRows.push(["Promoted club, under 6 games (" + mk.name.toLowerCase() + ")", gap(bin.filter(r => PROMO[r.i]), bin.filter(r => !PROMO[r.i]))]);
+      flagRows.push(["Newly promoted club, under 6 games (" + mk.name.toLowerCase() + ")", gap(bin.filter(r => PROMO[r.i]), bin.filter(r => !PROMO[r.i]))]);
       if (mk.kind === "yellows") {
         const epl = bin.filter(r => LG[r.i] === 0);
         flagRows.push(["Unknown referee, EPL only (" + mk.name.toLowerCase() + ")", gap(epl.filter(r => !REFK[r.i]), epl.filter(r => REFK[r.i]))]);
       }
-      $("#flag-table").innerHTML = "<thead><tr><th>Flag</th><th class='num'>Flagged</th><th class='num'>Gap</th><th class='num'>95% interval</th><th>Reading</th></tr></thead><tbody>" + flagRows.map(([name, g]) => g ? "<tr><td>" + esc(name) + "</td><td class='num'>" + g.n + "</td><td class='num'>" + signed(g.gap, 3) + "</td><td class='num ci'>" + signed(g.ci[0], 3) + " to " + signed(g.ci[1], 3) + "</td><td>" + (g.ci[0] > 0 ? '<span class="status bad">worse than promised</span>' : g.ci[1] < 0 ? '<span class="status good">better than promised</span>' : '<span class="status flag">no clear effect</span>') + "</td></tr>" : "<tr><td>" + esc(name) + "</td><td colspan='4' class='ci'>too few flagged</td></tr>").join("") + "</tbody>";
+      $("#flag-table").innerHTML = "<thead><tr><th>Warning flag</th><th class='num'>Flagged</th><th class='num'>Gap</th><th class='num'>Range (95%)</th><th>Reading</th></tr></thead><tbody>" + flagRows.map(([name, g]) => g ? "<tr><td>" + esc(name) + "</td><td class='num'>" + g.n + "</td><td class='num'>" + signed(g.gap, 3) + "</td><td class='num ci'>" + signed(g.ci[0], 3) + " to " + signed(g.ci[1], 3) + "</td><td>" + (g.ci[0] > 0 ? '<span class="status bad">worse than promised</span>' : g.ci[1] < 0 ? '<span class="status good">better than promised</span>' : '<span class="status flag">no clear effect</span>') + "</td></tr>" : "<tr><td>" + esc(name) + "</td><td colspan='4' class='ci'>too few flagged</td></tr>").join("") + "</tbody>";
     }
     resetOU();
     drawCal();
@@ -1459,20 +1634,20 @@ tr.hl td:first-child { font-weight: 700; }
   renderers.ratings = function () {
     const sec = $("#sec-ratings");
     sec.innerHTML =
-      '<div class="section-head"><h2>Ratings and season simulator</h2><p>Club ratings from the Bayesian model fitted on every result known on ' + esc(D.data_as_of.slice(0, 10)) + ', and a season simulator that replays every remaining 2026/27 match in your browser. Nudge a club and see what it does to the title race and the relegation fight.</p></div>' +
+      '<div class="section-head"><h2>Club strength and season simulator</h2><p>How strong each club is, according to the main model fitted on every result known on ' + esc(D.data_as_of.slice(0, 10)) + '. The simulator then plays every remaining 2026/27 match thousands of times in your browser. Nudge a club up or down and see what it does to the title race and the relegation fight.</p></div>' +
       '<div class="panel"><div class="controls"><div class="ctl"><span class="lbl">League</span>' + segHTML("rt-league", [{ v: "EPL", label: "EPL" }, { v: "LaLiga", label: "La Liga" }], simState.league) + '</div></div>' +
-      '<div class="grid-2" style="align-items:start"><div><h3>Attack against defence</h3><div class="chart-box h-520"><canvas id="rt-chart"></canvas></div><p class="caption">Each club with its 80% range; top right is strongest. Defence runs right-to-left so better defences sit to the right.</p>' +
-      explain("<p>Ratings are multiples of an average club in this league. Attack 1.30 means 30% more goals than average against an average defence; defence 0.80 means 20% fewer goals conceded. The whiskers cover 80% of the model's plausible values; long whiskers mean less evidence, as for a promoted club early in the season. The model counts matches from recent seasons with a half-life of about a year.</p>") +
+      '<div class="grid-2" style="align-items:start"><div><h3>Attack against defence</h3><div class="chart-box h-520"><canvas id="rt-chart"></canvas></div><p class="caption">Each dot is a club; the lines show the model\'s 80% range. Top right is strongest. The defence axis runs right to left, so better defences sit on the right.</p>' +
+      explain("<p>Ratings compare each club with an average club in the same league. Attack 1.30 means 30% more goals than average against an average defence. Defence 0.80 means 20% fewer goals conceded than average. Long lines mean the model has less evidence, as for a newly promoted club early in the season. Older matches count less: a match from a year ago counts about half as much as this week's.</p>") +
       '</div><div><h3>Simulator</h3><div class="controls">' +
       '<div class="ctl"><label for="sim-club">Club to nudge</label><select id="sim-club"></select></div>' +
       sliderHTML("sim-att", "Its attack", 0.7, 1.3, 0.01, simState.att, "mult") + sliderHTML("sim-def", "Goals it concedes", 0.7, 1.3, 0.01, simState.def, "mult") +
-      sliderHTML("sim-home", "Home advantage, share of usual", 0, 2, 0.05, simState.home, "share") +
-      '<div class="ctl"><span class="lbl">Seasons simulated</span>' + segHTML("sim-n", [{ v: "1000", label: "1,000" }, { v: "5000", label: "5,000" }, { v: "10000", label: "10,000" }], String(simState.n)) + "</div>" +
+      sliderHTML("sim-home", "Home advantage, share of normal", 0, 2, 0.05, simState.home, "share") +
+      '<div class="ctl"><span class="lbl">Seasons to play</span>' + segHTML("sim-n", [{ v: "1000", label: "1,000" }, { v: "5000", label: "5,000" }, { v: "10000", label: "10,000" }], String(simState.n)) + "</div>" +
       '<button type="button" class="btn" id="sim-run">Run the season</button><button type="button" class="btn ghost" id="sim-reset">Reset nudges</button>' +
       '</div><div class="progress" aria-hidden="true"><div id="sim-prog"></div></div><p class="caption" id="sim-status"></p>' +
       '<div class="chart-box h-260"><canvas id="sim-dist"></canvas></div><p class="caption" id="sim-dist-cap"></p></div></div></div>' +
       '<div class="panel"><h3>Season outlook <span class="sub" id="sim-sub"></span></h3><div class="table-wrap"><table id="sim-table"></table></div>' +
-      explain("<p>Each simulated season draws one plausible set of ratings from the model, plays every remaining match with random goals, and adds the points to the current table. Ties are split by goal difference, then goals scored (the EPL rule; La Liga uses head to head first, which this ignores). The baseline and your scenario use the same random numbers, so differences come from your nudges, not from luck. Nudges multiply scoring rates: an attack of +10% means 10% more goals in every remaining match.</p>") +
+      explain("<p>Each simulated season picks one plausible set of ratings from the model, plays every remaining match with random goals, and adds the points to the current table. Ties are split by goal difference, then goals scored (the EPL rule; La Liga uses head to head first, which this ignores). The normal run and your scenario use the same random numbers, so any difference comes from your nudges, not from luck. An attack of +10% means 10% more goals in every remaining match.</p>") +
       "</div>";
     bindSeg("rt-league", v => { simState.league = v; simState.club = null; setupClubs(); drawRatings(); runBoth(); });
     bindSlider("sim-att", v => { simState.att = v; });
@@ -1497,7 +1672,7 @@ tr.hl td:first-child { font-weight: 700; }
       chart("rt-chart", {
         type: "scatter",
         data: { datasets: [{ label: "Clubs", data: rt.map(r => ({ x: r.def, y: r.att, club: r.club })), backgroundColor: color, pointRadius: 5, pointHoverRadius: 7, pointBorderColor: css("--surface"), pointBorderWidth: 1.5, whiskers: rt.map(r => ({ x: [r.defLo, r.defHi], y: [r.attLo, r.attHi] })), pointLabels: rt.map(r => D.clubs[r.club]) }] },
-        options: baseOptions({ scales: { x: { reverse: true, title: { display: true, text: "Goals conceded vs league average (right is better)", color: css("--muted") } }, y: { title: { display: true, text: "Goals scored vs league average", color: css("--muted") } } }, plugins: { tooltip: { callbacks: { label: c => " " + D.clubs[c.raw.club] + ": attack " + c.raw.y.toFixed(2) + ", defence " + c.raw.x.toFixed(2) } } } }),
+        options: baseOptions({ scales: { x: { reverse: true, title: { display: true, text: "Goals let in, against league average (right is better)", color: css("--muted") } }, y: { title: { display: true, text: "Goals scored, against league average", color: css("--muted") } } }, plugins: { tooltip: { callbacks: { label: c => " " + D.clubs[c.raw.club] + ": attack " + c.raw.y.toFixed(2) + ", defence " + c.raw.x.toFixed(2) } } } }),
       });
     }
     function runBoth() {
@@ -1515,15 +1690,15 @@ tr.hl td:first-child { font-weight: 700; }
         simState.running = false;
         $("#sim-run").disabled = false;
         prog.style.width = "100%";
-        status.textContent = (nudged ? "Scenario and baseline" : "Baseline") + ": " + simState.n.toLocaleString() + " simulated seasons of the " + (lg === "LaLiga" ? "La Liga" : "EPL") + ", " + D.sim[lg].remaining.length + " remaining matches each.";
+        status.textContent = (nudged ? "Your scenario and the normal run" : "Normal run") + ": " + simState.n.toLocaleString() + " simulated seasons of the " + (lg === "LaLiga" ? "La Liga" : "EPL") + ", " + D.sim[lg].remaining.length + " remaining matches each.";
         drawTable(); drawDist();
       };
       const runScenario = baseRes => {
         if (!nudged) { finish(baseRes, baseRes); return; }
-        simulate(lg, scenario, f => { prog.style.width = (50 + 50 * f).toFixed(0) + "%"; status.textContent = "Running your scenario..."; }, res => finish(baseRes, res));
+        simulate(lg, scenario, f => { prog.style.width = (50 + 50 * f).toFixed(0) + "%"; status.textContent = "Playing your scenario..."; }, res => finish(baseRes, res));
       };
       if (simCache[key]) { prog.style.width = "50%"; runScenario(simCache[key]); return; }
-      simulate(lg, { club: null, att: 1, def: 1, home: 1, n: simState.n }, f => { prog.style.width = ((nudged ? 50 : 100) * f).toFixed(0) + "%"; status.textContent = "Running the baseline..."; }, res => { simCache[key] = res; runScenario(res); });
+      simulate(lg, { club: null, att: 1, def: 1, home: 1, n: simState.n }, f => { prog.style.width = ((nudged ? 50 : 100) * f).toFixed(0) + "%"; status.textContent = "Playing the normal run..."; }, res => { simCache[key] = res; runScenario(res); });
     }
     function drawTable() {
       const L = simCache.last;
@@ -1531,8 +1706,8 @@ tr.hl td:first-child { font-weight: 700; }
       const base = {}; L.base.forEach(r => { base[r.club] = r; });
       const rowsS = L.scen.slice().sort((a, b) => b.pts - a.pts);
       const d = (v, b, f) => L.nudged ? " <span class='" + (v - b > 0.0005 ? "pos" : v - b < -0.0005 ? "neg" : "ci") + "'>" + f(v - b) + "</span>" : "";
-      $("#sim-sub").textContent = L.nudged ? "your scenario, with the change from the baseline" : "baseline";
-      $("#sim-table").innerHTML = "<thead><tr><th>Club</th><th class='num'>Played</th><th class='num'>Points now</th><th class='num'>Expected points</th><th class='num'>Title</th><th class='num'>Top four</th><th class='num'>Relegation</th><th class='num'>Expected position</th></tr></thead><tbody>" +
+      $("#sim-sub").textContent = L.nudged ? "your scenario, with the change from the normal run" : "normal run";
+      $("#sim-table").innerHTML = "<thead><tr><th>Club</th><th class='num'>Played</th><th class='num'>Points now</th><th class='num'>Expected final points</th><th class='num'>Wins the title</th><th class='num'>Top four</th><th class='num'>Relegated</th><th class='num'>Average finish</th></tr></thead><tbody>" +
         rowsS.map(r => {
           const b = base[r.club];
           return "<tr class='" + (r.club === L.scenario.club && L.nudged ? "ref" : "") + "'><td>" + esc(D.clubs[r.club]) + "</td><td class='num'>" + r.played + "</td><td class='num'>" + r.now + "</td><td class='num'>" + r.pts.toFixed(1) + d(r.pts, b.pts, x => signed(x, 1)) + "</td><td class='num'>" + pct(r.title, 1) + d(r.title, b.title, x => signed(x * 100, 1)) + "</td><td class='num'>" + pct(r.top4, 1) + d(r.top4, b.top4, x => signed(x * 100, 1)) + "</td><td class='num'>" + pct(r.releg, 1) + d(r.releg, b.releg, x => signed(x * 100, 1)) + "</td><td class='num'>" + r.meanPos.toFixed(1) + "</td></tr>";
@@ -1544,14 +1719,14 @@ tr.hl td:first-child { font-weight: 700; }
       const s = L.scen.find(r => r.club === simState.club), b = L.base.find(r => r.club === simState.club);
       if (!s || !b) return;
       const labels = s.dist.map((_, p) => String(p + 1));
-      const datasets = [{ label: "Baseline", data: b.dist, backgroundColor: css("--neutral-series"), borderRadius: { topLeft: 4, topRight: 4 }, borderSkipped: "start", barPercentage: 0.9, categoryPercentage: 0.8 }];
+      const datasets = [{ label: "Normal run", data: b.dist, backgroundColor: css("--neutral-series"), borderRadius: { topLeft: 4, topRight: 4 }, borderSkipped: "start", barPercentage: 0.9, categoryPercentage: 0.8 }];
       if (L.nudged) datasets.push({ label: "Your scenario", data: s.dist, backgroundColor: css("--s1"), borderRadius: { topLeft: 4, topRight: 4 }, borderSkipped: "start", barPercentage: 0.9, categoryPercentage: 0.8 });
       chart("sim-dist", {
         type: "bar",
         data: { labels, datasets },
         options: baseOptions({ plugins: { legend: { display: L.nudged, labels: { color: css("--ink-2"), boxWidth: 12 } }, tooltip: { callbacks: { title: c => "Finish " + c[0].label, label: c => " " + c.dataset.label + ": " + pct(c.raw, 1) } } }, scales: { x: { title: { display: true, text: "Final position", color: css("--muted") }, grid: { display: false } }, y: { ticks: { callback: v => Math.round(v * 100) + "%" } } } }),
       });
-      $("#sim-dist-cap").textContent = "Where " + D.clubs[simState.club] + " finish across the simulated seasons" + (L.nudged ? ", baseline (grey) against your scenario (blue)." : ".");
+      $("#sim-dist-cap").textContent = "Where " + D.clubs[simState.club] + " finish across the simulated seasons" + (L.nudged ? ": normal run (grey) against your scenario (blue)." : ".");
     }
     setupClubs();
     drawRatings();
@@ -1568,36 +1743,38 @@ tr.hl td:first-child { font-weight: 700; }
     const stackModels = ev.stack.models;
     const drift = driftNorms();
     sec.innerHTML =
-      '<div class="section-head"><h2>Evidence</h2><p>The tests behind each decision: how the challengers were tuned, why the stack stays a shadow, what the steadier-fit test found, how team news is sized, and the normal gaps the weekly drift monitor watches.</p></div>' +
+      '<div class="section-head"><h2>Tests and decisions</h2><p>The tests behind each choice: this month\'s check-up of the models, how the machine-learning models were tuned, why the team of models stays in the background, how team news is sized, and the normal gaps the weekly early-warning check watches.</p></div>' +
+      auditHTML(ev.audit) +
       '<div class="grid-2" style="align-items:start">' +
-      '<div class="panel"><h3>Challenger tuning <span class="sub">cross-validated on 2017/18 to 2020/21</span></h3><div class="table-wrap"><table><thead><tr><th>Model</th><th>Settings</th><th class="num">CV log loss</th><th></th></tr></thead><tbody>' +
-      ev.cv.map(r => "<tr" + (bestCv[r.model] === r ? " class='ref'" : "") + "><td>" + esc(MODELS[r.model] ? MODELS[r.model].name : r.model) + "</td><td class='ci'>" + esc(r.params === "{}" ? "none" : r.params.replace(/[{}"]/g, "").replace(/,/g, ", ")) + "</td><td class='num'>" + r.log_loss.toFixed(4) + "</td><td>" + (bestCv[r.model] === r ? '<span class="status good">chosen</span>' : "") + "</td></tr>").join("") +
-      "</tbody></table></div><p class=\"caption\">Time-ordered folds only: every fold trained on earlier matches and tested on later ones. The simplest settings won.</p></div>" +
-      '<div class="panel"><h3>Stack weights <span class="sub">why the stack stays a shadow</span></h3><div class="table-wrap"><table><thead><tr><th>Model</th><th class="num">Both tuning seasons</th><th class="num">2021/22 alone</th><th class="num">2022/23 alone</th></tr></thead><tbody>' +
-      stackModels.map((m, j) => "<tr><td>" + esc(MODELS[m].name) + "</td>" + [ev.stack.weights[j], ev.stack_by_season["2021"][m], ev.stack_by_season["2022"][m]].map(v => "<td class='num'>" + pct(v) + "</td>").join("") + "</tr>").join("") +
-      "</tbody></table></div><p class=\"caption\">Fitted on one season alone, the big weight jumps between near-identical models. The data cannot tell them apart, and the stack's small edge over the Bayesian model was not clear on the test seasons, so it stays a shadow.</p></div>" +
+      '<div class="panel"><h3>Tuning the machine-learning models <span class="sub">tested on 2017/18 to 2020/21</span></h3><div class="table-wrap"><table><thead><tr><th>Model</th><th>Settings</th><th class="num">Surprise score</th><th></th></tr></thead><tbody>' +
+      ev.cv.map(r => "<tr" + (bestCv[r.model] === r ? " class='ref'" : "") + "><td>" + (MODELS[r.model] ? nameHTML(r.model) : esc(r.model)) + "</td><td class='ci'>" + esc(r.params === "{}" ? "none" : r.params.replace(/[{}"]/g, "").replace(/,/g, ", ")) + "</td><td class='num'>" + r.log_loss.toFixed(4) + "</td><td>" + (bestCv[r.model] === r ? '<span class="status good">chosen</span>' : "") + "</td></tr>").join("") +
+      "</tbody></table></div><p class=\"caption\">Each setting learned from earlier matches and was scored on later ones, never the other way round. The simplest settings won.</p></div>" +
+      '<div class="panel"><h3>Team of models <span class="sub">why it stays in the background</span></h3><div class="table-wrap"><table><thead><tr><th>Model</th><th class="num">Weight, both tuning seasons</th><th class="num">2021/22 alone</th><th class="num">2022/23 alone</th></tr></thead><tbody>' +
+      stackModels.map((m, j) => "<tr><td>" + nameHTML(m) + "</td>" + [ev.stack.weights[j], ev.stack_by_season["2021"][m], ev.stack_by_season["2022"][m]].map(v => "<td class='num'>" + pct(v) + "</td>").join("") + "</tr>").join("") +
+      "</tbody></table></div><p class=\"caption\">The team of models blends the others with these weights. Fitted on one season at a time, the biggest weight jumps from one near-identical model to another: the data cannot tell them apart. Its small edge over the main model was not clear in the seasons kept aside, so it stays in the background.</p></div>" +
       "</div>" +
-      '<div class="panel"><h3>Steadier stack fit <span class="sub">weekly replay over 2023/24 to 2025/26</span></h3>' + legendHTML([{ label: "Current weekly fit", color: css("--s1"), line: true }, { label: "Steadier fit (pull 0.1), not adopted", color: css("--s2"), line: true }]) +
-      '<div class="small-multiples" id="ev-steady"></div><p class="caption">Each panel: one model\'s weight, week by week, under the live weekly rule (10-point cap, 5% floor, 60-match threshold).</p>' +
-      explain("<p>The steadier fit pulls each weekly target towards the current weights. It was slightly more accurate (log loss change " + MINUS + "0.0003, interval " + MINUS + "0.0011 to +0.0003) and five times less jumpy week to week, but it did not halve the sensitivity to tiny input noise (0.009 against 0.006), one of the two conditions set before the test. So it was not adopted: a rule bent after seeing the numbers stops protecting you.</p>") + "</div>" +
+      '<div class="panel"><h3>A steadier way to set the weights <span class="sub">weekly replay over 2023/24 to 2025/26</span></h3>' + legendHTML([{ label: "Current weekly update", color: css("--s1"), line: true }, { label: "Steadier update, not adopted", color: css("--s2"), line: true }]) +
+      '<div class="small-multiples" id="ev-steady"></div><p class="caption">Each panel: one model\'s weight, week by week, under the live weekly rule (moves at most 10 points a week, never below 5%, only after 60 scored live matches).</p>' +
+      explain("<p>The steadier update pulls each week's new weights towards the current ones. It was very slightly more accurate (surprise score change " + MINUS + "0.0003, range " + MINUS + "0.0011 to +0.0003) and five times less jumpy, but it did not halve the reaction to tiny random changes in the data (0.009 against 0.006), one of the two conditions set before the test. So it was not adopted: a rule bent after seeing the numbers stops protecting you.</p>") + "</div>" +
       '<div class="grid-2" style="align-items:start">' +
       '<div class="panel"><h3>Team news calculator <span class="sub">rule news_v1</span></h3><div class="controls">' +
-      '<div class="ctl"><label for="nw-match">Next-round match</label><select id="nw-match">' + D.up.rows.map((r, j) => '<option value="' + j + '">' + esc(D.clubs[r.h] + " v " + D.clubs[r.a]) + "</option>").join("") + "</select></div></div>" +
-      '<div class="controls">' + sliderHTML("nw-hs", "Home starters out", 0, 3, 1, 0, "int") + '<label class="toggle"><input type="checkbox" id="nw-ht"> Home main threat out</label>' + sliderHTML("nw-as", "Away starters out", 0, 3, 1, 0, "int") + '<label class="toggle"><input type="checkbox" id="nw-at"> Away main threat out</label></div>' +
+      '<div class="ctl"><label for="nw-match">Match this gameweek</label><select id="nw-match">' + D.up.rows.map((r, j) => '<option value="' + j + '">' + esc(D.clubs[r.h] + " v " + D.clubs[r.a]) + "</option>").join("") + "</select></div></div>" +
+      '<div class="controls">' + sliderHTML("nw-hs", "Home regular starters out", 0, 3, 1, 0, "int") + '<label class="toggle"><input type="checkbox" id="nw-ht"> Home top scorer out</label>' + sliderHTML("nw-as", "Away regular starters out", 0, 3, 1, 0, "int") + '<label class="toggle"><input type="checkbox" id="nw-at"> Away top scorer out</label></div>' +
       '<div id="nw-out"></div>' +
-      explain("<p>Each regular starter out lowers the club's scoring rate by 2.5% and raises the opponent's by 2.5%; the main goal threat out lowers it a further 6%; no rate moves more than 12%. The sizes are Assumptions: no free player data exists to fit them. The home, draw, away figures here use independent Poisson goals from the expected goals, a close approximation to the full model. After 10 gameweeks, the news-on against news-off comparison decides whether the sizes stay.</p>") + "</div>" +
-      '<div class="panel"><h3>Drift monitor norms <span class="sub">published minus benchmark, test seasons</span></h3><div class="table-wrap"><table><thead><tr><th>Market</th><th>Benchmark</th><th class="num">Normal gap</th><th class="num">95% interval</th></tr></thead><tbody>' +
+      explain("<p>Each regular starter out lowers that club's expected goals by 2.5% and raises the opponent's by 2.5%. The top scorer out lowers it a further 6%. No rate moves more than 12%. These sizes are educated guesses [A]: no free player data exists to measure them. The home, draw, away figures here are a close shortcut to the full model. After 10 gameweeks, comparing forecasts with and without news decides whether the sizes stay.</p>") + "</div>" +
+      '<div class="panel"><h3>Early-warning check <span class="sub">normal gaps, main model minus a simple benchmark</span></h3><div class="table-wrap"><table><thead><tr><th>Market</th><th>Benchmark</th><th class="num">Normal gap</th><th class="num">Range (95%)</th></tr></thead><tbody>' +
       drift.map(d => "<tr><td>" + esc(d.name) + "</td><td>" + esc(d.bench) + "</td><td class='num'>" + signed(d.gap, 4) + "</td><td class='num ci'>" + signed(d.ci[0], 4) + " to " + signed(d.ci[1], 4) + "</td></tr>").join("") +
-      "</tbody></table></div><p class=\"caption\">Negative means the published model beats its benchmark. Each Monday the weekly run compares the last four gameweeks with these norms and flags a market only if it is worse beyond chance, after a Holm correction for four markets.</p>" +
-      '<h3 style="margin-top:8px">Calibration studies</h3><ul class="facts">' +
-      fact("Phase 3a", "Fixed Dirichlet map on the Bayesian model: log loss " + MINUS + "0.0003 (" + MINUS + "0.0027 to +0.0021). Not applied.") +
-      fact("Monthly map", "Power map refitted monthly: slope 1.24 to 1.09, log loss " + MINUS + "0.0009 (" + MINUS + "0.0035 to +0.0017). Not applied.") +
-      fact("Phase 4", "On the stack, no map beat the raw forecast on the tuning seasons.") +
-      fact("Rule", "Apply a map only if the whole 95% interval of the log-loss change is below zero.") +
+      "</tbody></table></div><p class=\"caption\">Negative means the main model beats the benchmark. Every Monday the weekly run compares the last four gameweeks with these normal gaps and raises a warning only if a market has got worse beyond what luck explains, with a correction for checking four markets at once.</p>" +
+      '<h3 style="margin-top:8px">Earlier honesty fixes, all rejected</h3><ul class="facts">' +
+      fact("Sep 2026", "A fixed correction on the main model's chances: surprise score " + MINUS + "0.0003 (range " + MINUS + "0.0027 to +0.0021). Not applied.") +
+      fact("Sep 2026", "A correction refitted every month: fixed the slope (1.24 to 1.09) but surprise score only " + MINUS + "0.0009 (" + MINUS + "0.0035 to +0.0017). Not applied.") +
+      fact("Sep 2026", "On the team of models, no correction beat leaving it alone.") +
+      fact("Rule", "A change goes live only if the whole 95% range of its surprise-score change is below zero, and you approve it.") +
       "</ul></div></div>";
     drawSteady();
     const nw = { hs: 0, ht: false, as: 0, at: false, j: 0 };
     const upd = () => newsCalc(nw);
+    $$("[data-goto]", sec).forEach(b => b.addEventListener("click", () => { show(b.dataset.goto); window.scrollTo({ top: 0 }); }));
     $("#nw-match").addEventListener("change", e => { nw.j = Number(e.target.value); upd(); });
     bindSlider("nw-hs", v => { nw.hs = v; upd(); });
     bindSlider("nw-as", v => { nw.as = v; upd(); });
@@ -1605,6 +1782,21 @@ tr.hl td:first-child { font-weight: 700; }
     $("#nw-at").addEventListener("change", e => { nw.at = e.target.checked; upd(); });
     upd();
   };
+  function auditHTML(a) {
+    if (!a) return "";
+    const st = { fixed: '<span class="status good">fixed</span>', proposed: '<span class="status flag">waiting for you</span>', none: '<span class="status good">no error</span>', kept: '<span class="status good">kept as is</span>' };
+    const verdictTag = v => v === "pass" ? '<span class="status good">clear gain</span>' : v === "fail" ? '<span class="status flag">no clear gain</span>' : v === "worse" ? '<span class="status bad">clearly worse</span>' : '<span class="status flag">' + esc(v) + "</span>";
+    return '<div class="panel"><h3>Model check-up <span class="sub">' + esc(a.date) + "</span></h3>" +
+      '<p class="caption">' + esc(a.summary) + "</p>" +
+      '<h3 style="font-size:18px">What I found</h3><ol class="findings">' +
+      a.findings.map(f => "<li><b>" + esc(f.title) + "</b> " + (st[f.status] || "") + "<br>" + esc(f.text) + "</li>").join("") + "</ol>" +
+      '<h3 style="font-size:18px">Accuracy tests on past seasons</h3><div class="table-wrap"><table><thead><tr><th>Idea</th><th>Seasons</th><th>Market</th><th class="num">Change</th><th class="num">Range</th><th>Verdict</th></tr></thead><tbody>' +
+      a.tests.map(t => "<tr><td>" + esc(t.idea) + "</td><td class='ci'>" + esc(t.seasons) + "</td><td>" + esc(t.market) + "</td><td class='num'>" + signed(t.change, 4) + "</td><td class='num ci'>" + signed(t.lo, 4) + " to " + signed(t.hi, 4) + "</td><td>" + verdictTag(t.verdict) + "</td></tr>").join("") +
+      "</tbody></table></div><p class='caption'>" + esc(a.tests_note) + "</p>" +
+      (a.proposals && a.proposals.length ? '<h3 style="font-size:18px">Waiting for your yes</h3><ol class="findings">' + a.proposals.map(p => "<li><b>" + esc(p.title) + "</b><br>" + esc(p.text) + "</li>").join("") + "</ol>" +
+        '<p class="caption">Nothing here changes a live forecast until you approve it. See the effect on this gameweek: <button type="button" class="open" data-goto="predictions" style="border:0;background:none;color:var(--accent);font-weight:700;cursor:pointer;padding:0">Predictions</button>, then tick "Also show the proposed fix".</p>' : "") +
+      "</div>";
+  }
   function drawSteady() {
     const box = $("#ev-steady");
     const st = D.ev.steadiness;
@@ -1643,23 +1835,23 @@ tr.hl td:first-child { font-weight: 700; }
     const after = oneXtwo(r.goals.exp_home * sh, r.goals.exp_away * sa);
     $("#nw-out").innerHTML =
       '<div class="table-wrap"><table><thead><tr><th></th><th class="num">' + esc(D.clubs[r.h]) + '</th><th class="num">' + esc(D.clubs[r.a]) + '</th></tr></thead><tbody>' +
-      "<tr><td>Scoring rate multiplier</td><td class='num'>x" + sh.toFixed(3) + "</td><td class='num'>x" + sa.toFixed(3) + "</td></tr>" +
+      "<tr><td>Expected goals multiplied by</td><td class='num'>x" + sh.toFixed(3) + "</td><td class='num'>x" + sa.toFixed(3) + "</td></tr>" +
       "<tr><td>Expected goals</td><td class='num'>" + r.goals.exp_home.toFixed(2) + " to " + (r.goals.exp_home * sh).toFixed(2) + "</td><td class='num'>" + r.goals.exp_away.toFixed(2) + " to " + (r.goals.exp_away * sa).toFixed(2) + "</td></tr>" +
       "</tbody></table></div>" +
       '<div class="model-rows" style="margin-top:8px"><span class="mname">Without news</span>' + stackbar(before[0], before[1], before[2]) + '<span class="got"></span><span class="mname">With news</span>' + stackbar(after[0], after[1], after[2]) + '<span class="got"></span></div>' +
-      '<p class="caption">' + (capped ? '<span class="status bad">Cap reached</span> ' : "") + "Home, draw, away before and after the answers (approximation from expected goals).</p>";
+      '<p class="caption">' + (capped ? '<span class="status bad">12% limit reached</span> ' : "") + "Home, draw, away before and after the answers (a close shortcut to the full model).</p>";
   }
   function fact_(k) { let f = 1; for (let j = 2; j <= k; j++) f *= j; return f; }
   function driftNorms() {
     const idx = rows({ leagues: [0, 1], seasons: TEST });
     const out = [];
     const pair1 = idx.filter(i => isFinite(P.elo[3 * i])).map(i => score1x2(P.bdc, i, "rps") - score1x2(P.elo, i, "rps"));
-    out.push({ name: "Home, draw, away (RPS)", bench: "Elo", gap: mean(pair1), ci: bootMean(pair1, 400, 41) });
-    [["goals_2.5", "Over 2.5 goals (log loss)"], ["corners_9.5", "Over 9.5 corners (log loss)"], ["yellows_4.5", "Over 4.5 yellows (log loss)"]].forEach(([k, name]) => {
+    out.push({ name: "Home, draw, away (closeness score)", bench: "Club rating points", gap: mean(pair1), ci: bootMean(pair1, 400, 41) });
+    [["goals_2.5", "3 or more goals (surprise score)"], ["corners_9.5", "10 or more corners (surprise score)"], ["yellows_4.5", "5 or more yellow cards (surprise score)"]].forEach(([k, name]) => {
       const mk = marketBy(k);
       const key = mk.models.bdc || mk.models.model;
       const vals = idx.filter(i => isFinite(mk.happened(i)) && isFinite(B[key][i]) && isFinite(B[mk.models.base][i])).map(i => scoreBin(B[key][i], mk.happened(i), "log_loss") - scoreBin(B[mk.models.base][i], mk.happened(i), "log_loss"));
-      out.push({ name, bench: "League base rate", gap: mean(vals), ci: bootMean(vals, 400, 43) });
+      out.push({ name, bench: "League average", gap: mean(vals), ci: bootMean(vals, 400, 43) });
     });
     return out;
   }

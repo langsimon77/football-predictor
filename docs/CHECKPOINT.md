@@ -1,6 +1,27 @@
 # Checkpoint
 
-## Latest: 26 Sep 2026, Phase 7 built, tested, and deployed; sign-off waits on three clean scheduled days (27 to 29 Sep)
+## Latest: 9 Oct 2026, Model Lab rewritten in plain language with a Predictions page; model check-up done, three proposals wait for Lang
+
+### Done this session
+- First real locks on Thu 8 Oct (Málaga v Espanyol, Arsenal v Leeds); scheduled daily runs succeed every day but start 5 to 7 hours late.
+- Model Lab rewritten in plain language (plain model names, technical names small and grey, glossary) with a new Predictions page: the current gameweek, EPL Matchday 6 and La Liga Matchday 8. Republished to the same address.
+- Model check-up (`scripts/audit_2026_10.py`, `reports/audit_2026_10.md`, LEARN chapter 8): goals are less spread out than Poisson; a goals fix passed the test seasons and a pre-registered replication on 2018/19 and 2019/20 (GitHub run 37909076802, stored as `data/backtests/dc_bayes_v1_walkforward_2018_2020.parquet`). Corners and yellows: nothing to change.
+- Errors fixed: the bookmaker gap in MODEL_CARD (0.016, not 0.014); the Model Lab builder now refuses stale local data.
+
+### Open questions for Lang
+1. Approve the goals fix `shape_v1`? (MODEL_CHANGELOG, 9 Oct 2026.)
+2. Approve the earlier daily schedule (00:41 UTC)? The 11:30 UTC Saturday kickoff can otherwise lock late until 25 Oct.
+3. Approve running the background models for provisional forecasts?
+4. Phase 7 sign-off: every scheduled day since 27 Sep has succeeded (main runs 09:30 to 11:48 UTC).
+
+### Next actions
+| Action | Owner |
+|---|---|
+| Decide the three proposals and the Phase 7 sign-off. | Lang |
+| If `shape_v1` is approved: implement, add the background copy, recompute tier cut points and drift norms, dry run on GitHub, then switch on. | Claude, after approval |
+| First weekly report with live scores, Mon 12 Oct. | Automatic |
+
+## Earlier: 26 Sep 2026, Phase 7 built, tested, and deployed; sign-off waits on three clean scheduled days (27 to 29 Sep)
 
 ### Done this session
 - Phases 4, 5, 6 approved and live. GitHub Pages on: https://langsimon77.github.io/football-predictor/ (first deploy passed).
