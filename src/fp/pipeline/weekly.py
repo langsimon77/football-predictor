@@ -39,7 +39,10 @@ STACK_FILE = ROOT / "data" / "stacking" / "stack_1x2.json"
 STACK_HISTORY = ROOT / "data" / "stacking" / "history.csv"
 AUDIT = ROOT / "data" / "audit" / "misses.csv"
 DRIFT = ROOT / "data" / "audit" / "drift.json"
-BASELINES = ROOT / "data" / "backtests" / "baselines_2021_2025.parquet"
+# The published Bayesian forecast carries the goals shape fix since 9 Oct 2026
+# (scripts/shape_v1_rollout.py), so its drift norms and stack pool use the
+# backtest forecasts rebuilt with the same fix.
+BASELINES = ROOT / "data" / "backtests" / "baselines_2021_2025_shape_v1.parquet"
 WEEKLY = ROOT / "docs" / "weekly"
 ANSWERS = ROOT / "data" / "manual" / "answers.yaml"
 PROBS = ["p_home", "p_draw", "p_away"]

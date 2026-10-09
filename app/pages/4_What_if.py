@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
+from scipy.special import gammaln, logsumexp
 from scipy.stats import nbinom, poisson
 
 import lib
@@ -58,6 +59,33 @@ def scales(hn: int, ht: bool, an: int, at: bool) -> tuple[float, float]:
     return float(np.clip(home, 1 - CAP, 1 + CAP)), float(np.clip(away, 1 - CAP, 1 + CAP))
 
 
+def cmp_pmf(mean: float, v: float) -> np.ndarray:
+    """COM-Poisson goals 0 to 10 with this mean (same as fp.models.shape)."""
+    g = np.arange(11)
+    t = np.log(max(mean, 1e-6)) * v
+    for _ in range(30):
+        lp = g * t - v * gammaln(g + 1)
+        p = np.exp(lp - logsumexp(lp))
+        m = (p * g).sum()
+        t -= (m - mean) / max((p * g**2).sum() - m**2, 1e-9)
+    lp = g * t - v * gammaln(g + 1)
+    return np.exp(lp - logsumexp(lp))
+
+
+def shaped(lam: float, nu: float, sh: dict) -> np.ndarray:
+    """The published goals fix shape_v1 (Methods, chapter 8)."""
+    r = np.log(lam / nu)
+    lam, nu = lam * np.exp(sh["s"] * r / 2), nu * np.exp(-sh["s"] * r / 2)
+    m = np.outer(cmp_pmf(lam, sh["vh"]), cmp_pmf(nu, sh["va"]))
+    rho = sh["rho"]
+    m[0, 0] *= 1 - lam * nu * rho
+    m[0, 1] *= 1 + lam * rho
+    m[1, 0] *= 1 + nu * rho
+    m[1, 1] *= 1 - rho
+    m = np.clip(m, 1e-12, None)
+    return m / m.sum()
+
+
 def markets(hs: float, as_: float, k: float) -> dict[str, float]:
     lam = np.asarray(w["lam"]) * hs * np.exp(np.asarray(w["home"]) * (k - 1))
     nu = np.asarray(w["nu"]) * as_
@@ -71,6 +99,9 @@ def markets(hs: float, as_: float, k: float) -> dict[str, float]:
     m[:, 1, 1] *= 1 - rho
     m = np.clip(m, 0, None)
     m = (m / m.sum(axis=(1, 2), keepdims=True)).mean(axis=0)
+    if w.get("shape"):  # the goals fix: same expected goals, reshaped scores
+        m = shaped(float((m.sum(axis=1) * g).sum()), float((m.sum(axis=0) * g).sum()),
+                   w["shape"])
     total = np.add.outer(g, g)
     return {"Home win": float(np.tril(m, -1).sum()), "Draw": float(np.trace(m)),
             "Away win": float(np.triu(m, 1).sum()), "Over 2.5 goals": float(m[total > 2.5].sum()),

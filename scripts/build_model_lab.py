@@ -33,12 +33,13 @@ from fp.validate.leakage import known_as_of
 
 sys.path.insert(0, str(Path(__file__).parent))
 import audit_2026_10 as audit  # noqa: E402
+import shape_v1_rollout  # noqa: E402
 import stack_steadiness  # noqa: E402
 
 TEMPLATE = ROOT / "tools" / "model_lab" / "template.html"
 BACKTESTS = ROOT / "data" / "backtests"
-MODELS_1X2 = ["bdc", "elo", "dc", "multinomial", "ordered_logit", "random_forest", "xgboost",
-              "base", "mkt_pre", "mkt_sharp"]
+MODELS_1X2 = ["bdc", "bdc_plain", "elo", "dc", "multinomial", "ordered_logit", "random_forest",
+              "xgboost", "base", "mkt_pre", "mkt_sharp"]
 LINES = {"goals": [1.5, 2.5, 3.5], "corners": [8.5, 9.5, 10.5, 11.5], "yellows": [3.5, 4.5, 5.5]}
 SIM_DRAWS = 500
 
@@ -94,7 +95,14 @@ def backtest_block(matches: pd.DataFrame, names: dict[str, int]) -> dict:
 
     bdc = pd.read_parquet(BACKTESTS / "dc_bayes_v1_walkforward_2021_2025.parquet").set_index(
         "match_id").reindex(b["match_id"])
-    mats = np.stack([np.asarray(x, dtype=float).reshape(11, 11) for x in bdc["bdc_matrix"]])
+    plain_mats = np.stack([np.asarray(x, dtype=float).reshape(11, 11) for x in bdc["bdc_matrix"]])
+    # Since 10 Oct 2026 the main model carries the goals fix shape_v1. Its past-season
+    # forecasts are rebuilt as the live run would have made them: numbers refitted
+    # each month on the previous 730 days only.
+    gf = audit.goals_frame()
+    fixed, _ = shape_v1_rollout.rolling_tables(gf)
+    pos = pd.Series(np.arange(len(gf)), index=gf["match_id"]).reindex(b["match_id"]).to_numpy()
+    mats = fixed[pos]
     total = np.add.outer(np.arange(11), np.arange(11))
     iv = bdc["bdc_intervals"].map(json.loads)
     corners = pd.read_parquet(BACKTESTS / "corners_total_poisson_walkforward_2021_2025.parquet"
@@ -116,7 +124,11 @@ def backtest_block(matches: pd.DataFrame, names: dict[str, int]) -> dict:
     one = {}
     src = {"bdc": "p", "base": "base"}
     for mname in MODELS_1X2:
-        if mname == "mkt_pre":
+        if mname == "bdc":
+            arr = audit.markets(mats)["x12"]
+        elif mname == "bdc_plain":
+            arr = b[["p_home", "p_draw", "p_away"]].to_numpy(float)
+        elif mname == "mkt_pre":
             arr = pre
         elif mname == "mkt_sharp":
             arr = sharp
@@ -127,8 +139,10 @@ def backtest_block(matches: pd.DataFrame, names: dict[str, int]) -> dict:
     binary: dict[str, list[int]] = {}
     for line in LINES["goals"]:
         binary[f"bdc_goals_{line}"] = milli(mats[:, total > line].sum(axis=1))
+        binary[f"bdc_plain_goals_{line}"] = milli(plain_mats[:, total > line].sum(axis=1))
         binary[f"base_goals_{line}"] = milli(base[f"base_goals_{line}"])
     binary["bdc_btts"] = milli(mats[:, 1:, 1:].sum(axis=(1, 2)))
+    binary["bdc_plain_btts"] = milli(plain_mats[:, 1:, 1:].sum(axis=(1, 2)))
     binary["base_btts"] = milli(base["base_btts"])
     binary["mkt_pre_goals_2.5"] = milli(pre_ou)
     binary["mkt_sharp_goals_2.5"] = milli(sharp_ou)
@@ -139,8 +153,14 @@ def backtest_block(matches: pd.DataFrame, names: dict[str, int]) -> dict:
         binary[f"model_yellows_{line}"] = milli(cards[f"p_over_{str(line).replace('.', '_')}"])
         binary[f"base_yellows_{line}"] = milli(base[f"base_yellows_{line}"])
 
+    # Stored 80% intervals are from the plain model; the fix widens them slightly
+    # (factors measured at switch-on, data/tiers/thresholds.json).
+    scale = json.loads((ROOT / "data" / "tiers" / "thresholds.json").read_text()).get(
+        "width_scale", {})
+
     def width(key: str) -> list[int]:
-        return milli(np.array([d[key][1] - d[key][0] for d in iv]))
+        k = "1x2" if key in ("p_home", "p_draw", "p_away") else key[2:]
+        return milli(np.array([d[key][1] - d[key][0] for d in iv]) * scale.get(k, 1.0))
 
     return {
         "n": len(b), "id": b["match_id"].tolist(),
@@ -339,7 +359,7 @@ def main(argv: list[str] | None = None) -> int:
     if not args.allow_stale:
         check_fresh(meta)
     now = pd.Timestamp(meta["generated_utc"])
-    proposal = audit.proposal() if audit.OUT_JSON.exists() else None
+    proposal = None  # the goals fix went live on 10 Oct 2026: forecasts already carry it
     data = {
         "built": f"{pd.Timestamp.now(tz='UTC'):%Y-%m-%d %H:%M} UTC",
         "data_as_of": meta["generated_utc"], "model_version": meta["model_version"],

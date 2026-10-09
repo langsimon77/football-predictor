@@ -10,9 +10,10 @@ A one-page summary of the published forecasts: what they are for, how they were 
 | Total corners, over 8.5 to 11.5 | `corners_total_poisson_v1` | 25 Sep 2026 |
 | Total yellow cards, over 3.5 to 5.5 | `cards_nb_v1`, with an EPL referee effect when the referee is known at lock | 25 Sep 2026 |
 | Team news | `news_v1`: your Question Queue answers scale the scoring rates, capped at 12% | 26 Sep 2026 |
+| Goals shape | `shape_v1`: same expected goals, but goal counts less spread out than Poisson (COM-Poisson) plus a small stretch between the sides; four numbers refitted monthly on the last two seasons of the model's own forecasts | 10 Oct 2026 |
 | Confidence tiers | `tiers_v1`: High, Medium, Low per market | 26 Sep 2026 |
 
-Shadow models are locked and scored every day but never published: Elo, fast Dixon-Coles, four machine-learning challengers, the stacked ensemble, and the Bayesian model without news.
+Shadow models are locked and scored every day but never published: Elo, fast Dixon-Coles, four machine-learning challengers, the stacked ensemble, the Bayesian model without news, and the Bayesian model without the goals shape fix.
 
 ## Intended use
 
@@ -44,7 +45,7 @@ Lower is better. Over/under 2.5 goals: log loss 0.6731 against 0.6647 for the cl
 
 ## Known limitations
 
-1. **Too timid.** Strong favourites win more often than the model says (calibration slope 1.23; 1 is perfect). No calibration map passed the strict test [V].
+1. **Too timid.** Strong favourites win more often than the model says (calibration slope 1.23; 1 is perfect). No calibration map passed the strict test [V]. The goals shape fix (`shape_v1`, live 10 Oct 2026) addresses part of this: home, draw, away log loss −0.0022 on 2023/24 to 2025/26 and −0.0020 on a pre-registered replication on 2018/19 and 2019/20 [V: `reports/audit_2026_10.md`].
 2. **Behind the market** by about 0.016 in log loss even at the Friday snapshot (0.9759 against 0.9601) [V].
 3. **No player data.** Team news is a count of missing starters, with effect sizes that are Assumptions [A], to be tested after 10 gameweeks.
 4. **Referees.** La Liga referees are named after our lock; EPL Friday and Saturday referees usually are too [V].

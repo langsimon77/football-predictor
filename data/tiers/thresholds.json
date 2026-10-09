@@ -3,14 +3,22 @@
   "version": "tiers_v1",
   "approved": "Lang, 26 Sep 2026",
   "rule": "favoured probability sets the start; wide interval or ensemble disagreement drops one tier; one flag caps at Medium; two or more force Low. Flags: source failure, unknown referee (cards), unanswered key question, manager change. The promoted-club flag is shown, never counted.",
+  "refit": "Goals cut points refit by the same rule for shape_v1 (Lang approved 9 Oct 2026); width cuts scaled by the measured widening 1x2 x1.021, over_1_5 x1.034, over_2_5 x1.060, over_3_5 x1.051, btts x1.067.",
+  "width_scale": {
+    "1x2": 1.021,
+    "over_1_5": 1.034,
+    "over_2_5": 1.06,
+    "over_3_5": 1.051,
+    "btts": 1.067
+  },
   "thresholds": [
     {
       "market": "1x2",
-      "high": 0.58,
+      "high": 0.61,
       "low": 0.44,
-      "width_max": 0.16,
+      "width_max": 0.163,
       "disagree_max": 0.07,
-      "basis": "bdc forecasts, 2021/22 and 2022/23"
+      "basis": "dc_bayes_v1 with shape_v1, 2021/22 and 2022/23 (refit 9 Oct 2026)"
     },
     {
       "market": "1x2_stack",
@@ -22,35 +30,35 @@
     },
     {
       "market": "over_1_5",
-      "high": 0.79,
-      "low": 0.7,
-      "width_max": 0.13,
+      "high": 0.8,
+      "low": 0.71,
+      "width_max": 0.134,
       "disagree_max": null,
-      "basis": "dc_bayes_v1, 2021/22 and 2022/23"
+      "basis": "dc_bayes_v1 with shape_v1, 2021/22 and 2022/23 (refit 9 Oct 2026)"
     },
     {
       "market": "over_2_5",
-      "high": 0.61,
+      "high": 0.62,
       "low": 0.55,
-      "width_max": 0.16,
+      "width_max": 0.17,
       "disagree_max": null,
-      "basis": "dc_bayes_v1, 2021/22 and 2022/23"
+      "basis": "dc_bayes_v1 with shape_v1, 2021/22 and 2022/23 (refit 9 Oct 2026)"
     },
     {
       "market": "over_3_5",
       "high": 0.79,
       "low": 0.69,
-      "width_max": 0.16,
+      "width_max": 0.168,
       "disagree_max": null,
-      "basis": "dc_bayes_v1, 2021/22 and 2022/23"
+      "basis": "dc_bayes_v1 with shape_v1, 2021/22 and 2022/23 (refit 9 Oct 2026)"
     },
     {
       "market": "btts",
       "high": 0.58,
       "low": 0.53,
-      "width_max": 0.13,
+      "width_max": 0.139,
       "disagree_max": null,
-      "basis": "dc_bayes_v1, 2021/22 and 2022/23"
+      "basis": "dc_bayes_v1 with shape_v1, 2021/22 and 2022/23 (refit 9 Oct 2026)"
     },
     {
       "market": "corners_over_8_5",

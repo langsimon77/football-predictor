@@ -2,11 +2,16 @@ name: Daily predictions
 
 on:
   schedule:
-    - cron: "41 4 * * *"   # 04:41 UTC = 06:41 Juba. Off the hour: GitHub delays on-the-hour jobs.
-    # Backups: GitHub delays scheduled runs (25 and 26 Sep both started about 5 hours
-    # late) and may drop them. A backup does nothing if today's run already committed.
-    - cron: "41 10 * * *"
-    - cron: "41 16 * * *"
+    # 00:41 UTC = 02:41 Juba (Lang approved 9 Oct 2026). GitHub starts scheduled runs
+    # 5 to 7 hours late; at 04:41 the run landed between 09:30 and 11:48 UTC, around
+    # the 11:30 UTC Saturday kickoff, which could then lock under 24 hours before
+    # kickoff. Started at 00:41 it should land around 05:00 to 07:30 UTC, clear of
+    # every kickoff. Off the hour: GitHub delays on-the-hour jobs most.
+    - cron: "41 0 * * *"
+    # Backups: GitHub may drop a scheduled run. A backup does nothing if today's run
+    # already committed.
+    - cron: "41 6 * * *"
+    - cron: "41 12 * * *"
   workflow_dispatch:
     inputs:
       dry_run:
@@ -116,7 +121,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           for path in ledger reports data/manual/answers.yaml data/manual/managers.csv \
-                      app/data/ratings_history.csv; do
+                      app/data/ratings_history.csv data/shape/shape_v1.json; do
             [ -e "$path" ] && git add "$path"
           done
           if git diff --cached --quiet; then

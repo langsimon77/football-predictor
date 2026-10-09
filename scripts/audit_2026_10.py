@@ -421,18 +421,19 @@ def panel() -> dict:
         "summary": (
             "I checked the daily pipeline, the four published models and the saved forecasts of "
             "five past seasons, looking for errors and for ways to be more accurate. No error "
-            "changes a published number. Two timing and display problems need a small fix. One "
-            "accuracy fix for goals passed both its tests and waits for your yes. Corners and "
-            "yellow cards are already as good as these tests can make them."),
+            "changes a published number. Two timing and display problems got a small fix. One "
+            "accuracy fix for goals passed both its tests. You approved all three on 9 Oct; "
+            "they run from 10 Oct. Corners and yellow cards are already as good as these "
+            "tests can make them."),
         "findings": [
-            {"title": "Goals are less random than the model assumes.", "status": "proposed",
+            {"title": "Goals are less random than the model assumes.", "status": "live",
              "text": ("Teams fail to score less often than the model says (home sides 22% against "
                       "25% forecast) and 0-0 is rarer (6% against 8%). The same pattern makes the "
                       "model too cautious about strong favourites: forecasts of 70% or more won "
                       "82% "
                       "of the time. A fix that reshapes the goal counts passed on past seasons and "
                       "again on two older seasons it had never seen.")},
-            {"title": "Early Saturday kickoffs can lock too late.", "status": "proposed",
+            {"title": "Early Saturday kickoffs can lock too late.", "status": "live",
              "text": (f"GitHub starts the 04:41 UTC run 5 to 7 hours late (between "
                       f"{t.get('earliest', '?')} "
                       f"and {t.get('latest', '?')} UTC). The 11:30 UTC Saturday kickoff falls "
@@ -443,7 +444,7 @@ def panel() -> dict:
                       "this "
                       "week with 6 minutes to spare. Fix: start the schedule at 00:41 UTC "
                       "instead.")},
-            {"title": "Provisional confidence can be one level too high.", "status": "proposed",
+            {"title": "Provisional confidence can be one level too high.", "status": "live",
              "text": ("Before a match locks, the background models are not run, so the 'models "
                       "disagree' check is skipped. Up to about 1 provisional label in 10 may drop "
                       "one "
@@ -471,6 +472,10 @@ def panel() -> dict:
             "a "
             "pass could be luck; that is why I wrote the replication rule down first and tested "
             "two candidates on 2018/19 and 2019/20 with a stricter 97.5% range."),
+        "proposals_title": "Approved by you on 9 Oct 2026, live from the 10 Oct run",
+        "proposals_note": ("Forecasts locked before 10 Oct keep their original numbers: the "
+                           "record is never edited. Switch-on details: "
+                           "reports/shape_v1_rollout.md."),
         "proposals": [
             {"title": "1. Goals fix (proposed name shape_v1).",
              "text": ("Keep the main model's expected goals; change only how they turn into exact "

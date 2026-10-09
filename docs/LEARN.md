@@ -605,7 +605,7 @@ Every chart has a one-line caption saying what it shows, and an "Explain this" n
 
 | Run | When (Juba time) | What it does |
 |---|---|---|
-| Daily | 06:41 | Refresh data, record results, refit, ask tomorrow's questions, lock matches 24 to 48 hours out, rebuild the dashboard and the fixtures page. |
+| Daily | 02:41 (since 10 Oct 2026; GitHub usually starts it 5 to 7 hours late) | Refresh data, record results, refit, ask tomorrow's questions, lock matches 24 to 48 hours out, rebuild the dashboard and the fixtures page. |
 | Weekly | Monday 08:00 | Score the week, audit the biggest misses, check for drift, re-weight the shadow stack, write `docs/weekly/<date>.md`. |
 | Monthly | 1st, 08:00 | Calibration check, refresh the model card's live record, keep the schedules switched on. |
 
@@ -626,7 +626,7 @@ It **may not** change a model's structure, its inputs, or the code, and it never
 - If a shadow model, the question queue, or the dashboard fails, the published forecast still locks.
 - Either way, a run that was not clean opens a "Daily run degraded" Issue with the details. A run that stops opens "Daily run failed".
 - If a locked match moves by more than 7 days, it locks again with the reason recorded, and the new lock is the one scored (PRD item 26b).
-- GitHub often starts scheduled runs hours late (about 5 hours on 25 and 26 Sep) and can drop them [E: GitHub docs]. Two backup times (12:41 and 18:41 Juba) run only if that day's run has not happened, so one dropped run cannot leave a match unlocked.
+- GitHub often starts scheduled runs hours late (5 to 7 hours in late September and early October) and can drop them [E: GitHub docs]. Two backup times (08:41 and 14:41 Juba since 10 Oct 2026) run only if that day's run has not happened, so one dropped run cannot leave a match unlocked.
 
 ### 7.5 A test that said no
 
@@ -685,10 +685,15 @@ The daily run is scheduled for 04:41 UTC, but GitHub starts it 5 to 7 hours late
 
 The fix is simple: schedule the run at 00:41 UTC. With today's delays it would start around 05:00 to 07:30 UTC, far from any kickoff [E].
 
-### 8.6 What waits for you
+### 8.6 What you decided, and what runs now
 
-1. **Goals fix (`shape_v1`).** Live for all goal markets, with the old forecast kept as a background copy so we can compare live. Tier cut points and the early-warning norms would be recomputed by the same rules.
-2. **Earlier daily schedule.** 00:41 UTC main run; backups at 06:41 and 12:41 UTC.
-3. **Background models for provisional forecasts**, so a provisional confidence label uses the same checks as the locked one.
+You approved all three on 9 Oct 2026, and signed off Phase 7. From the 10 Oct daily run:
 
-Nothing here is live until you say yes.
+1. **Goals fix (`shape_v1`) is live** for every goal market. Each month the run refits the four numbers from the model's own forecasts of the last two seasons; October's are in `data/shape/shape_v1.json`. A copy without the fix (`dc_bayes_v1_noshape`) is locked beside it, so the live record will show whether the fix keeps paying. Matches locked before 10 Oct keep their original forecasts: the ledger is never edited.
+2. **The confidence cut points for goals were refit by the same rule.** The "clear favourite" cut for High rose from 58% to 61%, because the fixed forecasts are a little sharper. On the test seasons, High now promises 70.8% and wins 75.1% (before: 67.9% and 74.4%) [V: `reports/shape_v1_rollout.md`].
+3. **The daily run is scheduled at 00:41 UTC** (02:41 Juba), so it should start around 07:00 to 09:30 Juba, well before any kickoff.
+4. **Provisional forecasts get the background models**, so their confidence labels use the same checks as locked ones.
+
+### 8.7 One thing you can do: answer the daily Issue
+
+On 9 Oct, all nine matches that locked carried an "unanswered question" flag, because the 8 Oct question Issue got no answers. That flag caps confidence at Medium. Barcelona v Getafe (79% for Barcelona) showed High while provisional and locked as Medium for this reason alone. Ticking the boxes, even "no news", lifts the cap.

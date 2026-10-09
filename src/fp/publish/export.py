@@ -29,7 +29,7 @@ import pandas as pd
 
 from fp import ROOT
 from fp.evaluate import metrics
-from fp.models import bayes_dc
+from fp.models import bayes_dc, shape
 from fp.models import counts_nb as cn
 from fp.publish import drivers, season
 from fp.validate.leakage import known_as_of
@@ -68,6 +68,7 @@ class RunView:
     names: dict[str, str] = field(default_factory=dict)
     questions: list[dict] = field(default_factory=list)
     model_version: str = ""
+    shape: shape.Shape | None = None
 
 
 def _primary(rows: pd.DataFrame) -> pd.DataFrame:
@@ -128,8 +129,13 @@ def detail(view: RunView, row: pd.Series, all_rows: pd.DataFrame) -> dict | None
     news = json.loads(row["news_adjustments"]) if isinstance(row["news_adjustments"], str) else []
     scale = ((news[0]["scale_home_goals"], news[0]["scale_away_goals"]) if news else (1.0, 1.0))
     post = m.bayes
-    mk = bayes_dc.markets(post, home, away, scale=scale)
     lam, nu = post.rates(home, away)
+    # The shape fix applies to provisional rows and to rows locked with it.
+    sh = view.shape if view.shape is not None and (
+        not row["locked"] or shape.RULE in str(row.get("flags", ""))) else None
+    mk = bayes_dc.markets(post, home, away, scale=scale)
+    if sh is not None:
+        mk = shape.apply(mk, lam * scale[0], nu * scale[1], sh)
     out: dict[str, Any] = {
         "match_id": row["match_id"], "locked": bool(row["locked"]),
         "kickoff_utc": row["kickoff_utc"], "matrix": [round(float(v), 6) for v in
@@ -146,7 +152,8 @@ def detail(view: RunView, row: pd.Series, all_rows: pd.DataFrame) -> dict | None
                                           "home_id"]))),
         "whatif": json.dumps({
             "lam": _thin(lam), "nu": _thin(nu), "home": _thin(post.home), "rho": _thin(post.rho),
-            "scale": list(scale)}),
+            "scale": list(scale),
+            "shape": {k: float(v) for k, v in vars(sh).items()} if sh is not None else None}),
         "corners_pmf": None, "cards_pmf": None, "referee": None,
     }
     counts = (view.counts or {}).get(str(row["league"]))

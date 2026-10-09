@@ -35,7 +35,7 @@ import pandas as pd
 from fp import ROOT, ledger
 from fp.features import rolling
 from fp.ingest import matches as build
-from fp.models import bayes_dc, elo, posterior_store
+from fp.models import bayes_dc, elo, posterior_store, shape
 from fp.models import dixon_coles as dc
 from fp.models.priors import PromotedPrior, season_teams
 from fp.models.promotion import PromotionModel, fit_promotion_model, promoted_priors
@@ -64,6 +64,10 @@ BAYES_PARAMS = bayes_dc.BayesParams(use_sot=True, sampler="numpyro")
 LEAGUES = ("EPL", "LaLiga")
 PROMOTED_FLAG_GAMES = 6
 RELOCK_DAYS = 7
+# Goals shape fix (approved by Lang on 9 Oct 2026, reports/audit_2026_10.md). The
+# published Bayesian row carries the fix; a plain copy is locked as a shadow row.
+SHAPE_LIVE = True
+NO_SHAPE_MODEL = shape.UNSHAPED_MODEL
 # Failure-path test (Phase 7): set by FP_FORCE_FAIL, honoured only on dry runs.
 # "bayes" fails the Bayesian diagnostics so the run falls back; "crash" stops the run.
 FORCE_FAIL = ""
@@ -176,11 +180,22 @@ def candidates(fixtures: pd.DataFrame, now: pd.Timestamp, existing: pd.DataFrame
     return window
 
 
+def bayes_markets(post: bayes_dc.Posterior, home: str, away: str,
+                  scale: tuple[float, float], sh: shape.Shape | None) -> tuple[dict, dict]:
+    """(published markets, plain markets). With the shape fix off, both are plain."""
+    plain = bayes_dc.markets(post, home, away, scale=scale)
+    if sh is None:
+        return plain, plain
+    lam, nu = post.rates(home, away)
+    return shape.apply(plain, lam * scale[0], nu * scale[1], sh), plain
+
+
 def build_rows(cands: pd.DataFrame, models: dict[str, LeagueModels], now: pd.Timestamp,
                stale: bool, counts: dict[str, counts_live.LeagueCounts] | None = None,
                fixture_features: pd.DataFrame | None = None,
                referees: dict[str, str] | None = None,
-               news: news_live.NewsState | None = None) -> pd.DataFrame:
+               news: news_live.NewsState | None = None,
+               sh: shape.Shape | None = None) -> pd.DataFrame:
     version, dirty = model_version()
     rows = []
     for r in cands.itertuples():
@@ -220,14 +235,28 @@ def build_rows(cands: pd.DataFrame, models: dict[str, LeagueModels], now: pd.Tim
                 adjustments = [impact.record(match_news.home, match_news.away,
                                              match_news.source)]
                 unanswered = match_news.unanswered(str(r.match_id))
-            b = bayes_dc.markets(m.bayes, home, away, scale=scale)
+            b, unshaped = bayes_markets(m.bayes, home, away, scale, sh)
+            b = dict(b)
             b_top, b_iv = b.pop("top_scorelines"), b.pop("intervals")
             b.pop("matrix")
             b_flags = flags + (["posterior_fallback"] if m.bayes_fallback else [])
+            if sh is not None:
+                # The same forecast without the shape fix, to compare live (9 Oct 2026).
+                u = dict(unshaped)
+                u_top, u_iv = u.pop("top_scorelines"), u.pop("intervals")
+                u.pop("matrix")
+                rows.append({
+                    **common, **u, "prediction_id": f"{r.match_id}:{NO_SHAPE_MODEL}",
+                    "model_name": NO_SHAPE_MODEL, "degraded": m.bayes_fallback,
+                    "top_scorelines": json.dumps(u_top), "intervals": json.dumps(u_iv),
+                    "flags": json.dumps([*b_flags, "shadow", "no_shape"]),
+                })
+                b_flags.append(shape.RULE)
             if scale != (1.0, 1.0):
                 b_flags.append("news_adjusted")
                 # The same forecast without news, kept to test whether news helps (S6.5).
-                plain = bayes_dc.markets(m.bayes, home, away)
+                plain, _ = bayes_markets(m.bayes, home, away, (1.0, 1.0), sh)
+                plain = dict(plain)
                 p_top, p_iv = plain.pop("top_scorelines"), plain.pop("intervals")
                 plain.pop("matrix")
                 rows.append({
@@ -400,6 +429,7 @@ class Context:
     use_github: bool = False
     publish_dir: Path | None = None
     site_dir: Path | None = None
+    shape_store: Path = shape.STORE
 
 
 def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataFrame:
@@ -416,6 +446,8 @@ def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataF
     bayes = ctx.with_bayes
     models = {lg: fit_league(ctx.matches, ctx.fixtures, lg, now, ctx.prior, season,
                              ctx.second_tier, ctx.promo, bayes, ctx.store) for lg in LEAGUES}
+    sh = (shape.current(ctx.matches, existing, now, ctx.shape_store, save=not dry_run)
+          if SHAPE_LIVE and bayes else None)
     counts = fixture_features = referees = None
     if ctx.with_counts:
         features = rolling.match_features(known_as_of(ctx.matches, now))
@@ -426,13 +458,15 @@ def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataF
             referees = known_referees(ctx.referee_appointments, now)
     news = (news_live.gather(ctx.fixtures, now, ctx.use_github) if ctx.with_news else None)
     new = build_rows(cands, models, now, report.stale, counts, fixture_features, referees,
-                     news)
-    if ctx.with_shadows and len(cands):
+                     news, sh)
+    challengers = None
+    if ctx.with_shadows and (len(cands) or ctx.publish_dir is not None):
         try:  # shadows never block the published forecast
             challengers = shadows.fit_challengers(ctx.matches, now)
-            feats = shadows.fixture_features(cands, ctx.matches, ctx.fixtures, now, models,
-                                             fixture_features)
-            new = shadows.add_shadows(new, challengers, feats)
+            if len(cands):
+                feats = shadows.fixture_features(cands, ctx.matches, ctx.fixtures, now, models,
+                                                 fixture_features)
+                new = shadows.add_shadows(new, challengers, feats)
         except Exception:
             log.exception("shadow models failed; locking without them")
     if ctx.with_tiers and len(new):
@@ -463,7 +497,7 @@ def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataF
     if ctx.publish_dir is not None and not dry_run:
         try:  # the dashboard never blocks the ledger
             publish_run(ctx, now, existing, results, models, counts, news, report.stale,
-                        questions)
+                        questions, sh, challengers)
         except Exception:
             log.exception("dashboard export failed")
     return new
@@ -485,9 +519,12 @@ def question_list(news: news_live.NewsState, opened: dict | None) -> list[dict]:
 
 def publish_run(ctx: Context, now: pd.Timestamp, locked: pd.DataFrame, results: pd.DataFrame,
                 models: dict[str, LeagueModels], counts: dict | None,
-                news: news_live.NewsState | None, stale: bool, questions: list[dict]) -> None:
+                news: news_live.NewsState | None, stale: bool, questions: list[dict],
+                sh: shape.Shape | None = None, challengers: dict | None = None) -> None:
     """Provisional forecasts for unlocked matches in the window, then the
-    dashboard files and the static page. Nothing here touches the ledger."""
+    dashboard files and the static page. Nothing here touches the ledger.
+    Provisional rows get the shadow models too (approved 9 Oct 2026), so their
+    confidence labels use the same checks as locked ones."""
     fx = ctx.fixtures
     soon = fx[fx["time_confirmed"] & (fx["kickoff_utc"] > now)
               & fx["match_id"].isin(publish.window(fx, now))]
@@ -496,7 +533,17 @@ def publish_run(ctx: Context, now: pd.Timestamp, locked: pd.DataFrame, results: 
     features = (rolling.features_for_fixtures(soon, ctx.matches, now)
                 if counts is not None and len(soon) else None)
     referees = known_referees(ctx.referee_appointments, now)
-    rows = build_rows(prov, models, now, stale, counts, features, referees, news)
+    rows = build_rows(prov, models, now, stale, counts, features, referees, news, sh)
+    if challengers and len(prov):
+        try:
+            prov_features = features if features is not None else \
+                rolling.features_for_fixtures(prov, ctx.matches, now)
+            feats = shadows.fixture_features(prov, ctx.matches, fx, now, models,
+                                             prov_features[prov_features["match_id"].isin(
+                                                 prov["match_id"])])
+            rows = shadows.add_shadows(rows, challengers, feats)
+        except Exception:
+            log.exception("shadow models failed for provisional rows; tiers without them")
     if ctx.with_tiers and len(rows):
         rows = shadows.add_tiers(rows, PRIMARY_MODEL)
     assert ctx.publish_dir is not None
@@ -504,7 +551,8 @@ def publish_run(ctx: Context, now: pd.Timestamp, locked: pd.DataFrame, results: 
         now=now, ledger=locked, results=results, provisional=rows, matches=ctx.matches,
         fixtures=fx, models=models, counts=counts, features=features, referees=referees,
         manager_flags=news.manager_flags if news is not None else set(),
-        names=_short_names(), questions=questions, model_version=model_version()[0])
+        names=_short_names(), questions=questions, model_version=model_version()[0],
+        shape=sh)
     table = publish.export(view, ctx.publish_dir)
     if ctx.site_dir is not None:
         site.write(table, now, ctx.site_dir, ctx.publish_dir)
@@ -554,6 +602,7 @@ def _main(args: argparse.Namespace) -> int:
                      else None if args.dry_run else REPORT),
         with_bayes=BAYES_LIVE or args.with_bayes,
         store=(args.ledger.parent / "posteriors" if replay else posterior_store.STORE),
+        shape_store=(args.ledger.parent / "shape_v1.json" if replay else shape.STORE),
         with_counts=counts_live.COUNTS_LIVE or args.with_counts,
         referee_appointments=pd.read_parquet(build.PROCESSED / "referee_appointments.parquet"),
         with_shadows=shadows.SHADOWS_LIVE,

@@ -509,7 +509,8 @@ tr.hl td:first-child { font-weight: 700; }
 
   // Plain names first; the technical name is shown small and grey beside it.
   const MODELS = {
-    bdc: { name: "Main model (counts goals)", short: "Main model", tech: "Bayesian Dixon-Coles, published", color: "--s1" },
+    bdc: { name: "Main model (counts goals)", short: "Main model", tech: "Bayesian Dixon-Coles with the goals fix, published", color: "--s1" },
+    bdc_plain: { name: "Main model before the fix", short: "Before the fix", tech: "Bayesian Dixon-Coles without shape_v1" },
     stack: { name: "Team of models", short: "Team of models", tech: "stacked ensemble, background only" , color: "--s5" },
     equal: { name: "Simple average of models", short: "Simple average", tech: "equal-weight blend" },
     multinomial: { name: "Simple learner", short: "Simple learner", tech: "multinomial regression" },
@@ -524,13 +525,13 @@ tr.hl td:first-child { font-weight: 700; }
     model: { name: "Main model (counts corners or cards)", short: "Main model", tech: "Poisson for corners, negative binomial for yellows", color: "--s1" },
   };
   // Model names in the live data files.
-  const LIVE_NAMES = { dc_bayes_v1: "bdc", dc_mle_v0: "dc", elo_v0: "elo", stack_v1: "stack", multinomial_v1: "multinomial", ordered_logit_v1: "ordered_logit", random_forest_v1: "random_forest", xgboost_v1: "xgboost" };
+  const LIVE_NAMES = { dc_bayes_v1: "bdc", dc_bayes_v1_noshape: "bdc_plain", dc_mle_v0: "dc", elo_v0: "elo", stack_v1: "stack", multinomial_v1: "multinomial", ordered_logit_v1: "ordered_logit", random_forest_v1: "random_forest", xgboost_v1: "xgboost" };
   const NONEWS = { name: "Main model without team news", tech: "dc_bayes_v1_nonews" };
   function nameHTML(m) {
     const x = MODELS[m] || (m === "nonews" ? NONEWS : { name: m });
     return esc(x.name) + (x.tech ? '<span class="tech">' + esc(x.tech) + "</span>" : "");
   }
-  const ORDER_1X2 = ["bdc", "stack", "equal", "multinomial", "ordered_logit", "random_forest", "xgboost", "dc", "elo", "base", "mkt_pre", "mkt_sharp"];
+  const ORDER_1X2 = ["bdc", "bdc_plain", "stack", "equal", "multinomial", "ordered_logit", "random_forest", "xgboost", "dc", "elo", "base", "mkt_pre", "mkt_sharp"];
 
   function happenedFn(kind, line) {
     if (kind === "goals") return i => HG[i] + AG[i] > line ? 1 : 0;
@@ -540,11 +541,11 @@ tr.hl td:first-child { font-weight: 700; }
   }
   const MARKETS = [{ k: "1x2", name: "Home, draw, away", type: "1x2", tierKey: "1x2" }];
   [1.5, 2.5, 3.5].forEach(l => {
-    const models = { bdc: "bdc_goals_" + l, base: "base_goals_" + l };
+    const models = { bdc: "bdc_goals_" + l, bdc_plain: "bdc_plain_goals_" + l, base: "base_goals_" + l };
     if (l === 2.5) { models.mkt_pre = "mkt_pre_goals_2.5"; models.mkt_sharp = "mkt_sharp_goals_2.5"; }
     MARKETS.push({ k: "goals_" + l, name: Math.ceil(l) + " or more goals (over " + l + ")", type: "bin", models, happened: happenedFn("goals", l), tierKey: "over_" + String(l).replace(".", "_"), width: "goals_" + l, kind: "goals" });
   });
-  MARKETS.push({ k: "btts", name: "Both teams score", type: "bin", models: { bdc: "bdc_btts", base: "base_btts" }, happened: happenedFn("btts"), tierKey: "btts", width: "btts", kind: "goals" });
+  MARKETS.push({ k: "btts", name: "Both teams score", type: "bin", models: { bdc: "bdc_btts", bdc_plain: "bdc_plain_btts", base: "base_btts" }, happened: happenedFn("btts"), tierKey: "btts", width: "btts", kind: "goals" });
   [8.5, 9.5, 10.5, 11.5].forEach(l => MARKETS.push({ k: "corners_" + l, name: Math.ceil(l) + " or more corners (over " + l + ")", type: "bin", models: { model: "model_corners_" + l, base: "base_corners_" + l }, happened: happenedFn("corners", l), tierKey: "corners_over_" + String(l).replace(".", "_"), kind: "corners" }));
   [3.5, 4.5, 5.5].forEach(l => MARKETS.push({ k: "yellows_" + l, name: Math.ceil(l) + " or more yellow cards (over " + l + ")", type: "bin", models: { model: "model_yellows_" + l, base: "base_yellows_" + l }, happened: happenedFn("yellows", l), tierKey: "yellows_over_" + String(l).replace(".", "_"), kind: "yellows" }));
   const marketBy = k => MARKETS.find(m => m.k === k);
@@ -855,11 +856,11 @@ tr.hl td:first-child { font-weight: 700; }
       const t = idx.map(i => tier1x2(i, Object.assign({}, tierState, { forecast: "bdc" }))).filter(r => r.lvl === l);
       return { n: t.length, won: mean(t.map(r => r.hit)), promised: mean(t.map(r => r.fav)) };
     });
-    const up = D.up.rows;
+    const up = gameweek();
     const locked = up.filter(r => r.locked).length;
     const ladder = ORDER_1X2.slice().sort((a, b) => ll[b] - ll[a]);
     sec.innerHTML =
-      '<div class="section-head"><h2>How good is the model?</h2><p>We replayed five past seasons as if they were live: each match was forecast using only what was known a day or two before kickoff. The last three seasons (2023/24 to 2025/26, ' + idx.length.toLocaleString() + " matches with bookmaker prices) were kept aside and scored once, so the model never learned from them. Every number here is worked out in your browser from those saved forecasts.</p></div>" +
+      '<div class="section-head"><h2>How good is the model?</h2><p>We replayed five past seasons as if they were live: each match was forecast using only what was known a day or two before kickoff. The last three seasons (2023/24 to 2025/26, ' + idx.length.toLocaleString() + " matches with bookmaker prices) were kept aside for testing. Every number here is worked out in your browser from those saved forecasts.</p><p>Since 10 Oct 2026 the main model includes the goals fix, replayed here as it would have run: refitted each month on earlier matches only. The fix was chosen after looking at the kept-aside seasons, so its clean check is the replay on 2018/19 and 2019/20 (Tests and decisions).</p></div>" +
       '<div class="kpis">' +
       kpi("Main model's surprise score", num(ll.bdc, 4), "Lower is better. Club rating points " + num(ll.elo, 4) + "; league averages " + num(ll.base, 4) + "; a blind guess 1.0986.") +
       kpi("Behind the bookmakers by", signed(ll.bdc - ll.mkt_sharp, 4), "Against Friday prices: " + signed(ll.bdc - ll.mkt_pre, 4) + ". The bookmakers still know more, for example team news and line-ups.") +
@@ -1252,7 +1253,7 @@ tr.hl td:first-child { font-weight: 700; }
         '<div class="pill-row">' + (r.locked ? "<b>Locked</b>: final, will be scored" : "<b>Provisional</b>: updates daily until it locks") + " &middot; Confidence: " + (tiers["1x2"] ? tierBadge(["Low", "Medium", "High"].indexOf(tiers["1x2"])) : "none") + " &middot; Expected goals " + r.goals.exp_home.toFixed(2) + " to " + r.goals.exp_away.toFixed(2) + "</div></div>" +
         '<div class="panel"><h3>What every model says <span class="sub">home, draw, away</span></h3>' + legendHTML([{ label: "Home win", color: css("--home") }, { label: "Draw", color: css("--draw") }, { label: "Away win", color: css("--away") }]) +
         '<div class="model-rows">' + models.map(m => '<span class="mname">' + m.html + "</span>" + stackbar(m.p[0], m.p[1], m.p[2]) + '<span class="got"></span>').join("") + "</div>" +
-        '<p class="caption">Before a match locks, the daily run computes only the main model and two simple ones. The background models are added when it locks.</p></div>' +
+        '<p class="caption">Since 10 Oct 2026 the daily run computes every background model for provisional forecasts too. Older snapshots may show only three.</p></div>' +
         '<div class="grid-2"><div class="panel"><h3>Exact scores <span class="sub">main model, chance in %</span></h3>' + heat + "</div>" +
         '<div class="panel"><h3>What drives this forecast</h3><ol class="drivers">' + (r.drivers || []).map(d => "<li>" + esc(d) + "</li>").join("") + "</ol>" +
         '<div class="table-wrap"><table><thead><tr><th>Market</th><th class="num">Chance</th><th class="num">Likely range</th><th>Confidence</th></tr></thead><tbody>' +
@@ -1334,7 +1335,7 @@ tr.hl td:first-child { font-weight: 700; }
   const ouState = { high: 0.61, low: 0.55, width: 0.16, useWidth: true, promoFlag: false, refFlag: true };
   renderers.calibration = function () {
     const sec = $("#sec-calibration");
-    const compOpts = ["stack", "elo", "multinomial", "ordered_logit", "random_forest", "xgboost", "dc", "mkt_pre", "base"];
+    const compOpts = ["bdc_plain", "stack", "elo", "multinomial", "ordered_logit", "random_forest", "xgboost", "dc", "mkt_pre", "base"];
     sec.innerHTML =
       '<div class="section-head"><h2>Honesty and confidence</h2><p>Two questions. First, is the model honest: when it says 70%, does it happen about 70% of the time? Second, do the High, Medium and Low labels really sort forecasts into groups you can trust more or less? Move the cut points and watch the answers change.</p></div>' +
       '<div class="panel"><h3>Is the model honest? <span class="sub">home, draw, away</span></h3><div class="controls">' +
@@ -1344,7 +1345,7 @@ tr.hl td:first-child { font-weight: 700; }
       '<div class="ctl"><span class="lbl">Groups</span>' + segHTML("cal-bins", [{ v: "5", label: "5" }, { v: "10", label: "10" }, { v: "15", label: "15" }], String(cal.bins)) + "</div>" +
       '</div><div class="grid-2" style="align-items:start"><div><div id="cal-legend"></div><div class="chart-box h-440"><canvas id="cal-chart"></canvas></div><p class="caption">Each point is a group of similar forecasts: the chance given (across) against how often it really happened (up). Points on the dotted line are honest. Points above it mean the model was too cautious.</p></div>' +
       '<div><div class="table-wrap"><table id="cal-table"></table></div>' +
-      explain("<p><b>Slope</b>: draw a line through five groups of home-win forecasts. A slope of 1 is honest; above 1 means too cautious (favourites win more often than promised); below 1 means too bold. <b>Average gap</b> (expected calibration error): how far, on average, the forecast chance sits from what happened, across ten bands. The main model is too cautious (slope about 1.2): its strong favourites win more often than it says. The machine-learning models learn their chances straight from results, so they sit closer to 1. The proposed fix in Tests and decisions targets this.</p>") +
+      explain("<p><b>Slope</b>: draw a line through five groups of home-win forecasts. A slope of 1 is honest; above 1 means too cautious (favourites win more often than promised); below 1 means too bold. <b>Average gap</b> (expected calibration error): how far, on average, the forecast chance sits from what happened, across ten bands. Before the goals fix, the main model was too cautious (slope about 1.24): its strong favourites won more often than it said. The fix, live since 10 Oct 2026, brings it closer to 1; pick Main model before the fix in the list above to compare. The machine-learning models learn their chances straight from results, so they sit close to 1.</p>") +
       "</div></div></div>" +
       '<div class="panel"><h3>Do the confidence labels work? <span class="sub">home, draw, away</span></h3><div class="controls">' +
       '<div class="ctl"><span class="lbl">Forecast</span>' + segHTML("tl-forecast", [{ v: "bdc", label: "Main model" }, { v: "stack", label: "Team of models" }], tierState.forecast) + "</div>" +
@@ -1784,7 +1785,7 @@ tr.hl td:first-child { font-weight: 700; }
   };
   function auditHTML(a) {
     if (!a) return "";
-    const st = { fixed: '<span class="status good">fixed</span>', proposed: '<span class="status flag">waiting for you</span>', none: '<span class="status good">no error</span>', kept: '<span class="status good">kept as is</span>' };
+    const st = { fixed: '<span class="status good">fixed</span>', proposed: '<span class="status flag">waiting for you</span>', live: '<span class="status good">approved, live from 10 Oct</span>', none: '<span class="status good">no error</span>', kept: '<span class="status good">kept as is</span>' };
     const verdictTag = v => v === "pass" ? '<span class="status good">clear gain</span>' : v === "fail" ? '<span class="status flag">no clear gain</span>' : v === "worse" ? '<span class="status bad">clearly worse</span>' : '<span class="status flag">' + esc(v) + "</span>";
     return '<div class="panel"><h3>Model check-up <span class="sub">' + esc(a.date) + "</span></h3>" +
       '<p class="caption">' + esc(a.summary) + "</p>" +
@@ -1793,8 +1794,8 @@ tr.hl td:first-child { font-weight: 700; }
       '<h3 style="font-size:18px">Accuracy tests on past seasons</h3><div class="table-wrap"><table><thead><tr><th>Idea</th><th>Seasons</th><th>Market</th><th class="num">Change</th><th class="num">Range</th><th>Verdict</th></tr></thead><tbody>' +
       a.tests.map(t => "<tr><td>" + esc(t.idea) + "</td><td class='ci'>" + esc(t.seasons) + "</td><td>" + esc(t.market) + "</td><td class='num'>" + signed(t.change, 4) + "</td><td class='num ci'>" + signed(t.lo, 4) + " to " + signed(t.hi, 4) + "</td><td>" + verdictTag(t.verdict) + "</td></tr>").join("") +
       "</tbody></table></div><p class='caption'>" + esc(a.tests_note) + "</p>" +
-      (a.proposals && a.proposals.length ? '<h3 style="font-size:18px">Waiting for your yes</h3><ol class="findings">' + a.proposals.map(p => "<li><b>" + esc(p.title) + "</b><br>" + esc(p.text) + "</li>").join("") + "</ol>" +
-        '<p class="caption">Nothing here changes a live forecast until you approve it. See the effect on this gameweek: <button type="button" class="open" data-goto="predictions" style="border:0;background:none;color:var(--accent);font-weight:700;cursor:pointer;padding:0">Predictions</button>, then tick "Also show the proposed fix".</p>' : "") +
+      (a.proposals && a.proposals.length ? '<h3 style="font-size:18px">' + esc(a.proposals_title || "Waiting for your yes") + '</h3><ol class="findings">' + a.proposals.map(p => "<li><b>" + esc(p.title) + "</b><br>" + esc(p.text) + "</li>").join("") + "</ol>" +
+        (a.proposals_note ? '<p class="caption">' + esc(a.proposals_note) + "</p>" : "") : "") +
       "</div>";
   }
   function drawSteady() {
