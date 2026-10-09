@@ -10,3 +10,111 @@
   threat_out: false
   source: 'Issue #5'
   used_at_utc: 2026-10-08T11:35Z
+- question: EPL_2627_aston_villa_brentford:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #6'
+  used_at_utc: 2026-10-09T11:29Z
+- question: EPL_2627_aston_villa_brentford:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #6'
+  used_at_utc: 2026-10-09T11:29Z
+- question: EPL_2627_chelsea_bournemouth:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #6'
+  used_at_utc: 2026-10-09T11:29Z
+- question: EPL_2627_chelsea_bournemouth:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #6'
+  used_at_utc: 2026-10-09T11:29Z
+- question: EPL_2627_ipswich_fulham:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #6'
+  used_at_utc: 2026-10-09T11:29Z
+- question: EPL_2627_ipswich_fulham:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #6'
+  used_at_utc: 2026-10-09T11:29Z
+- question: EPL_2627_man_united_tottenham:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #6'
+  used_at_utc: 2026-10-09T11:29Z
+- question: EPL_2627_man_united_tottenham:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #6'
+  used_at_utc: 2026-10-09T11:29Z
+- question: EPL_2627_sunderland_brighton:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #6'
+  used_at_utc: 2026-10-09T11:29Z
+- question: EPL_2627_sunderland_brighton:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #6'
+  used_at_utc: 2026-10-09T11:29Z
+- question: LaLiga_2627_alaves_atletico_madrid:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #6'
+  used_at_utc: 2026-10-09T11:29Z
+- question: LaLiga_2627_alaves_atletico_madrid:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #6'
+  used_at_utc: 2026-10-09T11:29Z
+- question: LaLiga_2627_barcelona_getafe:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #6'
+  used_at_utc: 2026-10-09T11:29Z
+- question: LaLiga_2627_barcelona_getafe:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #6'
+  used_at_utc: 2026-10-09T11:29Z
+- question: LaLiga_2627_rayo_vallecano_athletic_bilbao:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #6'
+  used_at_utc: 2026-10-09T11:29Z
+- question: LaLiga_2627_rayo_vallecano_athletic_bilbao:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #6'
+  used_at_utc: 2026-10-09T11:29Z
+- question: LaLiga_2627_real_madrid_villarreal:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #6'
+  used_at_utc: 2026-10-09T11:29Z
+- question: LaLiga_2627_real_madrid_villarreal:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #6'
+  used_at_utc: 2026-10-09T11:29Z
