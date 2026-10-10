@@ -8,13 +8,18 @@
 - Model check-up (`reports/audit_2026_10.md`, LEARN chapter 8). Lang approved all three proposals and Phase 7 on 9 Oct 2026.
 - Switched on for the 10 Oct run: `shape_v1` (`src/fp/models/shape.py`, numbers in `data/shape/shape_v1.json`, plain copy `dc_bayes_v1_noshape`); goals tier cut points refit (`reports/shape_v1_rollout.md`); weekly drift norms and stack pool from `data/backtests/baselines_2021_2025_shape_v1.parquet`; daily cron 00:41 UTC (backups 06:41, 12:41); shadow models for provisional rows; Streamlit what-if uses the fix.
 
+### Checked 10 Oct 2026
+- First run on the new schedule started 06:23 UTC (scheduled 00:41). Sunday's 7 matches locked 29.6 to 36.6 hours before kickoff, none late.
+- 63 rows: every `dc_bayes_v1` row carries `shape_v1`, each with its `dc_bayes_v1_noshape` copy. October numbers read from `data/shape/shape_v1.json` (no refit within the month).
+- Dashboard: all 12 provisional matches carry the fix and all 9 models; the what-if receives the fix. CI green on 29bb322. Model Lab refreshed.
+- All 7 locks again carry the unanswered-question flag (Issue #7 unanswered).
+
 ### Open questions for Lang
 1. None open. Please answer the daily question Issue: unanswered questions cap confidence at Medium (all nine 9 Oct locks were capped).
 
 ### Next actions
 | Action | Owner |
 |---|---|
-| Check the 10 Oct run: first `shape_v1` and `dc_bayes_v1_noshape` rows, start time under the new schedule, provisional shadow rows on the dashboard. | Claude, next session |
 | First weekly report with live scores, Mon 12 Oct. | Automatic |
 | First monthly `shape_v1` refit, Sun 1 Nov (logged in `data/shape/shape_v1.json`). | Automatic |
 | News-on against news-off test after 10 gameweeks; `shape_v1` against its plain copy at the end of 2026/27. | Claude, then Lang |
