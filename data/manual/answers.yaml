@@ -118,3 +118,87 @@
   threat_out: false
   source: 'Issue #6'
   used_at_utc: 2026-10-09T11:29Z
+- question: EPL_2627_crystal_palace_nottm_forest:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #7'
+  used_at_utc: 2026-10-10T06:24Z
+- question: EPL_2627_crystal_palace_nottm_forest:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #7'
+  used_at_utc: 2026-10-10T06:24Z
+- question: EPL_2627_hull_everton:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #7'
+  used_at_utc: 2026-10-10T06:24Z
+- question: EPL_2627_hull_everton:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #7'
+  used_at_utc: 2026-10-10T06:24Z
+- question: EPL_2627_liverpool_man_city:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #7'
+  used_at_utc: 2026-10-10T06:24Z
+- question: EPL_2627_liverpool_man_city:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #7'
+  used_at_utc: 2026-10-10T06:24Z
+- question: LaLiga_2627_elche_celta_vigo:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #7'
+  used_at_utc: 2026-10-10T06:24Z
+- question: LaLiga_2627_elche_celta_vigo:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #7'
+  used_at_utc: 2026-10-10T06:24Z
+- question: LaLiga_2627_racing_santander_valencia:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #7'
+  used_at_utc: 2026-10-10T06:24Z
+- question: LaLiga_2627_racing_santander_valencia:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #7'
+  used_at_utc: 2026-10-10T06:24Z
+- question: LaLiga_2627_real_betis_osasuna:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #7'
+  used_at_utc: 2026-10-10T06:24Z
+- question: LaLiga_2627_real_betis_osasuna:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #7'
+  used_at_utc: 2026-10-10T06:24Z
+- question: LaLiga_2627_real_sociedad_deportivo_la_coruna:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #7'
+  used_at_utc: 2026-10-10T06:24Z
+- question: LaLiga_2627_real_sociedad_deportivo_la_coruna:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #7'
+  used_at_utc: 2026-10-10T06:24Z
