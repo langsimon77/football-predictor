@@ -25,6 +25,7 @@ from fp.ensemble import stacking
 from fp.evaluate import metrics
 from fp.features import ml_features
 from fp.ingest.matches import PROCESSED
+from fp.models import shape
 from fp.models.priors import PromotedPrior
 from fp.models.promotion import fit_promotion_model
 from fp.pipeline import daily
@@ -33,6 +34,7 @@ from fp.validate.leakage import known_as_of
 
 sys.path.insert(0, str(Path(__file__).parent))
 import audit_2026_10 as audit  # noqa: E402
+import pairs_lab  # noqa: E402
 import shape_v1_rollout  # noqa: E402
 import stack_steadiness  # noqa: E402
 
@@ -76,7 +78,8 @@ def base_rates(matches: pd.DataFrame, frame: pd.DataFrame) -> pd.DataFrame:
     return pd.concat(out, ignore_index=True)
 
 
-def backtest_block(matches: pd.DataFrame, names: dict[str, int]) -> dict:
+def backtest_block(matches: pd.DataFrame, names: dict[str, int], gf: pd.DataFrame,
+                   fixed: np.ndarray) -> dict:
     b = pd.read_parquet(BACKTESTS / "baselines_2021_2025.parquet")
     b = b.sort_values("kickoff_utc").reset_index(drop=True)
     m = matches.set_index("match_id")
@@ -99,8 +102,6 @@ def backtest_block(matches: pd.DataFrame, names: dict[str, int]) -> dict:
     # Since 10 Oct 2026 the main model carries the goals fix shape_v1. Its past-season
     # forecasts are rebuilt as the live run would have made them: numbers refitted
     # each month on the previous 730 days only.
-    gf = audit.goals_frame()
-    fixed, _ = shape_v1_rollout.rolling_tables(gf)
     pos = pd.Series(np.arange(len(gf)), index=gf["match_id"]).reindex(b["match_id"]).to_numpy()
     mats = fixed[pos]
     total = np.add.outer(np.arange(11), np.arange(11))
@@ -360,11 +361,19 @@ def main(argv: list[str] | None = None) -> int:
         check_fresh(meta)
     now = pd.Timestamp(meta["generated_utc"])
     proposal = None  # the goals fix went live on 10 Oct 2026: forecasts already carry it
+    gf = audit.goals_frame()
+    fixed, _ = shape_v1_rollout.rolling_tables(gf)
+    sh = shape.current(matches, pd.DataFrame(), now, save=False)
+    odds_files = sorted((ROOT / "data" / "raw" / "football_data_co_uk").glob("*/fixtures.csv"))
+    pairs = pairs_lab.upcoming(args.pages_dir, sh, short, odds_files[-1] if odds_files else None)
+    pairs["track"] = pairs_lab.track_record(fixed, gf, BACKTESTS, matches, short)
+    pairs["odds_file"] = odds_files[-1].parent.name if odds_files else None
     data = {
         "built": f"{pd.Timestamp.now(tz='UTC'):%Y-%m-%d %H:%M} UTC",
         "data_as_of": meta["generated_utc"], "model_version": meta["model_version"],
         "clubs": [short.get(t, t) for t in ids],
-        "bt": backtest_block(matches, names),
+        "bt": backtest_block(matches, names, gf, fixed),
+        "pairs": pairs,
         "up": upcoming_block(args.pages_dir, names, short, proposal),
         "sim": simulator_block(matches, fixtures, names, now),
         "ev": evidence_block(),

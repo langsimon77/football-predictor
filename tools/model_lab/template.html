@@ -399,6 +399,16 @@ tr.hl td:first-child { font-weight: 700; }
 .pcard .open { justify-self: start; border: 0; background: transparent; color: var(--accent); font-weight: 700; padding: 2px 0; cursor: pointer; font-size: 13px; }
 .banner { border: 1px solid var(--warn); background: color-mix(in srgb, var(--warn) 14%, var(--surface)); border-radius: 10px; padding: 8px 12px; font-size: 13.5px; }
 .findings { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 14px; }
+.pairs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(420px, 100%), 1fr)); gap: 12px; }
+.pair { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; align-items: start; }
+.pair .rank { font-family: var(--mono); font-size: 12px; color: var(--muted); grid-column: 1 / -1; display: flex; gap: 8px; align-items: center; }
+.pair .joint { font-family: var(--display); font-weight: 700; font-size: 34px; line-height: 1; color: var(--accent); }
+.pair .joint small { display: block; font-family: var(--body); font-size: 11.5px; font-weight: 400; color: var(--muted); margin-top: 2px; }
+.pair .legs { display: grid; gap: 6px; min-width: 0; }
+.pair .leg { display: grid; gap: 1px; border-left: 3px solid var(--line); padding-left: 8px; }
+.pair .leg b { font-size: 14.5px; }
+.pair .leg span { font-size: 12.5px; color: var(--ink-2); }
+.tagline { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-2); }
 .findings li b { color: var(--ink); }
 
 @media (max-width: 1080px) {
@@ -437,6 +447,7 @@ tr.hl td:first-child { font-weight: 700; }
   <nav class="rail" aria-label="Sections">
     <button data-sec="overview"><b>Overview</b><span>How good is the model?</span></button>
     <button data-sec="predictions"><b>Predictions</b><span>This gameweek, EPL and La Liga</span></button>
+    <button data-sec="pairs"><b>Pairs</b><span>Most likely pairs of outcomes</span></button>
     <button data-sec="scoreboard"><b>Scoreboard</b><span>Which model scores best?</span></button>
     <button data-sec="explorer"><b>Match explorer</b><span>Any past match, or this gameweek</span></button>
     <button data-sec="calibration"><b>Honesty and confidence</b><span>Does 70% happen 70% of the time?</span></button>
@@ -448,6 +459,7 @@ tr.hl td:first-child { font-weight: 700; }
   <main id="main">
     <section class="section" id="sec-overview" hidden></section>
     <section class="section" id="sec-predictions" hidden></section>
+    <section class="section" id="sec-pairs" hidden></section>
     <section class="section" id="sec-scoreboard" hidden></section>
     <section class="section" id="sec-explorer" hidden></section>
     <section class="section" id="sec-calibration" hidden></section>
@@ -1028,6 +1040,84 @@ tr.hl td:first-child { font-weight: 700; }
         }
       });
       $("#pr-list").innerHTML = out || '<p class="caption">No matches in this snapshot.</p>';
+    }
+    draw();
+  };
+
+  // ============================================================ PAIRS
+  const FAMS = [{ v: "result", label: "Result" }, { v: "goals", label: "Goals" }, { v: "btts", label: "Both score" }, { v: "corners", label: "Corners" }, { v: "yellows", label: "Yellow cards" }];
+  const pa = { day: null, kind: "either", fams: FAMS.map(f => f.v), n: 10 };
+  function bestPairs(ids, kind, fams, n) {
+    // Same rule as scripts/pairs_lab.py: highest joint chance first, no pick used twice.
+    const M = D.pairs.matches, ok = p => fams.indexOf(p.fam) >= 0, cands = [];
+    if (kind !== "two") ids.forEach(mid => {
+      const ps = M[mid].picks;
+      Object.keys(M[mid].joint).forEach(key => {
+        const [i, j] = key.split(",").map(Number);
+        if (ok(ps[i]) && ok(ps[j])) cands.push({ p: M[mid].joint[key], a: [mid, i], b: [mid, j] });
+      });
+    });
+    if (kind !== "same") {
+      const flat = [];
+      ids.forEach(mid => M[mid].picks.forEach((p, i) => { if (ok(p)) flat.push([mid, i, p.p]); }));
+      flat.sort((x, y) => y[2] - x[2]);
+      const top = flat.slice(0, 60);
+      for (let x = 0; x < top.length; x++) for (let y = x + 1; y < top.length; y++) {
+        if (top[x][0] !== top[y][0]) cands.push({ p: top[x][2] * top[y][2], a: [top[x][0], top[x][1]], b: [top[y][0], top[y][1]] });
+      }
+    }
+    cands.sort((u, v) => v.p - u.p);
+    const used = new Set(), out = [];
+    for (const c of cands) {
+      const ka = c.a.join(":"), kb = c.b.join(":");
+      if (used.has(ka) || used.has(kb)) continue;
+      used.add(ka); used.add(kb); out.push(c);
+      if (out.length === n) break;
+    }
+    return out;
+  }
+  renderers.pairs = function () {
+    const sec = $("#sec-pairs");
+    const P = D.pairs;
+    if (!P || !P.days.length) { sec.innerHTML = '<div class="section-head"><h2>Most likely pairs</h2><p>No matches in this snapshot.</p></div>'; return; }
+    if (!pa.day) pa.day = P.days[0].key;
+    const T = P.track;
+    sec.innerHTML =
+      '<div class="section-head"><h2>Most likely pairs</h2><p>Two outcomes at a time, ranked by the chance that <b>both</b> happen. A pair can come from one match or from two. Picks: result, goals, both teams score, corners and yellow cards, over or under. Chances use the goals fix. No pick is used twice.</p></div>' +
+      '<div class="banner">A view of how likely things are, not betting advice. The bookmakers beat this model in every past test, and every bet carries their margin; joining two picks charges it twice.</div>' +
+      '<div class="panel"><div class="controls">' +
+      '<div class="ctl"><span class="lbl">Day (Juba time)</span>' + segHTML("pa-day", P.days.map(d => ({ v: d.key, label: d.label + " (" + d.ids.length + ")" })), pa.day) + "</div>" +
+      '<div class="ctl"><span class="lbl">Pairs from</span>' + segHTML("pa-kind", [{ v: "either", label: "Either" }, { v: "same", label: "One match" }, { v: "two", label: "Two matches" }], pa.kind) + "</div>" +
+      '<div class="ctl"><span class="lbl">Show</span>' + segHTML("pa-n", [{ v: "5", label: "5" }, { v: "10", label: "10" }, { v: "15", label: "15" }], String(pa.n)) + "</div>" +
+      "</div>" +
+      '<div class="ctl"><span class="lbl">Markets allowed</span>' + chipsHTML("pa-fams", FAMS, pa.fams) + "</div>" +
+      explain("<p>For two picks from <b>one match</b> about the result, goals or both teams scoring, the chance both happen comes straight from the model\'s exact-score grid, so the link between them is counted. A corners or yellow-card pick is treated as unrelated to the other pick in its match [A]: in reality a lopsided match may bring more corners. For picks from <b>two matches</b>, the two chances are multiplied. A pair where one pick already implies the other (for example 3 or more goals with 2 or more goals) is skipped. <b>Bookmakers</b>: their chance from average odds with the margin removed, shown for the result and 3 or more goals only (no free source gives corners or card odds); it is not used in the ranking.</p>") +
+      "</div>" +
+      '<div id="pa-list"></div>' +
+      (T ? '<div class="panel"><h3>Do the pairs come true? <span class="sub">same method on every matchday of 2023/24 to 2025/26</span></h3>' +
+        '<p class="caption">Each matchday, the 10 most likely pairs (any kind, every market), as the model saw them before kickoff: ' + T.pairs.toLocaleString() + " pairs on " + T.days + " days. The model promised " + pct(T.promised, 1) + " on average; " + pct(T.won, 1) + " came true.</p>" +
+        '<div class="table-wrap"><table><thead><tr><th>Promised chance</th><th class="num">Pairs</th><th class="num">Promised</th><th class="num">Came true</th><th class="num">Range (95%)</th></tr></thead><tbody>' +
+        T.bands.map(b => "<tr><td>" + esc(b.band) + "</td><td class='num'>" + b.n + "</td><td class='num'>" + pct(b.promised, 1) + "</td><td class='num'>" + pct(b.won, 1) + "</td><td class='num ci'>" + pct(b.lo, 1) + " to " + pct(b.hi, 1) + "</td></tr>").join("") +
+        "</tbody></table></div>" +
+        explain("<p>If the chances are honest, the last two columns should be close. These past forecasts are the same walk-forward forecasts used everywhere in this lab, with the goals fix replayed as it would have run. Corners and yellow-card chances in the same match are combined as if unrelated, so pairs that mix them may be a little off.</p>") + "</div>" : "");
+    bindSeg("pa-day", v => { pa.day = v; draw(); });
+    bindSeg("pa-kind", v => { pa.kind = v; draw(); });
+    bindSeg("pa-n", v => { pa.n = Number(v); draw(); });
+    bindChips("pa-fams", vals => { pa.fams = vals; draw(); });
+    function leg(mid, i) {
+      const m = P.matches[mid], pk = m.picks[i];
+      const w = juba(m.kickoff);
+      const bm = m.odds && m.odds[pk.k] != null ? " &middot; bookmakers " + pct(m.odds[pk.k]) : "";
+      return '<div class="leg"><b>' + esc(pk.label) + '</b><span>' + esc(m.h) + " v " + esc(m.a) + " &middot; " + w.time + " &middot; model " + pct(pk.p) + bm + "</span></div>";
+    }
+    function draw() {
+      const day = P.days.find(d => d.key === pa.day) || P.days[0];
+      const list = bestPairs(day.ids, pa.kind, pa.fams, pa.n);
+      $("#pa-list").innerHTML = list.length ? '<div class="pairs">' + list.map((c, r) => {
+        const same = c.a[0] === c.b[0];
+        return '<article class="pair"><div class="rank">#' + (r + 1) + ' <span class="tagline">' + (same ? "one match" : "two matches") + "</span>" + (P.matches[c.a[0]].locked && P.matches[c.b[0]].locked ? "" : ' <span class="tagline">includes a provisional forecast</span>') + '</div><div class="joint">' + pct(c.p) + "<small>both happen</small></div>" +
+          '<div class="legs">' + leg(c.a[0], c.a[1]) + leg(c.b[0], c.b[1]) + "</div></article>";
+      }).join("") + "</div>" : '<p class="caption">No pairs with these settings.</p>';
     }
     draw();
   };
