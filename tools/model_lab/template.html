@@ -188,6 +188,7 @@ a { color: var(--accent); }
 .rail button b { font-family: var(--display); font-weight: 600; font-size: 19px; color: var(--ink); letter-spacing: 0.01em; }
 .rail button span { font-size: 12.5px; }
 .rail button:hover { background: var(--surface-2); }
+.rail button[hidden] { display: none; }
 .rail button[aria-current="page"] { background: var(--accent-soft); }
 .rail button[aria-current="page"] b { color: var(--accent); }
 .rail .note { margin-top: 14px; padding: 10px 12px; font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); }
@@ -408,6 +409,17 @@ tr.hl td:first-child { font-weight: 700; }
 .pair .leg { display: grid; gap: 1px; border-left: 3px solid var(--line); padding-left: 8px; }
 .pair .leg b { font-size: 14.5px; }
 .pair .leg span { font-size: 12.5px; color: var(--ink-2); }
+.rbar { position: relative; height: 18px; background: var(--surface-2); border-radius: 4px; min-width: 150px; }
+.rbar .band { position: absolute; top: 5px; height: 8px; background: color-mix(in srgb, var(--s1) 30%, transparent); border-radius: 4px; }
+.rbar .dot { position: absolute; top: 3px; width: 12px; height: 12px; border-radius: 50%; background: var(--s1); transform: translateX(-50%); }
+.rbar .need { position: absolute; top: 0; bottom: 0; width: 3px; background: var(--crit); transform: translateX(-1.5px); border-radius: 1px; }
+.rkey { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--ink-2); align-items: center; }
+.rkey i { display: inline-block; vertical-align: -1px; margin-right: 5px; }
+.checker { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.leg-in { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 8px; }
+.leg-in h4 { margin: 0; font-size: 14px; }
+.leg-in select, .leg-in input[type="number"] { width: 100%; }
+.verdicts { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 14px; }
 .tagline { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-2); }
 .findings li b { color: var(--ink); }
 
@@ -448,6 +460,7 @@ tr.hl td:first-child { font-weight: 700; }
     <button data-sec="overview"><b>Overview</b><span>How good is the model?</span></button>
     <button data-sec="predictions"><b>Predictions</b><span>This gameweek, EPL and La Liga</span></button>
     <button data-sec="pairs"><b>Pairs</b><span>Most likely pairs of outcomes</span></button>
+    <button data-sec="bets" id="rail-bets" hidden><b>My bets</b><span>My record and a slip checker</span></button>
     <button data-sec="scoreboard"><b>Scoreboard</b><span>Which model scores best?</span></button>
     <button data-sec="explorer"><b>Match explorer</b><span>Any past match, or this gameweek</span></button>
     <button data-sec="calibration"><b>Honesty and confidence</b><span>Does 70% happen 70% of the time?</span></button>
@@ -460,6 +473,7 @@ tr.hl td:first-child { font-weight: 700; }
     <section class="section" id="sec-overview" hidden></section>
     <section class="section" id="sec-predictions" hidden></section>
     <section class="section" id="sec-pairs" hidden></section>
+    <section class="section" id="sec-bets" hidden></section>
     <section class="section" id="sec-scoreboard" hidden></section>
     <section class="section" id="sec-explorer" hidden></section>
     <section class="section" id="sec-calibration" hidden></section>
@@ -1121,6 +1135,154 @@ tr.hl td:first-child { font-weight: 700; }
     }
     draw();
   };
+
+  // ============================================================ MY BETS (private record)
+  // Shown only when the lab is built with --bets-json (a file kept outside the repository).
+  const PREF = {
+    "Home win": "first", "Draw no bet": "first", "European handicap": "first", "Draw in the first 10 minutes": "first",
+    "Over 1.5 goals": "reason", "Double chance": "reason", "Corners": "reason", "Total bookings (cards)": "reason", "Over 2.5 goals or more": "reason",
+    "Away win": "avoid", "Basketball winner": "avoid", "Under goals": "avoid", "Both teams score": "avoid",
+    "Double chance + goals or both score (combined market)": "avoid", "Bet builder (2 or more markets in one pick)": "never",
+  };
+  const PREF_TXT = { first: "use first", reason: "only with an independent reason", avoid: "avoid unless the evidence is strong", never: "never (bet builder)" };
+  const ssp = v => (v < 0 ? MINUS : "") + Math.round(Math.abs(v)).toLocaleString() + " SSP";
+  const bkEven = o => 1 / (1 + 0.8 * (o - 1));
+  function strengthTag(st) {
+    const cls = st.startsWith("clear: below") ? "bad" : st.startsWith("clear: above") ? "good" : "flag";
+    return '<span class="status ' + cls + '">' + esc(st.charAt(0).toUpperCase() + st.slice(1)) + "</span>";
+  }
+  function rangeBar(r) {
+    const x = v => Math.max(0, Math.min(100, v * 100)).toFixed(1) + "%";
+    return '<div class="rbar" title="won ' + pct(r.rate) + ", needed " + pct(r.needed) + '"><div class="band" style="left:' + x(r.lo) + ";width:" + ((r.hi - r.lo) * 100).toFixed(1) + '%"></div><div class="need" style="left:' + x(r.needed) + '"></div><div class="dot" style="left:' + x(r.rate) + '"></div></div>';
+  }
+  const RKEY = '<div class="rkey"><span><i style="width:11px;height:11px;border-radius:50%;background:var(--s1)"></i>won</span><span><i style="width:18px;height:8px;border-radius:4px;background:color-mix(in srgb, var(--s1) 30%, transparent)"></i>95% range</span><span><i style="width:3px;height:14px;background:var(--crit)"></i>needed to break even after tax</span><span class="ci">Scale 0% to 100%</span></div>';
+  const bt = { by: "market" };
+  renderers.bets = function () {
+    const sec = $("#sec-bets");
+    const G = D.bets;
+    if (!G) { sec.innerHTML = '<div class="section-head"><h2>My bets</h2><p>No betting record in this snapshot.</p></div>'; return; }
+    const sp = G.split, lossShare = sp.high.net / G.net, stakeShare = sp.high.staked / G.staked;
+    sec.innerHTML =
+      '<div class="section-head"><h2>My bets' + (G.book ? " at " + esc(G.book) : "") + '</h2><p>From ' + esc(G.source) + ": " + G.bets + " bets, " + esc(G.first) + " to " + esc(G.last) + ". The fair test of a pick is not how often it won, but whether it won more often than its price needed after the " + Math.round(G.tax * 100) + "% tax on winnings. Private: these numbers live only in this artifact, never in the public repository.</p></div>" +
+      '<div class="kpis">' +
+      kpi("Net result", ssp(G.net), pct(Math.abs(G.roi), 1) + " of " + ssp(G.staked) + " staked was lost. " + G.won + " bets won, " + G.lost + " lost, " + G.cashed + " cashed out.") +
+      kpi("Picks won", pct(G.pick_rate) + " <small>needed " + pct(G.pick_needed) + "</small>", "At average odds of " + G.pick_odds.toFixed(2) + ", the odds implied " + pct(G.pick_implied) + "; the tax raised the bar to " + pct(G.pick_needed) + ".") +
+      kpi("Bets above 1.70 total odds", pct(lossShare) + " <small>of losses</small>", sp.high.n + " bets and " + pct(stakeShare) + " of the money. " + sp.high.won + " won (" + pct(sp.high.won / sp.high.n) + ") against " + pct(sp.high.needed) + " needed.") +
+      kpi("Winning tax paid", G.tax_paid != null ? ssp(G.tax_paid) : "n/a", "A win at odds o really pays 1 + 0.8 (o " + MINUS + " 1) per unit staked.") +
+      "</div>" +
+      '<div class="panel"><h3>Money over time <span class="sub">running total, bets in date order</span></h3><div class="chart-box h-260"><canvas id="bt-cum"></canvas></div><p class="caption">The line is the running net result after each bet.</p></div>' +
+      '<div class="panel"><h3>Where the picks fell short <span class="sub">each pick judged as a single bet</span></h3><div class="controls"><div class="ctl"><span class="lbl">Group by</span>' + segHTML("bt-by", [{ v: "market", label: "Market" }, { v: "odds", label: "Pick odds" }, { v: "league", label: "League" }], bt.by) + "</div></div>" + RKEY +
+      '<div class="table-wrap"><table id="bt-table"></table></div><p class="caption">' + G.settled + " of " + G.picks + " picks settled with odds known; " + G.excluded + " left out (refunds, cash-outs, one cut-off screenshot). Clear means the whole 95% range is on one side of the line; with fewer than 10 picks, treat it as a guess.</p></div>" +
+      '<div class="panel"><h3>The 1.70 line <span class="sub">bets by total odds</span></h3>' + RKEY + '<div class="table-wrap"><table id="bt-total"></table></div>' +
+      '<p class="caption">Higher odds never raise the chance of winning; they only pay more when it happens. At 1.70 or below: ' + sp.low.n + " bets, " + sp.low.won + " won (" + pct(sp.low.won / sp.low.n) + ", " + pct(sp.low.needed) + " needed), net " + ssp(sp.low.net) + ". Above 1.70: " + sp.high.n + " bets, " + sp.high.won + " won (" + pct(sp.high.won / sp.high.n) + ", " + pct(sp.high.needed) + " needed), net " + ssp(sp.high.net) + ".</p></div>" +
+      '<div class="grid-2" style="align-items:start"><div class="panel"><h3>By bet type</h3><div class="table-wrap"><table id="bt-type"></table></div><p class="caption">Bets containing a bet-builder pick: ' + G.builder_bets.won + " of " + G.builder_bets.n + " won, return " + signed(G.builder_bets.roi * 100, 0) + "%.</p></div>" +
+      '<div class="panel"><h3>Pairs inside my combos</h3><p class="caption">Across ' + G.pairs.n + " pairs of picks, both won " + pct(G.pairs.rate) + " of the time against " + pct(G.pairs.needed) + " needed. Every pattern below has under 10 cases: a guess, not a rule.</p>" +
+      '<h4 style="margin:4px 0 0">Held up</h4><ul class="facts">' + G.pairs.held.map(r => fact(r.won + " of " + r.n, r.label)).join("") + "</ul>" +
+      '<h4 style="margin:8px 0 0">Failed</h4><ul class="facts">' + G.pairs.failed.map(r => fact(r.won + " of " + r.n, r.label + " (needed " + pct(r.needed) + ")")).join("") + "</ul></div></div>" +
+      '<div class="panel"><h3>Slip checker <span class="sub">my rules, applied to one or two picks</span></h3>' +
+      '<p class="caption">Pick from this snapshot\'s model forecasts (Premier League and La Liga), or type your own. Enter the odds your bookmaker offers. The checker applies the rules from my history and the after-tax maths. It never says how much to stake.</p>' +
+      '<div class="checker">' + legInput(1) + legInput(2) + "</div>" +
+      '<div id="ck-out"></div>' +
+      explain("<p><b>Break-even after tax</b> = 1 / (1 + 0.8 (odds " + MINUS + " 1)). <b>Gap</b> = your chance minus the break-even: above zero means the bet pays over time <i>if</i> the chance is right. The model\'s chance counts as independent; a chance you type yourself does not. Where the model disagrees a lot with the bookmakers, the bookmakers are more often right. Two picks from one match use the model\'s joint chance from its score grid; bookmakers usually need a bet builder for that, which breaks rule 2.</p>") + "</div>" +
+      '<div class="panel"><h3>My rules and guardrails</h3><ol class="findings">' +
+      "<li><b>Total odds 1.70 or lower.</b> Above it, " + sp.high.won + " of " + sp.high.n + " bets won, against " + pct(sp.high.needed) + " needed.</li>" +
+      "<li><b>No bet builders.</b> " + G.builder_bets.won + " of " + G.builder_bets.n + " such bets won.</li>" +
+      "<li><b>At most two picks.</b> Trebles: " + rowOf(G.bet_type, "Treble", r => r.won + " of " + r.n + " won, " + pct(r.needed) + " needed") + ".</li>" +
+      "<li><b>No single pick above 1.70.</b> " + rowOf(G.by.odds, "1.71 to 2.00", r => r.won + " of " + r.n + " picks at 1.71 to 2.00 won") + ".</li>" +
+      "<li><b>Market preference.</b> Use first: home win, draw no bet, European handicap, draw in the first 10 minutes. With an independent reason only: over 1.5 goals, double chance, corners, cards. Avoid: away wins, basketball winners, under goals, both teams score, the combined double-chance-and-goals market.</li>" +
+      "<li><b>An independent chance above the after-tax break-even</b>, or no bet. If nothing passes, no bet today.</li>" +
+      "<li><b>Guardrails:</b> a fixed weekly budget; the same stake every bet; never raise a stake to win back a loss; a day off after three losses in a row. My three biggest losses: " + G.worst.map(w => ssp(w.stake) + " on a " + w.type.toLowerCase() + " at " + w.odds.toFixed(2)).join("; ") + ".</li>" +
+      "</ol></div>";
+    bindSeg("bt-by", v => { bt.by = v; drawGroups(); });
+    function drawGroups() {
+      const rows = G.by[bt.by];
+      $("#bt-table").innerHTML = "<thead><tr><th>" + ({ market: "Market", odds: "Pick odds", league: "League" })[bt.by] + "</th><th class='num'>Picks</th><th class='bar-cell'>Won against needed</th><th class='num'>Won</th><th class='num'>Needed</th><th class='num'>Return as singles</th><th>Strength</th></tr></thead><tbody>" +
+        rows.map(r => "<tr><td>" + esc(r.label) + "</td><td class='num'>" + r.n + "</td><td class='bar-cell'>" + rangeBar(r) + "</td><td class='num'>" + pct(r.rate) + "</td><td class='num'>" + pct(r.needed) + "</td><td class='num'>" + signed(r.ret * 100, 0) + "%</td><td>" + strengthTag(r.strength) + "</td></tr>").join("") + "</tbody>";
+    }
+    $("#bt-total").innerHTML = "<thead><tr><th>Total odds</th><th class='num'>Bets</th><th class='bar-cell'>Won against needed</th><th class='num'>Won</th><th class='num'>Needed</th><th class='num'>Net</th><th class='num'>Return</th><th>Strength</th></tr></thead><tbody>" +
+      G.total_odds.map(r => "<tr" + (r.label === "1.51 to 1.70" ? " style='border-bottom:2px solid var(--crit)'" : "") + "><td>" + esc(r.label) + "</td><td class='num'>" + r.n + "</td><td class='bar-cell'>" + rangeBar(r) + "</td><td class='num'>" + pct(r.rate) + "</td><td class='num'>" + pct(r.needed) + "</td><td class='num'>" + ssp(r.net) + "</td><td class='num'>" + signed(r.roi * 100, 0) + "%</td><td>" + strengthTag(r.strength) + "</td></tr>").join("") + "</tbody>";
+    $("#bt-type").innerHTML = "<thead><tr><th>Type</th><th class='num'>Bets</th><th class='num'>Won</th><th class='num'>Needed</th><th class='num'>Net</th><th class='num'>Return</th></tr></thead><tbody>" +
+      G.bet_type.map(r => "<tr><td>" + esc(r.label) + "</td><td class='num'>" + r.n + "</td><td class='num'>" + pct(r.rate) + "</td><td class='num'>" + pct(r.needed) + "</td><td class='num'>" + ssp(r.net) + "</td><td class='num'>" + signed(r.roi * 100, 0) + "%</td></tr>").join("") + "</tbody>";
+    drawGroups();
+    const pts = G.series.map((r, i) => ({ x: i + 1, y: r.cum, d: r.date, net: r.net }));
+    chart("bt-cum", {
+      type: "line",
+      data: { datasets: [{ label: "Running net result", data: pts, borderColor: css("--s1"), backgroundColor: css("--s1"), borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0 },
+        { label: "Break-even", data: [{ x: 1, y: 0 }, { x: pts.length, y: 0 }], borderColor: css("--axis"), borderDash: [4, 4], borderWidth: 1.5, pointRadius: 0 }] },
+      options: baseOptions({ interaction: { mode: "nearest", intersect: false }, scales: { x: { type: "linear", min: 1, max: pts.length, title: { display: true, text: "Bets in date order", color: css("--muted") } }, y: { ticks: { callback: v => Math.round(v / 1000) + "k" }, title: { display: true, text: "SSP", color: css("--muted") } } }, plugins: { tooltip: { filter: c => c.datasetIndex === 0, callbacks: { title: c => "Bet " + c[0].raw.x + ", " + c[0].raw.d, label: c => " this bet " + ssp(c.raw.net) + "; running total " + ssp(c.raw.y) } } } }),
+    });
+    setupChecker();
+  };
+  function rowOf(rows, label, fn) { const r = rows.find(x => x.label === label); return r ? fn(r) : "no data"; }
+  const PICK_MARKET = k => k === "H" ? "Home win" : k === "A" ? "Away win" : k === "D" ? "Other" : k === "G>1.5" ? "Over 1.5 goals" : k.startsWith("G>") ? "Over 2.5 goals or more" : k.startsWith("G<") ? "Under goals" : k.indexOf("BTTS") >= 0 ? "Both teams score" : k[0] === "C" ? "Corners" : k[0] === "Y" ? "Total bookings (cards)" : "Other";
+  function legInput(n) {
+    const markets = Object.keys(PREF).concat(["Other"]);
+    const P = D.pairs || { matches: {} };
+    const groups = Object.keys(P.matches).map(mid => {
+      const m = P.matches[mid];
+      return '<optgroup label="' + esc(m.h + " v " + m.a + " (" + juba(m.kickoff).day + ")") + '">' + m.picks.map((pk, i) => '<option value="' + esc(mid + "|" + i) + '">' + esc(pk.label) + " (model " + pct(pk.p) + ")</option>").join("") + "</optgroup>";
+    }).join("");
+    return '<div class="leg-in"><h4>Pick ' + n + (n === 2 ? ' <span class="ci">(optional)</span>' : "") + "</h4>" +
+      '<div class="ctl"><label for="ck-src' + n + '">Pick</label><select id="ck-src' + n + '"><option value="">' + (n === 2 ? "No second pick" : "Choose a model pick, or type your own below") + '</option><option value="own">My own pick (type the chance)</option>' + groups + "</select></div>" +
+      '<div class="ctl"><label for="ck-mkt' + n + '">Market type</label><select id="ck-mkt' + n + '">' + markets.map(m => '<option value="' + esc(m) + '">' + esc(m) + "</option>").join("") + "</select></div>" +
+      '<div class="controls"><div class="ctl"><label for="ck-odds' + n + '">Bookmaker odds</label><input type="number" id="ck-odds' + n + '" min="1.01" step="0.01" placeholder="e.g. 1.35"></div>' +
+      '<div class="ctl"><label for="ck-p' + n + '">Chance, %</label><input type="number" id="ck-p' + n + '" min="1" max="99" step="0.1" placeholder="e.g. 80"></div></div></div>';
+  }
+  function setupChecker() {
+    [1, 2].forEach(n => {
+      $("#ck-src" + n).addEventListener("change", e => {
+        const v = e.target.value;
+        if (v && v !== "own") {
+          const [mid, i] = v.split("|"); const pk = D.pairs.matches[mid].picks[Number(i)];
+          $("#ck-p" + n).value = (pk.p * 100).toFixed(1); $("#ck-mkt" + n).value = PICK_MARKET(pk.k);
+          const o = D.pairs.matches[mid].odds || {};
+          if (o[pk.k] && !$("#ck-odds" + n).value) $("#ck-odds" + n).placeholder = "market fair " + (1 / o[pk.k]).toFixed(2);
+        }
+        check();
+      });
+      ["ck-mkt", "ck-odds", "ck-p"].forEach(id => $("#" + id + n).addEventListener("input", check));
+    });
+    check();
+  }
+  function check() {
+    const legs = [1, 2].map(n => {
+      const src = $("#ck-src" + n).value, o = Number($("#ck-odds" + n).value), p = Number($("#ck-p" + n).value) / 100, mkt = $("#ck-mkt" + n).value;
+      if (!src && n === 2) return null;
+      const model = src && src !== "own";
+      return { n, src, model, mid: model ? src.split("|")[0] : null, idx: model ? Number(src.split("|")[1]) : null, o, p, mkt };
+    }).filter(Boolean);
+    const box = $("#ck-out");
+    if (!legs.length || legs.some(l => !(l.o > 1) || !(l.p > 0 && l.p < 1))) { box.innerHTML = '<p class="caption">Choose a pick, then enter the bookmaker odds and a chance for each pick.</p>'; return; }
+    const O = legs.reduce((a, l) => a * l.o, 1);
+    let q = legs.reduce((a, l) => a * l.p, 1), sameMatch = false;
+    if (legs.length === 2 && legs[0].model && legs[1].model && legs[0].mid === legs[1].mid) {
+      sameMatch = true;
+      const i = Math.min(legs[0].idx, legs[1].idx), j = Math.max(legs[0].idx, legs[1].idx);
+      const jt = D.pairs.matches[legs[0].mid].joint[i + "," + j];
+      q = jt != null ? jt : NaN;
+    }
+    const need = bkEven(O), gap = q - need, ev = q * (1 + 0.8 * (O - 1)) - 1;
+    const allModel = legs.every(l => l.model);
+    const ok = (good, text) => '<li><span class="status ' + (good ? "good" : "bad") + '">' + (good ? "passes" : "fails") + "</span> " + text + "</li>";
+    const warn = text => '<li><span class="status flag">check</span> ' + text + "</li>";
+    let list = ok(O <= 1.70 + 1e-9, "Total odds " + O.toFixed(2) + " (rule 1: 1.70 or lower)") +
+      legs.map(l => ok(l.o <= 1.70 + 1e-9, "Pick " + l.n + " odds " + l.o.toFixed(2) + " (rule 4: 1.70 or lower)")).join("") +
+      legs.map(l => {
+        const pref = PREF[l.mkt] || "reason";
+        return pref === "never" ? ok(false, "Pick " + l.n + ": bet builder (rule 2)") : pref === "avoid" ? ok(false, "Pick " + l.n + ": " + esc(l.mkt) + " is on the avoid list (rule 5)") : pref === "first" ? ok(true, "Pick " + l.n + ": " + esc(l.mkt) + ", use first (rule 5)") : warn("Pick " + l.n + ": " + esc(l.mkt) + ", only with an independent reason (rule 5)");
+      }).join("") +
+      (sameMatch ? ok(false, "Both picks from one match: this usually needs a bet builder (rules 2 and 8)") : "") +
+      (allModel ? ok(gap > 0, "Independent chance " + (isFinite(q) ? pct(q, 1) : "n/a") + " against break-even " + pct(need, 1) + " (rule 6)") : warn("At least one chance is your own estimate, not an independent one (rule 6)"));
+    const pass = O <= 1.70 + 1e-9 && legs.every(l => l.o <= 1.70 + 1e-9 && PREF[l.mkt] !== "never" && PREF[l.mkt] !== "avoid") && !sameMatch && allModel && gap > 0;
+    box.innerHTML = '<div class="kpis" style="margin-top:12px">' +
+      kpi("Combined odds", O.toFixed(2), legs.length === 2 ? "Two picks multiplied." : "Single pick.") +
+      kpi("Chance it all comes true", isFinite(q) ? pct(q, 1) : "n/a", sameMatch ? "Joint chance from the score grid." : legs.length === 2 ? "Two matches: chances multiplied." : "") +
+      kpi("Needed after tax", pct(need, 1), "Break-even for odds " + O.toFixed(2) + ".") +
+      kpi("Gap", isFinite(gap) ? signed(gap * 100, 1) + " pts" : "n/a", isFinite(ev) ? "If the chance is right: " + signed(ev * 100, 1) + " SSP back per 100 SSP staked, on average." : "") +
+      '</div><ul class="verdicts" style="margin-top:10px">' + list + "</ul>" +
+      '<p style="margin:10px 0 0"><b>' + (pass ? "This slip passes my rules." : "This slip does not pass my rules: no bet.") + "</b> " + (pass ? "Passing is not a promise: a " + pct(q) + " chance still loses " + pct(1 - q) + " of the time." : "") + "</p>";
+  }
+  if (D.bets) { const rb = document.getElementById("rail-bets"); if (rb) rb.hidden = false; }
 
   // ============================================================ SCOREBOARD
   const sb = { market: "1x2", leagues: [0, 1], seasons: TEST.slice(), metric: "log_loss", ref: "bdc", models: ORDER_1X2.slice() };

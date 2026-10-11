@@ -349,6 +349,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("out", type=Path)
     ap.add_argument("--pages-dir", type=Path, required=True)
     ap.add_argument("--allow-stale", action="store_true")
+    ap.add_argument("--bets-json", type=Path, default=None,
+                    help="optional private betting-record summary, kept outside this repository")
     args = ap.parse_args(argv)
     matches = pd.read_parquet(PROCESSED / "matches.parquet")
     fixtures = pd.read_parquet(PROCESSED / "fixtures.parquet")
@@ -374,6 +376,8 @@ def main(argv: list[str] | None = None) -> int:
         "clubs": [short.get(t, t) for t in ids],
         "bt": backtest_block(matches, names, gf, fixed),
         "pairs": pairs,
+        "bets": (json.loads(args.bets_json.read_text(encoding="utf-8"))
+                 if args.bets_json is not None else None),
         "up": upcoming_block(args.pages_dir, names, short, proposal),
         "sim": simulator_block(matches, fixtures, names, now),
         "ev": evidence_block(),
