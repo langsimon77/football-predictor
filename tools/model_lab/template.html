@@ -422,6 +422,19 @@ tr.hl td:first-child { font-weight: 700; }
 table.picks th, table.picks td { padding: 5px 6px; font-size: 12.5px; }
 table.picks td:first-child { font-weight: 700; }
 .picks-box { display: grid; gap: 4px; }
+.legrow { display: grid; grid-template-columns: minmax(0, 1fr) 96px auto; gap: 8px; align-items: center; border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; }
+.legrow .lt { font-size: 13.5px; }
+.legrow .lt small { display: block; color: var(--muted); font-size: 12px; }
+.formgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.formgrid input, .formgrid select, .formgrid textarea { width: 100%; }
+.res { font-size: 11.5px; font-weight: 700; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--line); text-transform: uppercase; letter-spacing: .04em; }
+.res.won { background: color-mix(in srgb, var(--good) 22%, transparent); }
+.res.lost { background: color-mix(in srgb, var(--crit) 22%, transparent); }
+.res.void, .res.cashed { background: var(--surface-2); }
+.betcard { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 6px; background: var(--surface); }
+.betcard .top { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; }
+.betcard .legs { margin: 0; padding-left: 18px; display: grid; gap: 3px; font-size: 13.5px; }
+.mini { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 2px 7px; font-size: 12px; cursor: pointer; }
 .verdicts { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 14px; }
 .tagline { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-2); }
 .findings li b { color: var(--ink); }
@@ -464,6 +477,7 @@ table.picks td:first-child { font-weight: 700; }
     <button data-sec="predictions"><b>Predictions</b><span>This gameweek, EPL and La Liga</span></button>
     <button data-sec="pairs"><b>Pairs</b><span>Most likely pairs of outcomes</span></button>
     <button data-sec="bets" id="rail-bets" hidden><b>My bets</b><span>My record and a slip checker</span></button>
+    <button data-sec="log"><b>Bet log</b><span>Record bets; results checked after</span></button>
     <button data-sec="scoreboard"><b>Scoreboard</b><span>Which model scores best?</span></button>
     <button data-sec="explorer"><b>Match explorer</b><span>Any past match, or this gameweek</span></button>
     <button data-sec="calibration"><b>Honesty and confidence</b><span>Does 70% happen 70% of the time?</span></button>
@@ -477,6 +491,7 @@ table.picks td:first-child { font-weight: 700; }
     <section class="section" id="sec-predictions" hidden></section>
     <section class="section" id="sec-pairs" hidden></section>
     <section class="section" id="sec-bets" hidden></section>
+    <section class="section" id="sec-log" hidden></section>
     <section class="section" id="sec-scoreboard" hidden></section>
     <section class="section" id="sec-explorer" hidden></section>
     <section class="section" id="sec-calibration" hidden></section>
@@ -1372,9 +1387,178 @@ table.picks td:first-child { font-weight: 700; }
       kpi("Needed after tax", isFinite(needShown) ? pct(needShown, 1) : "see return", hasRefund ? "Win chance needed, counting the refund on a draw." : "Break-even for odds " + O.toFixed(2) + ".") +
       kpi("Gap", isFinite(gap) ? signed(gap * 100, 1) + " pts" : (hasRefund ? "see return" : "n/a"), isFinite(ev) ? "If the chance is right: " + signed(ev * 100, 1) + " SSP back per 100 SSP staked, on average." : "") +
       '</div><ul class="verdicts" style="margin-top:10px">' + list + "</ul>" +
-      '<p style="margin:10px 0 0"><b>' + (pass ? "This slip passes my rules." : "This slip does not pass my rules: no bet.") + "</b> " + (pass ? "Passing is not a promise: a " + pct(q) + " chance still loses " + pct(1 - q) + " of the time." : "") + "</p>";
+      '<p style="margin:10px 0 0"><b>' + (pass ? "This slip passes my rules." : "This slip does not pass my rules: no bet.") + "</b> " + (pass ? "Passing is not a promise: a " + pct(q) + " chance still loses " + pct(1 - q) + " of the time." : "") + "</p>" +
+      '<p style="margin:8px 0 0"><button type="button" class="btn ghost" id="ck-log">Record this slip in the Bet log</button></p>';
+    $("#ck-log").addEventListener("click", () => {
+      LOG.prefill = legs.map(l => {
+        if (l.model) {
+          const m = D.pairs.matches[l.mid], pk = m.picks[l.idx];
+          return { match_id: l.mid, match_label: m.h + " v " + m.a, competition: m.lg, kickoff_utc: m.kickoff, market: pickMarket(pk), pick_key: pk.k, pick_label: pk.label, model_p: Math.round(pk.p * 1000) / 1000, refund_p: pk.refund != null ? Math.round(pk.refund * 1000) / 1000 : null, odds: l.o, result: "open" };
+        }
+        return { match_id: null, match_label: "", market: l.mkt, pick_key: null, pick_label: "My own pick", model_p: null, odds: l.o, result: "open" };
+      });
+      show("log"); window.scrollTo({ top: 0 });
+    });
   }
   if (D.bets) { const rb = document.getElementById("rail-bets"); if (rb) rb.hidden = false; }
+
+  // ============================================================ BET LOG (private, db capability)
+  // Bets live in this artifact's own database under bets/, readable and writable by
+  // the artifact's owner only. Claude reads open bets after the matches, settles each
+  // pick from the results, and writes the outcome back. Not betting advice.
+  const LOG = { db: null, user: null, bets: [], status: "connecting", legs: [], prefill: null, sub: null, confirmDel: null, cashFor: null };
+  const LOG_MARKETS = Object.keys(PREF0).concat(["Other"]);
+  function betPayout(b) {
+    // The bookmaker's method: win boost added to winnings, then tax on the winnings.
+    const legs = b.legs || [];
+    if (b.status === "cashed") return Number(b.payout) || 0;
+    if (b.status !== "won" && b.status !== "void") return 0;
+    const O = legs.reduce((a, l) => a * (l.result === "void" ? 1 : Number(l.odds)), 1);
+    const stake = Number(b.stake), profit = stake * (O - 1);
+    const boosted = profit * (1 + (Number(b.boost) || 0) / 100);
+    return stake + boosted * (1 - (b.tax == null ? 20 : Number(b.tax)) / 100);
+  }
+  function betStatus(legs) {
+    if (legs.some(l => l.result === "lost")) return "lost";
+    if (legs.some(l => !l.result || l.result === "open")) return "open";
+    return legs.every(l => l.result === "void") ? "void" : "won";
+  }
+  function legLabel(l) { return esc(l.pick_label) + " <span class='ci'>" + esc(l.match_label || "") + (l.market ? " &middot; " + esc(l.market) : "") + " &middot; " + Number(l.odds).toFixed(2) + (l.model_p != null ? " &middot; model " + pct(l.model_p) : "") + "</span>"; }
+  renderers.log = function () {
+    const sec = $("#sec-log");
+    const P = D.pairs || { matches: {} };
+    const groups = Object.keys(P.matches).map(mid => {
+      const m = P.matches[mid];
+      return '<optgroup label="' + esc(m.h + " v " + m.a + " (" + juba(m.kickoff).day + ")") + '">' + m.picks.map((pk, i) => '<option value="' + esc(mid + "|" + i) + '">' + esc(pk.label) + " (model " + pct(pk.p) + ")</option>").join("") + "</optgroup>";
+    }).join("");
+    sec.innerHTML =
+      '<div class="section-head"><h2>Bet log</h2><p>Record each bet when you place it. After the matches, ask Claude to check your bets: Claude settles every pick from the real results and writes back won or lost and the payout. Settled bets build your live record, which feeds the betting analysis. Private: only you, as this artifact\'s owner, can read or write these bets.</p></div>' +
+      '<div id="log-status"></div><div class="kpis" id="log-kpis"></div>' +
+      '<div class="panel" id="log-form-panel"><h3>Record a bet</h3>' +
+      '<div class="formgrid"><div class="ctl"><label for="lg-date">Placed on</label><input type="date" id="lg-date"></div>' +
+      '<div class="ctl"><label for="lg-stake">Stake (SSP)</label><input type="number" id="lg-stake" min="1" step="1"></div>' +
+      '<div class="ctl"><label for="lg-tax">Tax on winnings, %</label><input type="number" id="lg-tax" min="0" max="50" step="1" value="20"></div>' +
+      '<div class="ctl"><label for="lg-boost">Win boost, %</label><input type="number" id="lg-boost" min="0" max="50" step="0.5" value="0"></div>' +
+      '<div class="ctl"><label for="lg-id">Bet ID (optional)</label><input type="search" id="lg-id"></div></div>' +
+      '<h4 style="margin:10px 0 4px">Picks</h4><div id="lg-legs" style="display:grid;gap:6px"></div>' +
+      '<div class="controls" style="margin-top:8px"><div class="ctl" style="min-width:min(100%,360px)"><label for="lg-pick">Add a model pick (this snapshot)</label><select id="lg-pick"><option value="">Choose a pick</option>' + groups + "</select></div>" +
+      '<div class="ctl"><span class="lbl">Or</span><button type="button" class="btn ghost" id="lg-own">Type my own pick</button></div></div>' +
+      '<div id="lg-own-box" hidden style="margin-top:8px"><div class="formgrid"><div class="ctl"><label for="lg-o-match">Match</label><input type="search" id="lg-o-match" placeholder="e.g. Sassuolo v AC Milan"></div>' +
+      '<div class="ctl"><label for="lg-o-date">Match date</label><input type="date" id="lg-o-date"></div>' +
+      '<div class="ctl"><label for="lg-o-mkt">Market</label><select id="lg-o-mkt">' + LOG_MARKETS.map(m => '<option value="' + esc(m) + '">' + esc(m) + "</option>").join("") + "</select></div>" +
+      '<div class="ctl"><label for="lg-o-pick">Pick</label><input type="search" id="lg-o-pick" placeholder="e.g. Draw or AC Milan"></div>' +
+      '<div class="ctl"><label for="lg-o-odds">Odds</label><input type="number" id="lg-o-odds" min="1.01" step="0.01"></div></div>' +
+      '<button type="button" class="btn ghost" id="lg-o-add" style="margin-top:6px">Add this pick</button></div>' +
+      '<div class="ctl" style="margin-top:10px"><label for="lg-notes">Notes (optional)</label><input type="search" id="lg-notes"></div>' +
+      '<p class="caption" id="lg-sum"></p><div class="controls"><button type="button" class="btn" id="lg-save">Save bet</button><span class="caption" id="lg-msg"></span></div></div>' +
+      '<div class="panel"><h3>Open bets <span class="sub">waiting for results</span></h3><div id="log-open" style="display:grid;gap:8px"></div></div>' +
+      '<div class="panel"><h3>Settled bets</h3><div id="log-done" style="display:grid;gap:8px"></div></div>' +
+      '<div class="panel"><h3>What the log says so far <span class="sub">settled picks, by market</span></h3><div class="table-wrap"><table id="log-mkt"></table></div><p class="caption">Each pick judged on its own: how often it won against what its odds needed after tax, and the model\'s average chance where the pick came from the model. Small numbers are luck; read them only after many bets.</p></div>';
+    $("#lg-date").value = new Date(Date.now() + 2 * 3600e3).toISOString().slice(0, 10);
+    $("#lg-pick").addEventListener("change", e => {
+      const v = e.target.value; if (!v) return;
+      const [mid, i] = v.split("|"); const m = P.matches[mid], pk = m.picks[Number(i)];
+      LOG.legs.push({ match_id: mid, match_label: m.h + " v " + m.a, competition: m.lg, kickoff_utc: m.kickoff, market: pickMarket(pk), pick_key: pk.k, pick_label: pk.label, model_p: Math.round(pk.p * 1000) / 1000, refund_p: pk.refund != null ? Math.round(pk.refund * 1000) / 1000 : null, odds: null, result: "open" });
+      e.target.value = ""; drawLegs();
+    });
+    $("#lg-own").addEventListener("click", () => { $("#lg-own-box").hidden = !$("#lg-own-box").hidden; });
+    $("#lg-o-add").addEventListener("click", () => {
+      const label = $("#lg-o-pick").value.trim(), match = $("#lg-o-match").value.trim(), odds = Number($("#lg-o-odds").value);
+      if (!label || !match || !(odds > 1)) { $("#lg-msg").textContent = "Give the match, the pick and its odds."; return; }
+      LOG.legs.push({ match_id: null, match_label: match, match_date: $("#lg-o-date").value || null, market: $("#lg-o-mkt").value, pick_key: null, pick_label: label, model_p: null, odds, result: "open" });
+      ["lg-o-pick", "lg-o-match", "lg-o-odds"].forEach(id => { $("#" + id).value = ""; }); $("#lg-msg").textContent = ""; drawLegs();
+    });
+    $("#lg-legs").addEventListener("input", e => { const i = e.target.dataset.odds; if (i != null) { LOG.legs[Number(i)].odds = Number(e.target.value) || null; drawSum(); } });
+    $("#lg-legs").addEventListener("click", e => { const i = e.target.dataset.rm; if (i != null) { LOG.legs.splice(Number(i), 1); drawLegs(); } });
+    ["lg-stake", "lg-tax", "lg-boost"].forEach(id => $("#" + id).addEventListener("input", drawSum));
+    $("#lg-save").addEventListener("click", saveBet);
+    $("#log-open").addEventListener("click", logClick); $("#log-done").addEventListener("click", logClick);
+    if (LOG.prefill) { LOG.legs = LOG.prefill; LOG.prefill = null; }
+    drawLegs(); drawLog(); connectLog();
+  };
+  renderers.log.refresh = function () { if (LOG.prefill) { LOG.legs = LOG.prefill; LOG.prefill = null; drawLegs(); } };
+  function drawLegs() {
+    $("#lg-legs").innerHTML = LOG.legs.length ? LOG.legs.map((l, i) => '<div class="legrow"><div class="lt">' + esc(l.pick_label) + "<small>" + esc(l.match_label) + " &middot; " + esc(l.market) + (l.model_p != null ? " &middot; model " + pct(l.model_p) : "") + '</small></div><input type="number" min="1.01" step="0.01" placeholder="odds" data-odds="' + i + '" value="' + (l.odds || "") + '"><button type="button" class="mini" data-rm="' + i + '">Remove</button></div>').join("") : "<p class='caption'>No picks yet. Add a model pick or type your own.</p>";
+    drawSum();
+  }
+  function drawSum() {
+    const stake = Number($("#lg-stake").value), O = LOG.legs.reduce((a, l) => a * (Number(l.odds) || NaN), 1);
+    const draft = { stake, tax: Number($("#lg-tax").value), boost: Number($("#lg-boost").value), legs: LOG.legs.map(l => Object.assign({}, l, { result: "won" })), status: "won" };
+    const pay = isFinite(O) && stake > 0 ? betPayout(draft) : NaN;
+    $("#lg-sum").textContent = LOG.legs.length ? LOG.legs.length + " pick" + (LOG.legs.length > 1 ? "s" : "") + (isFinite(O) ? ", total odds " + O.toFixed(2) : "") + (isFinite(pay) ? ". If every pick wins, the payout after tax is about " + Math.round(pay).toLocaleString() + " SSP." : ".") + (isFinite(O) && O > 1.70 ? " Above your 1.70 cap." : "") : "";
+  }
+  async function connectLog() {
+    const st = $("#log-status");
+    const use = window.claude && window.claude.use ? n => window.claude.use(n) : () => Promise.resolve(null);
+    LOG.db = await use("db"); LOG.user = await use("user");
+    if (!LOG.db) { LOG.status = "off"; st.innerHTML = '<div class="banner">Saving bets works only when this page is opened in Claude (claude.ai or the Claude app). This copy can show the form but cannot save.</div>'; $("#lg-save").disabled = true; return; }
+    if (LOG.user && LOG.user.isOwner && !LOG.user.isOwner()) { LOG.status = "reader"; st.innerHTML = '<div class="banner">Only the owner of this artifact can see or record bets.</div>'; $("#log-form-panel").hidden = true; return; }
+    if (LOG.sub) return;
+    LOG.sub = LOG.db.collection("bets").orderBy("created_utc", "desc").limit(1000).onSnapshot(snap => {
+      LOG.bets = snap.docs.map(d => Object.assign({ id: d.id }, d.data())); LOG.status = "ready"; st.innerHTML = ""; drawLog();
+    }, err => { LOG.status = "error"; st.innerHTML = '<div class="banner">The bet log stopped updating (' + esc(err.code) + "). Reload the page to reconnect.</div>"; });
+  }
+  async function saveBet() {
+    const msg = $("#lg-msg"), stake = Number($("#lg-stake").value);
+    if (!LOG.db) { msg.textContent = "Saving is not available in this copy of the page."; return; }
+    if (!LOG.legs.length || LOG.legs.some(l => !(Number(l.odds) > 1))) { msg.textContent = "Add at least one pick, each with its odds."; return; }
+    if (!(stake > 0)) { msg.textContent = "Enter the stake."; return; }
+    const now = new Date().toISOString();
+    const legs = LOG.legs.map(l => Object.assign({}, l, { odds: Number(l.odds), result: "open" }));
+    const body = { placed: $("#lg-date").value, bet_id: $("#lg-id").value.trim() || null, stake, tax: Number($("#lg-tax").value), boost: Number($("#lg-boost").value) || 0,
+      total_odds: Math.round(legs.reduce((a, l) => a * l.odds, 1) * 1000) / 1000, legs, notes: $("#lg-notes").value.trim() || null, status: "open", payout: null, net: null, created_utc: now, updated_utc: now, settled_utc: null, settled_by: null };
+    $("#lg-save").disabled = true; msg.textContent = "Saving...";
+    try {
+      await LOG.db.collection("bets").add(body);
+      LOG.legs = []; ["lg-stake", "lg-id", "lg-notes"].forEach(id => { $("#" + id).value = ""; }); drawLegs(); msg.textContent = "Saved. Ask Claude to check it after the matches.";
+    } catch (e) { msg.textContent = e && e.code === "quota_exceeded" ? "The log is full: delete old bets first." : "Not saved (" + (e && e.code || "error") + "). Try again."; }
+    $("#lg-save").disabled = false;
+  }
+  async function logClick(e) {
+    const b = e.target.closest("[data-bet]"); if (!b || !LOG.db) return;
+    const bet = LOG.bets.find(x => x.id === b.dataset.bet); if (!bet) return;
+    const act = b.dataset.act, ref = LOG.db.collection("bets").doc(bet.id), now = new Date().toISOString();
+    try {
+      if (act === "delete") {
+        if (LOG.confirmDel !== bet.id) { LOG.confirmDel = bet.id; drawLog(); return; }
+        LOG.confirmDel = null; await ref.delete(); return;
+      }
+      if (act === "cash") { LOG.cashFor = LOG.cashFor === bet.id ? null : bet.id; drawLog(); return; }
+      if (act === "cash-save") {
+        const v = Number((document.getElementById("cash-" + bet.id) || {}).value); if (!(v >= 0)) return;
+        LOG.cashFor = null;
+        await ref.update({ status: "cashed", payout: v, net: v - Number(bet.stake), settled_utc: now, settled_by: "Lang", updated_utc: now }); return;
+      }
+      if (act === "leg") {
+        const legs = (bet.legs || []).map(l => Object.assign({}, l));
+        const i = Number(b.dataset.leg); const order = ["open", "won", "lost", "void"];
+        legs[i].result = order[(order.indexOf(legs[i].result || "open") + 1) % order.length]; legs[i].checked_by = "Lang";
+        const status = betStatus(legs), draft = Object.assign({}, bet, { legs, status });
+        const pay = status === "open" ? null : betPayout(draft);
+        await ref.update({ legs, status, payout: pay == null ? null : Math.round(pay * 100) / 100, net: pay == null ? null : Math.round((pay - Number(bet.stake)) * 100) / 100, settled_utc: status === "open" ? null : now, settled_by: status === "open" ? null : "Lang", updated_utc: now });
+      }
+    } catch (err) { $("#log-status").innerHTML = '<div class="banner">Not saved (' + esc(err && err.code || "error") + ").</div>"; }
+  }
+  function betCard(b) {
+    const net = b.net != null ? Number(b.net) : null;
+    return '<div class="betcard"><div class="top"><b>' + esc(b.placed || "") + "</b><span>" + (b.legs || []).length + " pick" + ((b.legs || []).length > 1 ? "s" : "") + " &middot; odds " + Number(b.total_odds).toFixed(2) + " &middot; stake " + Math.round(Number(b.stake)).toLocaleString() + ' SSP</span><span class="res ' + esc(b.status) + '">' + esc(b.status) + "</span>" + (net != null ? "<b class='" + (net >= 0 ? "pos" : "neg") + "'>" + ssp(net) + "</b>" : "") + (b.settled_by ? "<span class='ci'>checked by " + esc(b.settled_by) + "</span>" : "") + "</div>" +
+      '<ol class="legs">' + (b.legs || []).map((l, i) => "<li>" + legLabel(l) + ' <button type="button" class="mini" data-bet="' + esc(b.id) + '" data-act="leg" data-leg="' + i + '" title="Tap to change: open, won, lost, void">' + esc(l.result || "open") + "</button>" + (l.score ? " <span class='ci'>" + esc(l.score) + "</span>" : "") + "</li>").join("") + "</ol>" +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">' + (b.status === "open" ? '<button type="button" class="mini" data-bet="' + esc(b.id) + '" data-act="cash">Cashed out</button>' : "") +
+      (LOG.cashFor === b.id ? '<input type="number" min="0" step="1" id="cash-' + esc(b.id) + '" placeholder="amount received" style="max-width:150px"><button type="button" class="mini" data-bet="' + esc(b.id) + '" data-act="cash-save">Save cash-out</button>' : "") +
+      '<button type="button" class="mini" data-bet="' + esc(b.id) + '" data-act="delete">' + (LOG.confirmDel === b.id ? "Tap again to delete" : "Delete") + "</button>" + (b.notes ? "<span class='ci'>" + esc(b.notes) + "</span>" : "") + "</div></div>";
+  }
+  function drawLog() {
+    if (!$("#log-open")) return;
+    const open = LOG.bets.filter(b => b.status === "open"), done = LOG.bets.filter(b => b.status !== "open");
+    $("#log-open").innerHTML = open.length ? open.map(betCard).join("") : "<p class='caption'>" + (LOG.status === "ready" ? "No open bets." : "Waiting for the log...") + "</p>";
+    $("#log-done").innerHTML = done.length ? done.map(betCard).join("") : "<p class='caption'>None settled yet.</p>";
+    const staked = done.reduce((a, b) => a + Number(b.stake), 0), net = done.reduce((a, b) => a + (Number(b.net) || 0), 0), won = done.filter(b => b.status === "won").length;
+    $("#log-kpis").innerHTML = kpi("Bets logged", String(LOG.bets.length), open.length + " open, " + done.length + " settled.") + kpi("Settled bets won", done.length ? pct(won / done.length) : "n/a", won + " of " + done.length + ".") + kpi("Net on settled bets", done.length ? ssp(net) : "n/a", done.length ? "Return " + signed(net / staked * 100, 1) + "% of " + ssp(staked) + " staked." : "") + kpi("Open stake", ssp(open.reduce((a, b) => a + Number(b.stake), 0)), "Not yet settled.");
+    const legs = []; done.forEach(b => (b.legs || []).forEach(l => { if (l.result === "won" || l.result === "lost") legs.push(l); }));
+    const by = {}; legs.forEach(l => { const k = l.market || "Other"; (by[k] = by[k] || []).push(l); });
+    const rows = Object.keys(by).map(k => { const x = by[k], w = x.filter(l => l.result === "won").length, need = mean(x.map(l => bkEven(Number(l.odds)))), mp = x.filter(l => l.model_p != null); return { k, n: x.length, w, need, mp: mp.length ? mean(mp.map(l => Number(l.model_p))) : NaN, nm: mp.length }; }).sort((a, b) => b.n - a.n);
+    $("#log-mkt").innerHTML = rows.length ? "<thead><tr><th>Market</th><th class='num'>Picks</th><th class='num'>Won</th><th class='num'>Needed after tax</th><th class='num'>Model's average chance</th></tr></thead><tbody>" + rows.map(r => "<tr><td>" + esc(r.k) + "</td><td class='num'>" + r.n + "</td><td class='num'>" + pct(r.w / r.n) + "</td><td class='num'>" + pct(r.need) + "</td><td class='num'>" + (r.nm ? pct(r.mp) + " <span class='ci'>(" + r.nm + ")</span>" : "<span class='ci'>none</span>") + "</td></tr>").join("") + "</tbody>" : "<tbody><tr><td class='ci'>No settled picks yet.</td></tr></tbody>";
+  }
 
   // ============================================================ SCOREBOARD
   const sb = { market: "1x2", leagues: [0, 1], seasons: TEST.slice(), metric: "log_loss", ref: "bdc", models: ORDER_1X2.slice() };
