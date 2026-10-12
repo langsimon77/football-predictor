@@ -34,7 +34,7 @@ Reported, not judged: fast Dixon-Coles, the challengers and the stack (live weig
 - A failed check means no proposal for that market. Any fix would be a new proposal with its own test.
 - Background running means forecasts locked and scored daily but not published. Publishing is a later decision for Lang, on that live record.
 
-## Amendment 1, 13 Oct 2026, before any trial result was scored or downloaded
+## Amendment 1, 12 Oct 2026 (21:28 UTC), before any trial result was scored or downloaded
 
 **Why.** Before scoring the trial leagues, I ran the scoring code on the EPL and La Liga as a reference. Judged one league at a time, the two live leagues fail 4 of their 16 checks: the EPL fails G4 (over 2.5 against the base rate, −0.0072, interval −0.0168 to +0.0022), C1 (corners, −0.0053, −0.0126 to +0.0021) and K1 (yellows, −0.0117, −0.0257 to +0.0012); La Liga fails G2 (against Elo, −0.0004, −0.0027 to +0.0020). The live leagues were accepted on both leagues pooled (2,280 test matches), where all their checks pass. A league holds about 1,100 test matches, so its intervals are about 1.4 times wider. Judged one at a time, the rule above rejects models that the live leagues' own evidence accepted.
 
