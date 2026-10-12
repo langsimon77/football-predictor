@@ -621,12 +621,16 @@ def _main(args: argparse.Namespace) -> int:
     replay = args.replay is not None
     fast = results_feed.collect(fixtures, offline=args.offline)
     score_only = results_feed.score_only_rows(matches, fixtures, fast)
-    log.info("fast results: %d finished matches waiting for football-data.co.uk (%s)",
+    log.info("fast results: %d finished matches waiting for football-data.co.uk (%s): %s",
              len(score_only), score_only["result_source"].value_counts().to_dict()
-             if len(score_only) else {})
+             if len(score_only) else {}, ", ".join(score_only["match_id"]))
+    goal_matches = results_feed.with_scores(matches, score_only)
+    missing = results_feed.still_missing(fixtures, goal_matches, pd.Timestamp(datetime.now(UTC)))
+    if missing and not replay:
+        log.info("no result from any source yet: %s", ", ".join(missing))
     ctx = Context(
         matches=matches,
-        goal_matches=results_feed.with_scores(matches, score_only),
+        goal_matches=goal_matches,
         score_only=score_only, fast_sources=fast,
         fixtures=fixtures,
         second_tier=second_tier,

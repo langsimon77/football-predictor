@@ -151,3 +151,14 @@ def cross_check(matches: pd.DataFrame, sources: list[pd.DataFrame]) -> list[str]
                     out.append(f"{r.match_id}: {c} is {float(theirs):.0f} in football-data.co.uk "
                                f"but {float(mine):.0f} in {r.source}")
     return out
+
+
+def still_missing(fixtures: pd.DataFrame, goal_matches: pd.DataFrame,
+                  now: pd.Timestamp) -> list[str]:
+    """Matches that kicked off more than three hours ago and have no result from any
+    source yet. Normal for a few hours; worth a look if it lasts a day."""
+    done = set(goal_matches["match_id"])
+    past = fixtures[fixtures["kickoff_utc"].notna()
+                    & (fixtures["kickoff_utc"] + RESULT_DELAY <= now)
+                    & (fixtures["season"] == fixtures["season"].max())]
+    return sorted(set(past["match_id"]) - done)
