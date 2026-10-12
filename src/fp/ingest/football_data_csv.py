@@ -1,7 +1,8 @@
 """Download and read the football-data.co.uk match CSVs.
 
-Files: E0 (Premier League), SP1 (La Liga), E1 (Championship), SP2 (Segunda).
-E1 and SP2 feed the promoted-team priors.
+Files: E0 (Premier League), SP1 (La Liga), E1 (Championship), SP2 (Segunda), and
+for the leagues on trial I1 (Serie A), F1 (Ligue 1), I2 (Serie B), F2 (Ligue 2).
+Second divisions feed the promoted-team priors.
 """
 
 from __future__ import annotations
@@ -10,11 +11,11 @@ from pathlib import Path
 
 import pandas as pd
 
+from fp import leagues
 from fp.ingest.http import fetch
 
 SOURCE = "football_data_co_uk"
 BASE_URL = "https://football-data.co.uk"
-DIVISIONS = ("E0", "SP1", "E1", "SP2")
 FIRST_SEASON = 2016  # 2016/17, per PRD item 20
 CURRENT_SEASON = 2026  # 2026/27
 
@@ -53,9 +54,17 @@ def read_csv(path: Path) -> pd.DataFrame:
     return frame
 
 
-def download_all() -> dict[tuple[str, int], Path]:
+def divisions(group: tuple[leagues.League, ...]) -> tuple[str, ...]:
+    """Top divisions first, then second divisions: ("E0", "SP1", "E1", "SP2") when live."""
+    return tuple(lg.division for lg in group) + tuple(lg.second for lg in group)
+
+
+DIVISIONS = divisions(leagues.LIVE)
+
+
+def download_all(group: tuple[leagues.League, ...] = leagues.LIVE) -> dict[tuple[str, int], Path]:
     paths = {}
     for start_year in seasons():
-        for division in DIVISIONS:
+        for division in divisions(group):
             paths[(division, start_year)] = download_division(division, start_year)
     return paths

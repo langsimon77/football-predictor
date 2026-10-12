@@ -18,14 +18,18 @@
 - Fast results live: football-data.org scores and Lang's chat entries (`data/manual/results_manual.csv`) fill in until football-data.co.uk publishes; first entries: Palace 3-1 Forest, Hull 2-2 Everton, Liverpool 0-3 Man City. Rayo v Athletic still had no result in any source on 12 Oct.
 - Model Lab: double chance, European handicap and draw no bet picks; confidence shown as a track-record percentage with the lowest odds that pass Lang's rules; a private Bet log tab (owner-only database) that Claude settles on request.
 - Approved order for new leagues: Serie A and Ligue 1 first (same data as La Liga), Champions League afterwards as its own project.
+- Serie A and Ligue 1, step 1 done (data only, no live effect): league table with live and trial status (`src/fp/leagues.py`); trial tables in `data/processed/trial/` (`python -m fp.pipeline.data --trial`); 67 clubs and 187 spellings mapped; three matches with no football result left out (`data/manual/left_out_matches.csv`); CI builds the trial tables and probes football-data.org for `SA` and `FL1`. Findings: `docs/DATA_SOURCES.md` section 6; lesson: LEARN chapter 9.
 
 ### Open questions for Lang
-1. None open. Please answer the daily question Issue: unanswered questions cap confidence at Medium (all nine 9 Oct locks were capped).
+1. Derby pairs for Serie A and Ligue 1 (feed the cards model and the challengers), proposed 12 Oct 2026:
+   - Italy (14): Inter v Milan, Roma v Lazio, Juventus v Torino, Genoa v Sampdoria, Verona v Chievo, Juventus v Inter, Napoli v Roma, Fiorentina v Juventus, Fiorentina v Bologna, Fiorentina v Empoli, Fiorentina v Pisa, Napoli v Salernitana, Napoli v Benevento, Atalanta v Brescia.
+   - France (21): PSG v Marseille, Lyon v Saint-Etienne, Marseille v Lyon, Nice v Monaco, Lens v Lille, PSG v Paris FC, Bordeaux v Toulouse, Bordeaux v Nantes, Metz v Nancy, Ajaccio v Bastia, Le Havre v Caen, Auxerre v Dijon, Reims v Troyes, Montpellier v Nimes, and the Breton derbies Nantes v Rennes, Rennes v Brest, Rennes v Lorient, Rennes v Guingamp, Brest v Lorient, Brest v Guingamp, Lorient v Guingamp.
+2. Please answer the daily question Issue: unanswered questions cap confidence at Medium (all nine 9 Oct locks were capped).
 
 ### Next actions
 | Action | Owner |
 |---|---|
-| Serie A and Ligue 1: data audit, team mapping, walk-forward backtests on GitHub, background running, then Lang decides on publishing. | Claude, next |
+| Serie A and Ligue 1, step 2: walk-forward backtests of every model on 2021/22 to 2025/26 on GitHub (goals first; cards after Lang answers the derby list), reported against the same baselines as the EPL and La Liga. Then Lang decides on background running, then on publishing. | Claude, next |
 | Settle Lang's logged bets when asked (procedure in Claude's memory). | Claude, on request |
 | First monthly `shape_v1` refit, Sun 1 Nov (logged in `data/shape/shape_v1.json`). | Automatic |
 | News-on against news-off test after 10 gameweeks; `shape_v1` against its plain copy at the end of 2026/27. | Claude, then Lang |

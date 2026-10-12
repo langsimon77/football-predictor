@@ -697,3 +697,19 @@ You approved all three on 9 Oct 2026, and signed off Phase 7. From the 10 Oct da
 ### 8.7 One thing you can do: answer the daily Issue
 
 On 9 Oct, all nine matches that locked carried an "unanswered question" flag, because the 8 Oct question Issue got no answers. That flag caps confidence at Medium. Barcelona v Getafe (79% for Barcelona) showed High while provisional and locked as Medium for this reason alone. Ticking the boxes, even "no news", lifts the cap.
+
+## Chapter 9: Adding a league
+
+### 9.1 Trial first, live later
+
+A new league starts on **trial**. Its data is downloaded and checked like the live leagues, but it lives in its own tables (`data/processed/trial/`). No live table, forecast or page can see it. It becomes live only when you approve, after the backtests. This protects the live forecasts: the safest change is one that cannot touch them. One table, `src/fp/leagues.py`, holds every league and its status, so "make Serie A live" will be a one-word change that you approve.
+
+### 9.2 A score is not always a result
+
+Sassuolo beat Pescara 2-1 in August 2016. The league later gave Pescara a 3-0 win, because Sassuolo had fielded a player missing from their registered squad list. Our source records 0-3. A model that learns from 0-3 learns something false about both teams' football. The same goes for a match stopped after 22 minutes. So such matches go on a short list, with a link to the news report, and no model learns from them. Only three of 7,372 Serie A and Ligue 1 matches are on it. None of the 7,719 EPL and La Liga matches is.
+
+The rule is about football, not about paperwork. Verona v Roma (2020) was also given 3-0 to Verona, but our source keeps the 0-0 played on the pitch, so it stays: 0-0 is what happened.
+
+### 9.3 Checking a new source against an old one
+
+Two sources that agree are worth more than one. For every season since 2016/17, the club lists from football-data.co.uk and openfootball match, and so does every 2026/27 score so far. Kickoff times agree exactly for 91% to 100% of matches each season. Most differences are five minutes. A wrong time zone would have shown up as a gap of one or two hours on every match.

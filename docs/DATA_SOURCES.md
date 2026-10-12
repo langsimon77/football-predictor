@@ -73,7 +73,7 @@ Second tiers (`E1`, `SP2`) have the same columns. `SP2` 2016/17 has no match sta
 
 ## 4. Team ID mapping
 
-- `data/manual/teams.csv`: 67 clubs (35 English, 32 Spanish) that played in the top flight from 2016/17 to 2026/27.
+- `data/manual/teams.csv`: 67 clubs (35 English, 32 Spanish; Italian and French clubs in section 6) that played in the top flight from 2016/17 to 2026/27.
 - `data/manual/team_aliases.csv`: 198 spellings from three sources: football-data.co.uk (67), openfootball (91), and football-data.org (40, current season, added 24 Sep 2026 from the runner).
 - `tests/test_team_mapping.py`: 72 tests, all passing [V: 23 Sep 2026]. They prove:
   - every top-flight name in every season maps, giving exactly 20 clubs;
@@ -102,3 +102,39 @@ Proposal: the primary benchmark is Pinnacle closing where present, else Betfair 
 **D5. Fixture calendar.** Proposal: openfootball is the primary calendar, and football-data.org is a cross-check plus the Champions League dates, once Lang has a key. A match without a confirmed kickoff time cannot be locked. The daily run reports any match within 72 hours that still has no time.
 
 **D6. First lock deadline.** La Liga's Fri 9 Oct match kicks off at 19:00 UTC. The 05:00 UTC run on Thu 8 Oct must lock it. Phase 1 and Phase 1F must be running on GitHub Actions, with one dry run, by Wed 7 Oct. That needs the public repo.
+
+## 6. Serie A and Ligue 1 (on trial since 12 Oct 2026)
+
+Lang chose these two as the next leagues on 12 Oct 2026. They are on **trial**: downloaded and checked, kept in `data/processed/trial/`, never in a live table or a published forecast until Lang approves (`src/fp/leagues.py`). Rebuild with `python -m fp.pipeline.data --trial`.
+
+**Coverage** [V: football-data.co.uk files downloaded 12 Oct 2026]
+
+| Item | Serie A (`I1`) | Ligue 1 (`F1`) |
+|---|---|---|
+| Matches, 2016/17 to 2025/26 | 3,800 | 3,522: 20 clubs to 2022/23, 18 from 2023/24 (306 a season); 2019/20 stopped by COVID-19 after 279 |
+| Matches in 2026/27 so far | 50 (to 20 Sep) | 45 (to 20 Sep) |
+| Shots, shots on target, fouls, corners, cards | 100% every season | 100% every season |
+| `Referee` | Column absent | Column absent |
+| `HxG`, `Time`, closing odds | Same as EPL and La Liga | Same |
+
+Second divisions: Serie B (`I2`) had 22 clubs in 2016/17 and 2017/18 and 19 in 2018/19; 2016/17 has no match statistics. Ligue 2 (`F2`) has 18 clubs from 2024/25; 2016/17 has no statistics and 2017/18 no fouls. Both feed promoted-team priors, as `E1` and `SP2` do.
+
+**Facts that shape the models**
+
+1. **No referee in either league** [V]. The cards model runs as it does for La Liga: no referee effect, and an unknown referee is not a flag.
+2. **Yellow cards follow the European count** [V: football-data.co.uk notes.txt], like La Liga: a second yellow counts as a yellow plus a red. 2016/17 to 2026/27 averages: Serie A 4.35 yellows a match, Ligue 1 3.71.
+3. **Goals and corners** [V]: Serie A 2.74 goals and 9.89 corners a match, Ligue 1 2.73 and 9.56 (EPL and La Liga: section 2).
+4. **openfootball kickoffs are Italian and French local time** [V]. Where both sources give a time (2019/20 on), 91% to 100% of kickoffs agree exactly each season. Most differences are 5 minutes (35 Serie A matches in 2020/21 and 2021/22); a few are rescheduled matches. football-data.co.uk wins, as for the live leagues.
+5. **Three matches have no football result and are left out** [V: news reports linked in `data/manual/left_out_matches.csv`]:
+   - Sassuolo v Pescara, 28 Aug 2016: 2-1 on the pitch; the league gave Pescara a 3-0 win (an unregistered player). The source records 0-3.
+   - Bastia v Lyon, 16 Apr 2017: stopped at half-time (0-0) after crowd trouble; the source records the 0-3 ruling.
+   - Nantes v Toulouse, 17 May 2026: stopped after 22 minutes (0-0) by a pitch invasion.
+   Other rulings were replayed or kept the score on the pitch (Verona v Roma 2020: the source keeps 0-0, not the 3-0 ruling), so their rows stay. EPL and La Liga have no such match since 2016/17 [V: no row lacks statistics or a half-time score].
+6. **openfootball lacks 10 Serie A scores in 2024/25** [V]. It is the calendar; football-data.co.uk has every score.
+
+**Team mapping** [V: `tests/test_team_mapping.py`, 12 Oct 2026]
+- 67 new clubs in `data/manual/teams.csv` (34 Italian, 33 French), 187 new spellings in `data/manual/team_aliases.csv` (football-data.co.uk 67, openfootball 82, football-data.org 38).
+- Every name in every season maps, giving 20 clubs (18 in Ligue 1 from 2023/24). Both sources name the same clubs in all 22 league-seasons. All 95 matches played so far in 2026/27 have the same date and score in both.
+- Promoted clubs: 3 a season in Serie A; in Ligue 1, 2, plus the play-off winner in the four seasons it beat the Ligue 1 club (2017, 2022, 2024, 2025). Every one appears under the same name in the previous season's second tier.
+- Ligue 2's "Ajaccio GFCO" (Gazélec Ajaccio) is a different club from "Ajaccio" (AC Ajaccio) and has no ID.
+- football-data.org spellings for Serie A (`SA`) and Ligue 1 (`FL1`) [E: openfootball's 2026/27 names match football-data.org's for all 40 EPL and La Liga clubs, so the same names were used]. CI probes both competitions and a test maps every name; it runs on GitHub, since this Mac cannot reach the API.

@@ -14,7 +14,24 @@ from fp.ingest import football_data_csv as fd
 from fp.ingest.http import cached_copies
 
 SOURCE = "football_data_co_uk"
-TOP_TIER = {"E0": "E1", "SP1": "SP2"}  # top division -> second division
+TOP_TIER = {"E0": "E1", "SP1": "SP2", "I1": "I2", "F1": "F2"}  # top -> second division
+
+
+def clubs_expected(division: str, start_year: int) -> int:
+    """Ligue 1 shrank to 18 clubs in 2023/24. The other leagues have 20."""
+    return 18 if division == "F1" and start_year >= 2023 else 20
+
+
+def promoted_expected(division: str, start_year: int) -> int:
+    """Ligue 1 promotes two clubs, plus the play-off winner when it beats the Ligue 1 club.
+
+    Seasons where the Ligue 2 club won the play-off: 2017 (Troyes), 2022 (Auxerre),
+    2024 (Saint-Etienne), 2025 (Metz). 2020 had no play-off. Checked against the
+    football-data.co.uk files on 12 Oct 2026.
+    """
+    if division != "F1":
+        return 3
+    return 3 if start_year in (2017, 2022, 2024, 2025) else 2
 
 
 def load(division: str, start_year: int) -> pd.DataFrame:
@@ -56,7 +73,8 @@ def test_unknown_name_raises():
 def test_every_top_tier_name_maps(division, start_year):
     frame = load(division, start_year)
     ids = {teams.to_team_id(n, SOURCE) for n in names_in(frame)}
-    assert len(ids) == 20, f"{division} {start_year}: expected 20 teams, got {len(ids)}"
+    want = clubs_expected(division, start_year)
+    assert len(ids) == want, f"{division} {start_year}: expected {want} teams, got {len(ids)}"
 
 
 @pytest.mark.parametrize("division", sorted(TOP_TIER))
@@ -70,7 +88,8 @@ def test_promoted_teams_keep_their_id_across_divisions(division, start_year):
     last_season = names_in(load(division, start_year - 1))
     second_tier_last = names_in(load(TOP_TIER[division], start_year - 1))
     promoted = this_season - last_season
-    assert len(promoted) == 3, f"{division} {start_year}: {sorted(promoted)}"
+    want = promoted_expected(division, start_year)
+    assert len(promoted) == want, f"{division} {start_year}: {sorted(promoted)}"
     assert promoted <= second_tier_last, sorted(promoted - second_tier_last)
 
 
@@ -84,7 +103,7 @@ def test_fixtures_file_names_map():
         teams.to_team_id(name, SOURCE)
 
 
-OPENFOOTBALL = {"E0": "en.1", "SP1": "es.1"}
+OPENFOOTBALL = {"E0": "en.1", "SP1": "es.1", "I1": "it.1", "F1": "fr.1"}
 
 
 def load_openfootball(division: str, start_year: int) -> pd.DataFrame:
@@ -100,7 +119,7 @@ def load_openfootball(division: str, start_year: int) -> pd.DataFrame:
 @pytest.mark.parametrize("division", sorted(TOP_TIER))
 @pytest.mark.parametrize("start_year", fd.seasons())
 def test_both_sources_agree_on_the_twenty_clubs(division, start_year):
-    """openfootball and football-data.co.uk must name the same 20 clubs every season."""
+    """openfootball and football-data.co.uk must name the same clubs every season."""
     of = load_openfootball(division, start_year)
     of_ids = {teams.to_team_id(n, "openfootball") for n in set(of["team1"]) | set(of["team2"])}
     fd_ids = {teams.to_team_id(n, SOURCE) for n in names_in(load(division, start_year))}
@@ -133,7 +152,7 @@ def test_current_season_results_agree_across_sources(division):
     assert (merged["score_fd"] == merged["score_of"]).all()
 
 
-@pytest.mark.parametrize("code", ["PL", "PD"])
+@pytest.mark.parametrize("code", ["PL", "PD", "SA", "FL1"])
 def test_football_data_org_names_map(code):
     """Runs where the API is reachable (GitHub's runner). This Mac's network times out."""
     from fp.ingest import football_data_api
@@ -144,4 +163,4 @@ def test_football_data_org_names_map(code):
     frame = football_data_api.read_matches(copies[-1])
     names = set(frame["home_name"]) | set(frame["away_name"])
     ids = {teams.to_team_id(n, football_data_api.SOURCE) for n in names}
-    assert len(ids) == 20
+    assert len(ids) == (18 if code == "FL1" else 20)

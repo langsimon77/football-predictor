@@ -6,6 +6,9 @@ Outputs (data/processed/):
 - second_tier.parquet: Championship and Segunda results, for promoted-team priors.
 - referee_appointments.parquet: EPL referees as first seen in fixtures.csv.
 
+Each builder takes a group of leagues (fp.leagues). The defaults build the live
+leagues only, so the leagues on trial never reach a live table.
+
 Every row that holds an outcome also holds result_available_utc: the earliest time
 the pipeline may treat that outcome as known. The leakage guard checks it.
 """
@@ -17,7 +20,7 @@ from datetime import UTC, datetime
 
 import pandas as pd
 
-from fp import ROOT
+from fp import ROOT, leagues
 from fp.ingest import football_data_csv as fd
 from fp.ingest import openfootball
 from fp.ingest.http import cached_copies
@@ -27,9 +30,14 @@ log = logging.getLogger(__name__)
 
 PROCESSED = ROOT / "data" / "processed"
 
-# division -> (league name, openfootball code)
-TOP_DIVISIONS = {"E0": ("EPL", "en.1"), "SP1": ("LaLiga", "es.1")}
-SECOND_DIVISIONS = {"E1": "EPL", "SP2": "LaLiga"}
+# division -> (league name, openfootball code), for every known league
+TOP_DIVISIONS = {lg.division: (lg.code, lg.openfootball) for lg in leagues.ALL}
+Group = tuple[leagues.League, ...]
+
+# Matches whose recorded score is not a football result (data/manual/left_out_matches.csv):
+# matches stopped before full time, and rulings that replaced the score on the pitch.
+# No model learns from them. None in the EPL or La Liga since 2016/17 (checked 12 Oct 2026).
+LEFT_OUT_CSV = ROOT / "data" / "manual" / "left_out_matches.csv"
 
 # A match lasts about 2 hours with stoppages. Treat its result as known 3 hours
 # after kickoff. Conservative on purpose: later is safe, earlier would leak.
@@ -164,20 +172,28 @@ def build_top_tier(division: str, season: int) -> pd.DataFrame:
     out["result_available_utc"] = out["kickoff_utc"] + delay
     for column in COUNT_COLUMNS:
         out[column] = out[column].astype("Int64")
-    return out
+    dropped = out["match_id"].isin(left_out())
+    if dropped.any():
+        log.info("%s %s: left out %d matches with no football result",
+                 division, season, int(dropped.sum()))
+    return out[~dropped].reset_index(drop=True)
 
 
-def build_matches() -> pd.DataFrame:
-    frames = [build_top_tier(d, y) for d in TOP_DIVISIONS for y in fd.seasons()]
+def left_out() -> set[str]:
+    return set(pd.read_csv(LEFT_OUT_CSV)["match_id"])
+
+
+def build_matches(group: Group = leagues.LIVE) -> pd.DataFrame:
+    frames = [build_top_tier(lg.division, y) for lg in group for y in fd.seasons()]
     matches = pd.concat(frames, ignore_index=True)
     return matches.sort_values(["kickoff_utc", "match_id"]).reset_index(drop=True)
 
 
-def build_fixtures(season: int = fd.CURRENT_SEASON) -> pd.DataFrame:
+def build_fixtures(season: int = fd.CURRENT_SEASON, group: Group = leagues.LIVE) -> pd.DataFrame:
     """The full calendar for one season from openfootball."""
     frames = []
-    for division in TOP_DIVISIONS:
-        cal = _calendar(division, season)
+    for lg in group:
+        cal = _calendar(lg.division, season)
         cal["status"] = cal["home_goals"].notna().map({True: "played", False: "scheduled"})
         frames.append(cal[[
             "match_id", "league", "season", "round", "date", "kickoff_utc", "time_confirmed",
@@ -186,10 +202,10 @@ def build_fixtures(season: int = fd.CURRENT_SEASON) -> pd.DataFrame:
     return pd.concat(frames, ignore_index=True).sort_values(["date", "match_id"])
 
 
-def build_second_tier() -> pd.DataFrame:
+def build_second_tier(group: Group = leagues.LIVE) -> pd.DataFrame:
     """Second-tier results. Clubs never promoted have no canonical ID, so names stay."""
     frames = []
-    for division, league in SECOND_DIVISIONS.items():
+    for division, league in ((lg.second, lg.code) for lg in group):
         for season in fd.seasons():
             raw = fd.read_csv(_latest(fd.SOURCE, f"{division}_{fd.season_code(season)}.csv"))
             frame = pd.DataFrame({
