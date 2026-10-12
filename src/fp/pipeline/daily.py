@@ -35,6 +35,7 @@ import pandas as pd
 from fp import ROOT, ledger
 from fp.features import rolling
 from fp.ingest import matches as build
+from fp.ingest import results_feed
 from fp.models import bayes_dc, elo, posterior_store, shape
 from fp.models import dixon_coles as dc
 from fp.models.priors import PromotedPrior, season_teams
@@ -291,18 +292,29 @@ def build_rows(cands: pd.DataFrame, models: dict[str, LeagueModels], now: pd.Tim
 
 
 def record_results(matches: pd.DataFrame, fixtures: pd.DataFrame, locked: pd.DataFrame,
-                   now: pd.Timestamp, path: Path) -> pd.DataFrame:
-    """Outcomes for locked matches: football-data.co.uk first, openfootball score as fallback."""
+                   now: pd.Timestamp, path: Path, extra: pd.DataFrame | None = None
+                   ) -> pd.DataFrame:
+    """Outcomes for locked matches: football-data.co.uk first; until its row arrives,
+    the best fast source (fp.ingest.results_feed: Lang's entry, football-data.org,
+    openfootball). Without `extra`, openfootball is the only fallback."""
     ids = set(locked["match_id"]) if len(locked) else set()
     full = known_as_of(matches[matches["match_id"].isin(ids)], now)
-    rows = full[["match_id", "home_goals", "away_goals", "home_corners", "away_corners",
-                 "home_yellows", "away_yellows", "home_reds", "away_reds"]].copy()
+    cols = ["match_id", "home_goals", "away_goals", "home_corners", "away_corners",
+            "home_yellows", "away_yellows", "home_reds", "away_reds"]
+    rows = full[cols].copy()
     rows["source"] = "football_data_co_uk"
-    fallback = fixtures[fixtures["match_id"].isin(ids - set(rows["match_id"]))
-                        & fixtures["home_goals"].notna()
-                        & (fixtures["kickoff_utc"] + build.RESULT_DELAY <= now)]
-    fb = fallback[["match_id", "home_goals", "away_goals"]].assign(source="openfootball")
+    if extra is not None:
+        fast = extra[extra["match_id"].isin(ids - set(rows["match_id"]))
+                     & (extra["result_available_utc"] <= now)]
+        fb = fast.reindex(columns=cols).assign(source=fast["result_source"].to_numpy())
+    else:
+        fallback = fixtures[fixtures["match_id"].isin(ids - set(rows["match_id"]))
+                            & fixtures["home_goals"].notna()
+                            & (fixtures["kickoff_utc"] + build.RESULT_DELAY <= now)]
+        fb = fallback[["match_id", "home_goals", "away_goals"]].assign(source="openfootball")
     results = pd.concat([rows, fb], ignore_index=True)
+    for c in cols[1:]:  # whole numbers, missing where a fast source had no statistics
+        results[c] = pd.to_numeric(results[c], errors="coerce").round().astype("Int64")
     results["recorded_utc"] = now
     if len(results):
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -389,6 +401,11 @@ def write_report(ledger_frame: pd.DataFrame, results: pd.DataFrame, now: pd.Time
             probs = g[["p_home", "p_draw", "p_away"]].to_numpy(dtype=float)
             lines.append(f"| `{model}` | {len(g)} | {metrics.rps(probs, y).mean():.3f} | "
                          f"{(probs.argmax(axis=1) == y).mean():.0%} |")
+        sources = results["source"].value_counts()
+        waiting = int(len(results) - sources.get("football_data_co_uk", 0))
+        lines += ["", "Results so far: " + ", ".join(f"{k} {v}" for k, v in sources.items())
+                  + (f". {waiting} still wait for football-data.co.uk, so their corners and "
+                     "cards are scored only if Lang entered them." if waiting else ".")]
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
@@ -430,6 +447,11 @@ class Context:
     publish_dir: Path | None = None
     site_dir: Path | None = None
     shape_store: Path = shape.STORE
+    # Matches table plus score-only rows from fast sources (fp.ingest.results_feed),
+    # for the goals models and the scoring; None means the matches table alone.
+    goal_matches: pd.DataFrame | None = None
+    score_only: pd.DataFrame | None = None
+    fast_sources: list[pd.DataFrame] | None = None
 
 
 def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataFrame:
@@ -444,7 +466,11 @@ def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataF
     # Refit every run, lock day or not (spec S5.6 step 1). This keeps the fallback
     # store fresh, so a failed fit on a lock day falls back to yesterday's posterior.
     bayes = ctx.with_bayes
-    models = {lg: fit_league(ctx.matches, ctx.fixtures, lg, now, ctx.prior, season,
+    goal_matches = ctx.goal_matches if ctx.goal_matches is not None else ctx.matches
+    if ctx.fast_sources:
+        for problem in results_feed.cross_check(ctx.matches, ctx.fast_sources):
+            log.warning("result check: %s", problem)
+    models = {lg: fit_league(goal_matches, ctx.fixtures, lg, now, ctx.prior, season,
                              ctx.second_tier, ctx.promo, bayes, ctx.store) for lg in LEAGUES}
     sh = (shape.current(ctx.matches, existing, now, ctx.shape_store, save=not dry_run)
           if SHAPE_LIVE and bayes else None)
@@ -490,7 +516,8 @@ def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataF
             questions = question_list(news, opened)
         except Exception:
             log.exception("question queue failed after locking")
-    results = (record_results(ctx.matches, ctx.fixtures, existing, now, ctx.results_path)
+    results = (record_results(ctx.matches, ctx.fixtures, existing, now, ctx.results_path,
+                              ctx.score_only)
                if not dry_run else pd.DataFrame())
     if ctx.report_path is not None and not dry_run:
         write_report(existing, results, now, ctx.report_path)
@@ -548,7 +575,8 @@ def publish_run(ctx: Context, now: pd.Timestamp, locked: pd.DataFrame, results: 
         rows = shadows.add_tiers(rows, PRIMARY_MODEL)
     assert ctx.publish_dir is not None
     view = publish.RunView(
-        now=now, ledger=locked, results=results, provisional=rows, matches=ctx.matches,
+        now=now, ledger=locked, results=results, provisional=rows,
+        matches=ctx.goal_matches if ctx.goal_matches is not None else ctx.matches,
         fixtures=fx, models=models, counts=counts, features=features, referees=referees,
         manager_flags=news.manager_flags if news is not None else set(),
         names=_short_names(), questions=questions, model_version=model_version()[0],
@@ -588,11 +616,19 @@ def main(argv: list[str] | None = None) -> int:
 def _main(args: argparse.Namespace) -> int:
     data_pipeline.main(skip_download=args.offline)
     matches = pd.read_parquet(build.PROCESSED / "matches.parquet")
+    fixtures = pd.read_parquet(build.PROCESSED / "fixtures.parquet")
     second_tier = pd.read_parquet(build.PROCESSED / "second_tier.parquet")
     replay = args.replay is not None
+    fast = results_feed.collect(fixtures, offline=args.offline)
+    score_only = results_feed.score_only_rows(matches, fixtures, fast)
+    log.info("fast results: %d finished matches waiting for football-data.co.uk (%s)",
+             len(score_only), score_only["result_source"].value_counts().to_dict()
+             if len(score_only) else {})
     ctx = Context(
         matches=matches,
-        fixtures=pd.read_parquet(build.PROCESSED / "fixtures.parquet"),
+        goal_matches=results_feed.with_scores(matches, score_only),
+        score_only=score_only, fast_sources=fast,
+        fixtures=fixtures,
         second_tier=second_tier,
         prior=PromotedPrior(matches),
         promo=fit_promotion_model(matches, second_tier),

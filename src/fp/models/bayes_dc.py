@@ -151,14 +151,19 @@ def _arrays(train: pd.DataFrame, teams: list[str], as_of: pd.Timestamp, p: Bayes
         "x": x, "y": y, "w": np.exp(-p.xi * age),
         "m00": ((x == 0) & (y == 0)).astype(float), "m01": ((x == 0) & (y == 1)).astype(float),
         "m10": ((x == 1) & (y == 0)).astype(float), "m11": ((x == 1) & (y == 1)).astype(float),
-        "xs": _column(train, "home_sot"), "ys": _column(train, "away_sot"),
+        "xs": np.nan_to_num(_column(train, "home_sot")),
+        "ys": np.nan_to_num(_column(train, "away_sot")),
+        # 1 where both shot counts are known. A score-only result (fp.ingest.results_feed)
+        # still counts for goals; its missing shots simply add nothing.
+        "ms": (np.isfinite(_column(train, "home_sot"))
+               & np.isfinite(_column(train, "away_sot"))).astype(float),
     }
 
 
 def _column(frame: pd.DataFrame, name: str) -> np.ndarray:
-    """A numeric column, or zeros when absent (it is then unused)."""
+    """A numeric column (missing values as NaN), or zeros when absent (it is then unused)."""
     if name in frame:
-        return frame[name].to_numpy(dtype=float)
+        return frame[name].to_numpy(dtype=float, na_value=np.nan)
     return np.zeros(len(frame))
 
 
@@ -204,7 +209,7 @@ def build_model(d: dict, n: int, prior_mean_att: np.ndarray, prior_sd_att: np.nd
             es_h = mu_s + home_s + b_att * att[d["hi"]] + b_def * dfn[d["ai"]]
             es_a = mu_s + b_att * att[d["ai"]] + b_def * dfn[d["hi"]]
             ll_s = d["xs"] * es_h - pt.exp(es_h) + d["ys"] * es_a - pt.exp(es_a)
-            pm.Potential("shots_on_target", pt.sum(d["w"] * ll_s))
+            pm.Potential("shots_on_target", pt.sum(d["w"] * d["ms"] * ll_s))
     return model
 
 
@@ -221,8 +226,6 @@ def fit(train: pd.DataFrame, as_of: pd.Timestamp, teams: list[str],
     promoted_priors = promoted_priors or {}
     age = (as_of - train["kickoff_utc"]).dt.total_seconds() / 86400
     train = train[age <= p.window_days]
-    if p.use_sot:
-        train = train.dropna(subset=["home_sot", "away_sot"])
     teams = sorted(set(teams) | set(train["home_id"]) | set(train["away_id"]))
     d = _arrays(train, teams, as_of, p)
     n = len(teams)
