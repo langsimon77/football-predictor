@@ -39,6 +39,9 @@ jobs:
       - name: Download, build, and validate data
         run: make data
 
+      - name: Same for the leagues on trial (Serie A, Ligue 1), kept apart from live tables
+        run: uv run python -m fp.pipeline.data --trial
+
       - name: Probe football-data.org (its files feed a mapping test)
         continue-on-error: true
         env:

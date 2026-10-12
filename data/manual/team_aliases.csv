@@ -66,6 +66,73 @@ football_data_co_uk,Valencia,valencia
 football_data_co_uk,Valladolid,valladolid
 football_data_co_uk,Vallecano,rayo_vallecano
 football_data_co_uk,Villarreal,villarreal
+football_data_co_uk,Atalanta,atalanta
+football_data_co_uk,Benevento,benevento
+football_data_co_uk,Bologna,bologna
+football_data_co_uk,Brescia,brescia
+football_data_co_uk,Cagliari,cagliari
+football_data_co_uk,Chievo,chievo
+football_data_co_uk,Como,como
+football_data_co_uk,Cremonese,cremonese
+football_data_co_uk,Crotone,crotone
+football_data_co_uk,Empoli,empoli
+football_data_co_uk,Fiorentina,fiorentina
+football_data_co_uk,Frosinone,frosinone
+football_data_co_uk,Genoa,genoa
+football_data_co_uk,Inter,inter
+football_data_co_uk,Juventus,juventus
+football_data_co_uk,Lazio,lazio
+football_data_co_uk,Lecce,lecce
+football_data_co_uk,Milan,milan
+football_data_co_uk,Monza,monza
+football_data_co_uk,Napoli,napoli
+football_data_co_uk,Palermo,palermo
+football_data_co_uk,Parma,parma
+football_data_co_uk,Pescara,pescara
+football_data_co_uk,Pisa,pisa
+football_data_co_uk,Roma,roma
+football_data_co_uk,Salernitana,salernitana
+football_data_co_uk,Sampdoria,sampdoria
+football_data_co_uk,Sassuolo,sassuolo
+football_data_co_uk,Spal,spal
+football_data_co_uk,Spezia,spezia
+football_data_co_uk,Torino,torino
+football_data_co_uk,Udinese,udinese
+football_data_co_uk,Venezia,venezia
+football_data_co_uk,Verona,hellas_verona
+football_data_co_uk,Ajaccio,ajaccio
+football_data_co_uk,Amiens,amiens
+football_data_co_uk,Angers,angers
+football_data_co_uk,Auxerre,auxerre
+football_data_co_uk,Bastia,bastia
+football_data_co_uk,Bordeaux,bordeaux
+football_data_co_uk,Brest,brest
+football_data_co_uk,Caen,caen
+football_data_co_uk,Clermont,clermont
+football_data_co_uk,Dijon,dijon
+football_data_co_uk,Guingamp,guingamp
+football_data_co_uk,Le Havre,le_havre
+football_data_co_uk,Le Mans,le_mans
+football_data_co_uk,Lens,lens
+football_data_co_uk,Lille,lille
+football_data_co_uk,Lorient,lorient
+football_data_co_uk,Lyon,lyon
+football_data_co_uk,Marseille,marseille
+football_data_co_uk,Metz,metz
+football_data_co_uk,Monaco,monaco
+football_data_co_uk,Montpellier,montpellier
+football_data_co_uk,Nancy,nancy
+football_data_co_uk,Nantes,nantes
+football_data_co_uk,Nice,nice
+football_data_co_uk,Nimes,nimes
+football_data_co_uk,Paris FC,paris_fc
+football_data_co_uk,Paris SG,psg
+football_data_co_uk,Reims,reims
+football_data_co_uk,Rennes,rennes
+football_data_co_uk,St Etienne,saint_etienne
+football_data_co_uk,Strasbourg,strasbourg
+football_data_co_uk,Toulouse,toulouse
+football_data_co_uk,Troyes,troyes
 openfootball,AFC Bournemouth,bournemouth
 openfootball,Arsenal FC,arsenal
 openfootball,Aston Villa,aston_villa
@@ -157,6 +224,88 @@ openfootball,UD Almería,almeria
 openfootball,UD Las Palmas,las_palmas
 openfootball,Valencia CF,valencia
 openfootball,Villarreal CF,villarreal
+openfootball,AC Milan,milan
+openfootball,AC Monza,monza
+openfootball,AC Pisa 1909,pisa
+openfootball,ACF Fiorentina,fiorentina
+openfootball,AS Roma,roma
+openfootball,Atalanta,atalanta
+openfootball,Atalanta BC,atalanta
+openfootball,Benevento Calcio,benevento
+openfootball,Bologna FC,bologna
+openfootball,Bologna FC 1909,bologna
+openfootball,Brescia Calcio,brescia
+openfootball,Cagliari Calcio,cagliari
+openfootball,Chievo Verona,chievo
+openfootball,Como 1907,como
+openfootball,Delfino Pescara,pescara
+openfootball,Empoli FC,empoli
+openfootball,FC Crotone,crotone
+openfootball,FC Internazionale Milano,inter
+openfootball,Frosinone Calcio,frosinone
+openfootball,Genoa CFC,genoa
+openfootball,Hellas Verona,hellas_verona
+openfootball,Hellas Verona FC,hellas_verona
+openfootball,Inter,inter
+openfootball,Juventus,juventus
+openfootball,Juventus FC,juventus
+openfootball,Lazio Roma,lazio
+openfootball,Parma Calcio 1913,parma
+openfootball,SPAL 2013 Ferrara,spal
+openfootball,SS Lazio,lazio
+openfootball,SSC Napoli,napoli
+openfootball,Sampdoria,sampdoria
+openfootball,Sassuolo Calcio,sassuolo
+openfootball,Spezia Calcio,spezia
+openfootball,Torino FC,torino
+openfootball,UC Sampdoria,sampdoria
+openfootball,US Cremonese,cremonese
+openfootball,US Lecce,lecce
+openfootball,US Palermo,palermo
+openfootball,US Salernitana 1919,salernitana
+openfootball,US Sassuolo Calcio,sassuolo
+openfootball,Udinese Calcio,udinese
+openfootball,Venezia FC,venezia
+openfootball,AC Ajaccio,ajaccio
+openfootball,AJ Auxerre,auxerre
+openfootball,AS Monaco,monaco
+openfootball,AS Monaco FC,monaco
+openfootball,AS Nancy Lorraine,nancy
+openfootball,AS Saint-Étienne,saint_etienne
+openfootball,Amiens SC,amiens
+openfootball,Angers SCO,angers
+openfootball,Clermont Foot 63,clermont
+openfootball,Dijon FCO,dijon
+openfootball,EA Guingamp,guingamp
+openfootball,ES Troyes AC,troyes
+openfootball,ESTAC Troyes,troyes
+openfootball,FC Lorient,lorient
+openfootball,FC Metz,metz
+openfootball,FC Nantes,nantes
+openfootball,Girondins Bordeaux,bordeaux
+openfootball,Le Havre AC,le_havre
+openfootball,Le Mans FC,le_mans
+openfootball,Lille OSC,lille
+openfootball,Montpellier HSC,montpellier
+openfootball,Nîmes Olympique,nimes
+openfootball,OGC Nice,nice
+openfootball,Olympique Lyonnais,lyon
+openfootball,Olympique Marseille,marseille
+openfootball,Olympique de Marseille,marseille
+openfootball,Paris FC,paris_fc
+openfootball,Paris Saint-Germain,psg
+openfootball,Paris Saint-Germain FC,psg
+openfootball,RC Lens,lens
+openfootball,RC Strasbourg,strasbourg
+openfootball,RC Strasbourg Alsace,strasbourg
+openfootball,Racing Club de Lens,lens
+openfootball,SC Bastia,bastia
+openfootball,SM Caen,caen
+openfootball,Stade Brestois 29,brest
+openfootball,Stade Rennais,rennes
+openfootball,Stade Rennais FC 1901,rennes
+openfootball,Stade de Reims,reims
+openfootball,Toulouse FC,toulouse
 football_data_org,AFC Bournemouth,bournemouth
 football_data_org,Arsenal FC,arsenal
 football_data_org,Aston Villa FC,aston_villa
@@ -197,3 +346,41 @@ football_data_org,Real Sociedad de Fútbol,real_sociedad
 football_data_org,Sevilla FC,sevilla
 football_data_org,Valencia CF,valencia
 football_data_org,Villarreal CF,villarreal
+football_data_org,AC Milan,milan
+football_data_org,AC Monza,monza
+football_data_org,ACF Fiorentina,fiorentina
+football_data_org,AS Roma,roma
+football_data_org,Atalanta BC,atalanta
+football_data_org,Bologna FC 1909,bologna
+football_data_org,Cagliari Calcio,cagliari
+football_data_org,Como 1907,como
+football_data_org,FC Internazionale Milano,inter
+football_data_org,Frosinone Calcio,frosinone
+football_data_org,Genoa CFC,genoa
+football_data_org,Juventus FC,juventus
+football_data_org,Parma Calcio 1913,parma
+football_data_org,SS Lazio,lazio
+football_data_org,SSC Napoli,napoli
+football_data_org,Torino FC,torino
+football_data_org,US Lecce,lecce
+football_data_org,US Sassuolo Calcio,sassuolo
+football_data_org,Udinese Calcio,udinese
+football_data_org,Venezia FC,venezia
+football_data_org,AJ Auxerre,auxerre
+football_data_org,AS Monaco FC,monaco
+football_data_org,Angers SCO,angers
+football_data_org,ES Troyes AC,troyes
+football_data_org,FC Lorient,lorient
+football_data_org,Le Havre AC,le_havre
+football_data_org,Le Mans FC,le_mans
+football_data_org,Lille OSC,lille
+football_data_org,OGC Nice,nice
+football_data_org,Olympique Lyonnais,lyon
+football_data_org,Olympique de Marseille,marseille
+football_data_org,Paris FC,paris_fc
+football_data_org,Paris Saint-Germain FC,psg
+football_data_org,RC Strasbourg Alsace,strasbourg
+football_data_org,Racing Club de Lens,lens
+football_data_org,Stade Brestois 29,brest
+football_data_org,Stade Rennais FC 1901,rennes
+football_data_org,Toulouse FC,toulouse

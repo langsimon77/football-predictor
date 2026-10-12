@@ -1,8 +1,9 @@
 """Fixture calendar from openfootball/football.json (public domain, CC0).
 
 Each season file lists all 380 matches with date and local kickoff time.
-EPL times are UK local time. La Liga times are Spanish local time.
-Verified 23 Sep 2026 by matching the first 2026/27 matches against football-data.co.uk.
+Times are local time in each league's country (fp.leagues). EPL and La Liga verified
+23 Sep 2026, Serie A and Ligue 1 on 12 Oct 2026, by matching kickoffs against
+football-data.co.uk.
 """
 
 from __future__ import annotations
@@ -12,12 +13,13 @@ from pathlib import Path
 
 import pandas as pd
 
+from fp import leagues
 from fp.ingest.football_data_csv import CURRENT_SEASON, FIRST_SEASON, season_code
 from fp.ingest.http import fetch
 
 SOURCE = "openfootball"
 BASE_URL = "https://raw.githubusercontent.com/openfootball/football.json/master"
-LEAGUES = {"en.1": "Europe/London", "es.1": "Europe/Madrid"}  # file code -> local time zone
+TIME_ZONES = {lg.openfootball: lg.time_zone for lg in leagues.ALL}  # file code -> local time
 
 
 def download(code: str, start_year: int) -> Path:
@@ -44,7 +46,7 @@ def read(path: Path, code: str) -> pd.DataFrame:
         matches["date"] + " " + matches["time"].where(matches["time_confirmed"], "00:00"),
         format="%Y-%m-%d %H:%M",
     )
-    utc = local.dt.tz_localize(LEAGUES[code]).dt.tz_convert("UTC")
+    utc = local.dt.tz_localize(TIME_ZONES[code]).dt.tz_convert("UTC")
     matches["kickoff_utc"] = utc.where(matches["time_confirmed"])
 
     # Scores come as {"ft": [h, a], "ht": [...]}, or as a bare [h, a] when no
@@ -59,9 +61,9 @@ def read(path: Path, code: str) -> pd.DataFrame:
     return matches
 
 
-def download_all() -> dict[tuple[str, int], Path]:
+def download_all(group: tuple[leagues.League, ...] = leagues.LIVE) -> dict[tuple[str, int], Path]:
     return {
-        (code, year): download(code, year)
+        (lg.openfootball, year): download(lg.openfootball, year)
         for year in range(FIRST_SEASON, CURRENT_SEASON + 1)
-        for code in LEAGUES
+        for lg in group
     }

@@ -16,6 +16,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from fp import leagues
 from fp.config import MissingSecretError, secret
 from fp.ingest.football_data_csv import CURRENT_SEASON
 from fp.ingest.http import fetch
@@ -23,6 +24,8 @@ from fp.ingest.http import fetch
 SOURCE = "football_data_org"
 BASE_URL = "https://api.football-data.org/v4"
 COMPETITIONS = {"PL": "EPL", "PD": "LaLiga", "CL": "UCL"}
+# Probed in CI only, so the mapping tests can check their club names.
+TRIAL_COMPETITIONS = {lg.fdorg: lg.code for lg in leagues.TRIAL}
 
 
 def download_matches(code: str, season: int = CURRENT_SEASON, refresh: bool = True) -> Path:
@@ -70,7 +73,7 @@ def probe() -> int:
     except MissingSecretError:
         print("football-data.org: no token set; skipping probe")
         return 0
-    for code in COMPETITIONS:
+    for code in [*COMPETITIONS, *TRIAL_COMPETITIONS]:
         try:
             frame = read_matches(download_matches(code))
         except Exception as error:  # report every failure, keep going
