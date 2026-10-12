@@ -21,6 +21,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from fp import leagues
 from fp.evaluate import backtest as bt
 from fp.features import rolling
 from fp.models.priors import season_teams
@@ -66,7 +67,7 @@ def schedule(matches: pd.DataFrame, frame: pd.DataFrame) -> pd.DataFrame:
 def promoted_teams(matches: pd.DataFrame) -> dict[tuple[str, int], int]:
     """1 for a club in its first top-flight season after promotion, else 0."""
     promoted: dict[tuple[str, int], int] = {}
-    for league in ("EPL", "LaLiga"):
+    for league in leagues.codes_in(matches["league"]):
         tbs = season_teams(matches, league)
         for season, teams in tbs.items():
             for team in teams:

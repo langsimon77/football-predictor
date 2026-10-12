@@ -15,6 +15,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from fp import leagues
 from fp.models import dixon_coles as dc
 
 ESTIMATION_SEASONS = (2017, 2018, 2019, 2020)
@@ -33,9 +34,9 @@ def promoted(teams_by_season: dict[int, set[str]], season: int) -> set[str]:
 
 
 def estimate(matches: pd.DataFrame) -> tuple[float, float]:
-    """Average first-season (attack, defence) of promoted clubs, both leagues pooled."""
+    """Average first-season (attack, defence) of promoted clubs, the table's leagues pooled."""
     values = []
-    for league in ("EPL", "LaLiga"):
+    for league in leagues.codes_in(matches["league"]):
         teams = season_teams(matches, league)
         for season in ESTIMATION_SEASONS:
             games = matches[(matches["league"] == league) & (matches["season"] == season)]

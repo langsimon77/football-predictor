@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime
+from pathlib import Path
 
 import pandas as pd
 
@@ -29,6 +30,7 @@ from fp.teams import map_series, to_team_id
 log = logging.getLogger(__name__)
 
 PROCESSED = ROOT / "data" / "processed"
+TRIAL_DIR = PROCESSED / "trial"  # the leagues on trial, apart from every live table
 
 # division -> (league name, openfootball code), for every known league
 TOP_DIVISIONS = {lg.division: (lg.code, lg.openfootball) for lg in leagues.ALL}
@@ -76,6 +78,11 @@ ODDS_COLUMNS = {
     "AHCh": "ah_line_close", "AvgCAHH": "odds_avg_close_ah_home",
     "AvgCAHA": "odds_avg_close_ah_away",
 }
+
+
+def processed_dir(league: str) -> Path:
+    """Where a league's processed tables live."""
+    return PROCESSED if leagues.get(league).status == "live" else TRIAL_DIR
 
 
 def match_id(league: str, season: int, home_id: str, away_id: str) -> str:

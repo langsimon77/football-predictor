@@ -22,6 +22,9 @@ on:
       sampler:
         description: "nutpie or numpyro"
         default: "numpyro"
+      leagues:
+        description: "Leagues, space separated (on trial: SerieA Ligue1)"
+        default: "EPL LaLiga"
 
 permissions:
   contents: read
@@ -31,9 +34,12 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       seasons: ${{ steps.s.outputs.seasons }}
+      leagues: ${{ steps.s.outputs.leagues }}
     steps:
       - id: s
-        run: echo "seasons=$(echo '${{ inputs.seasons }}' | jq -cR 'split(" ") | map(select(. != ""))')" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "seasons=$(echo '${{ inputs.seasons }}' | jq -cR 'split(" ") | map(select(. != ""))')" >> "$GITHUB_OUTPUT"
+          echo "leagues=$(echo '${{ inputs.leagues }}' | jq -cR 'split(" ") | map(select(. != ""))')" >> "$GITHUB_OUTPUT"
 
   backtest:
     needs: plan
@@ -42,7 +48,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        league: [EPL, LaLiga]
+        league: ${{ fromJSON(needs.plan.outputs.leagues) }}
         season: ${{ fromJSON(needs.plan.outputs.seasons) }}
     steps:
       - uses: actions/checkout@v7
@@ -63,7 +69,12 @@ jobs:
           restore-keys: raw-
 
       - name: Build data
-        run: make data
+        run: |
+          make data
+          # Leagues on trial keep their tables apart (fp.leagues); build them too.
+          if uv run python -c "from fp import leagues; assert leagues.get('${{ matrix.league }}').status == 'trial'"; then
+            uv run python -m fp.pipeline.data --trial
+          fi
 
       - name: Walk-forward backtest
         run: |

@@ -28,7 +28,7 @@ from fp.ingest import openfootball
 from fp.validate import freshness, schemas
 
 DUCKDB_PATH = build.PROCESSED / "football.duckdb"
-TRIAL_DIR = build.PROCESSED / "trial"
+TRIAL_DIR = build.TRIAL_DIR
 
 TABLES: dict[str, tuple[Callable[[], pd.DataFrame], Callable[[], pa.DataFrameSchema]]] = {
     "matches": (build.build_matches, schemas.matches_schema),
