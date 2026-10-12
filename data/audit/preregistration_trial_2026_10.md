@@ -7,7 +7,7 @@ Written 12 Oct 2026, before any Serie A or Ligue 1 forecast was made. Lang appro
 - Walk-forward forecasts for 2021/22 to 2025/26, both leagues, with the live code and the live settings. Nothing is tuned on Serie A or Ligue 1 results, with one exception that copies the live procedure: the challengers' settings are chosen by time-ordered cross-validation on 2017/18 to 2020/21.
 - Models: `dc_bayes_v1` (shots on target, NumPyro, weekly refits), fast Dixon-Coles, Elo, league base rates, `corners_total_poisson_v1`, `cards_nb_v1` (no referee: neither league publishes one), the four challengers.
 - The published goals forecast is `dc_bayes_v1` with `shape_v1`, its four numbers refitted at the first lock of each month on the previous 730 days of the two trial leagues' own stored forecasts (the live rule, with the live leagues pooled the same way).
-- Each league's promoted-club priors are estimated from its own league and second division, 2017/18 to 2020/21, as for the live leagues.
+- Promoted-club priors are estimated on 2017/18 to 2020/21 from the two trial leagues and their second divisions pooled, as the EPL and La Liga are pooled for the live priors.
 
 ## Test seasons
 
