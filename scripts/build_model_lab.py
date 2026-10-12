@@ -369,6 +369,7 @@ def main(argv: list[str] | None = None) -> int:
     odds_files = sorted((ROOT / "data" / "raw" / "football_data_co_uk").glob("*/fixtures.csv"))
     pairs = pairs_lab.upcoming(args.pages_dir, sh, short, odds_files[-1] if odds_files else None)
     pairs["track"] = pairs_lab.track_record(fixed, gf, BACKTESTS, matches, short)
+    pairs["record"] = pairs_lab.pick_record(fixed, gf, BACKTESTS, matches)
     pairs["odds_file"] = odds_files[-1].parent.name if odds_files else None
     data = {
         "built": f"{pd.Timestamp.now(tz='UTC'):%Y-%m-%d %H:%M} UTC",

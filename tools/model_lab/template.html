@@ -419,6 +419,9 @@ tr.hl td:first-child { font-weight: 700; }
 .leg-in { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 8px; }
 .leg-in h4 { margin: 0; font-size: 14px; }
 .leg-in select, .leg-in input[type="number"] { width: 100%; }
+table.picks th, table.picks td { padding: 5px 6px; font-size: 12.5px; }
+table.picks td:first-child { font-weight: 700; }
+.picks-box { display: grid; gap: 4px; }
 .verdicts { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 14px; }
 .tagline { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-2); }
 .findings li b { color: var(--ink); }
@@ -946,6 +949,69 @@ tr.hl td:first-child { font-weight: 700; }
   function fact(k, v) { return "<li><b>" + esc(k) + "</b><span>" + esc(v) + "</span></li>"; }
   function gloss(term, tech, text) { return "<div><dt>" + esc(term) + '<span class="tech">' + esc(tech) + "</span></dt><dd>" + esc(text) + "</dd></div>"; }
 
+  // ============================================================ PICK HELPERS
+  // Lang's rules from the betting record (11 Oct 2026). A pick "passes" only when the
+  // bookmaker's price beats the after-tax break-even of the model's chance; the page
+  // shows that price. It never recommends a stake or a bet.
+  const PREF0 = {
+    "Home win": "first", "Draw no bet": "first", "European handicap": "first", "Draw in the first 10 minutes": "first",
+    "Over 1.5 goals": "reason", "Double chance": "reason", "Corners": "reason", "Total bookings (cards)": "reason", "Over 2.5 goals or more": "reason", "Draw (full time)": "reason",
+    "Away win": "avoid", "Basketball winner": "avoid", "Under goals": "avoid", "Both teams score": "avoid",
+    "Double chance + goals or both score (combined market)": "avoid", "Bet builder (2 or more markets in one pick)": "never",
+  };
+  function pickMarket(pk) {
+    const k = pk.k;
+    if (k === "H") return "Home win";
+    if (k === "A") return "Away win";
+    if (k === "D") return "Draw (full time)";
+    if (pk.fam === "dc") return "Double chance";
+    if (pk.fam === "eh") return "European handicap";
+    if (pk.fam === "dnb") return "Draw no bet";
+    if (k === "G>1.5") return "Over 1.5 goals";
+    if (k.startsWith("G>")) return "Over 2.5 goals or more";
+    if (k.startsWith("G<")) return "Under goals";
+    if (pk.fam === "btts") return "Both teams score";
+    if (pk.fam === "corners") return "Corners";
+    if (pk.fam === "yellows") return "Total bookings (cards)";
+    return "Other";
+  }
+  function minOdds(pk) {
+    // Lowest odds at which the pick pays over time after the 20% tax, if the chance is right.
+    if (pk.fam === "dnb") { const lose = Math.max(1 - pk.p - pk.refund, 0); return 1 + lose / (0.8 * pk.p); }
+    return 1 + (1 / pk.p - 1) / 0.8;
+  }
+  function recordFor(pk) {
+    const R = (D.pairs && D.pairs.record) ? D.pairs.record[pk.fam] : null;
+    if (!R) return null;
+    const q = pk.fam === "dnb" ? pk.p / Math.max(1 - pk.refund, 1e-9) : pk.p;
+    const b = Math.min(Math.floor(q * 20), 19) / 20;
+    const row = R.find(r => Math.abs(r[0] - b) < 1e-9);
+    return row ? { n: row[1], rate: row[2] / row[1], lo: b, hi: b + 0.05 } : null;
+  }
+  function rulesVerdict(pk) {
+    const pref = PREF0[pickMarket(pk)] || "reason";
+    const need = minOdds(pk);
+    if (pref === "avoid" || pref === "never") return { ok: false, text: "No: " + pickMarket(pk).toLowerCase() + " is on your avoid list" };
+    if (need > 1.70 + 1e-9) return { ok: false, text: "No: it would need odds of " + need.toFixed(2) + ", above your 1.70 cap" };
+    return { ok: true, text: "Only at odds of " + need.toFixed(2) + " or more" + (pref === "reason" ? " (and only with a reason)" : "") };
+  }
+  function recordText(pk) {
+    const r = recordFor(pk);
+    if (!r) return "<span class='ci'>no track record</span>";
+    if (r.n < 30) return "<span class='ci'>too few to say (" + r.n + ")</span>";
+    return "<b>" + pct(r.rate) + "</b> <span class='ci'>of " + r.n.toLocaleString() + "</span>";
+  }
+  function picksTable(mid, all) {
+    const m = D.pairs && D.pairs.matches[mid];
+    if (!m) return "";
+    let ps = m.picks.map((pk, i) => ({ pk, i, v: rulesVerdict(pk) }));
+    ps.sort((a, b) => b.pk.p - a.pk.p);
+    const shown = all ? ps : ps.filter(x => x.v.ok).slice(0, 5);
+    if (!shown.length) return "<p class='caption'>No pick here can pass your rules.</p>";
+    return "<div class='table-wrap'><table class='picks'><thead><tr><th>Pick</th><th class='num'>Chance</th><th class='num'>Came true in testing</th><th>Your rules</th></tr></thead><tbody>" +
+      shown.map(x => "<tr><td>" + esc(x.pk.label) + "</td><td class='num'>" + pct(x.pk.p) + (x.pk.fam === "dnb" ? "<span class='ci'> win, " + pct(x.pk.refund) + " refund</span>" : "") + "</td><td class='num'>" + recordText(x.pk) + "</td><td>" + (x.v.ok ? "<span class='status flag'>" : "<span class='status bad'>") + esc(x.v.text) + "</span></td></tr>").join("") + "</tbody></table></div>";
+  }
+
   // ============================================================ PREDICTIONS
   // Juba is UTC+2 all year (no summer time), so the shift is fixed.
   const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -975,7 +1041,7 @@ tr.hl td:first-child { font-weight: 700; }
     const sec = $("#sec-predictions");
     const gw = gameweek();
     const locked = gw.filter(r => r.locked).length;
-    const high = gw.filter(r => r.tiers && r.tiers["1x2"] === "High").length;
+    const passable = gw.reduce((a, r) => a + ((D.pairs && D.pairs.matches[r.id]) ? D.pairs.matches[r.id].picks.filter(pk => rulesVerdict(pk).ok).length : 0), 0);
     const fav = gw.map(r => ({ r, p: Math.max(r.p[0], r.p[2]) / 1000, side: r.p[0] >= r.p[2] ? r.h : r.a })).sort((a, b) => b.p - a.p)[0];
     const roundOf = lg => { const x = gw.find(r => r.lg === lg); return x ? x.round : ""; };
     const hasFix = gw.some(r => r.fix);
@@ -984,7 +1050,7 @@ tr.hl td:first-child { font-weight: 700; }
       '<div class="kpis">' +
       kpi("Matches", String(gw.length), "Premier League " + gw.filter(r => r.lg === 0).length + ", La Liga " + gw.filter(r => r.lg === 1).length + ".") +
       kpi("Locked so far", locked + " <small>of " + gw.length + "</small>", locked === gw.length ? "Every forecast is final." : (gw.length - locked) + " will lock at the next daily runs.") +
-      kpi("High confidence", String(high), "Matches where the home, draw, away forecast is rated High.") +
+      kpi("Picks that could pass your rules", String(passable), "At the right price only. Each card lists the price needed.") +
       kpi("Biggest favourite", fav ? esc(D.clubs[fav.side]) + " <small>" + pct(fav.p) + "</small>" : "none", fav ? "Against " + D.clubs[fav.side === fav.r.h ? fav.r.a : fav.r.h] + "." : "") +
       "</div>" +
       '<div class="panel"><div class="controls">' +
@@ -992,20 +1058,28 @@ tr.hl td:first-child { font-weight: 700; }
       '<div class="ctl"><span class="lbl">Order</span>' + segHTML("pr-sort", [{ v: "time", label: "Kickoff" }, { v: "conf", label: "Clearest favourite" }, { v: "close", label: "Closest call" }], pr.sort) + "</div>" +
       (hasFix ? '<label class="toggle"><input type="checkbox" id="pr-fix"' + (pr.fix ? " checked" : "") + "> Also show the proposed fix (not live)</label>" : "") +
       "</div>" +
-      explain("<p>Each card shows the chances of a home win, a draw and an away win (blue, grey, red), the single most likely score, and the expected goals, corners and yellow cards. The likely score is only the best single guess: even the top score happens in only about one match in eight. <b>3 or more goals</b> is the over 2.5 line; <b>10 or more corners</b> is over 9.5; <b>5 or more yellow cards</b> is over 4.5. The badge on each line says how far to trust it: High, Medium or Low. It rates the likelier side, so <b>Both score 42%</b> with <b>High</b> means the model is fairly sure at least one side will not score. A newly promoted club early in the season, an unanswered team-news question, or an unknown referee all lower the confidence.</p>") +
+      explain("<p>Each card shows the chances of a home win, a draw and an away win (blue, grey, red), the single most likely score, and the expected goals, corners and yellow cards. The likely score is only the best single guess: even the top score happens in only about one match in eight. <b>3 or more goals</b> is the over 2.5 line; <b>10 or more corners</b> is over 9.5; <b>5 or more yellow cards</b> is over 4.5. Under each card, <b>Picks</b> lists the most likely picks that could pass your rules: the chance the model gives, how often forecasts like it <b>came true in testing</b> (2023/24 to 2025/26, same kind of pick, chance within the same 5-point band), and the lowest odds at which it pays over time after the 20% tax. If the bookmaker offers less, it fails your rules. Press <b>Show all picks</b> to see every pick, including those on your avoid list. This is not a recommendation to bet.</p>") +
       "</div>" +
       '<div id="pr-fix-note"></div><div id="pr-list" style="display:grid;gap:14px"></div>';
     bindSeg("pr-league", v => { pr.league = v; draw(); });
     bindSeg("pr-sort", v => { pr.sort = v; draw(); });
     if (hasFix) $("#pr-fix").addEventListener("change", e => { pr.fix = e.target.checked; draw(); });
     $("#pr-list").addEventListener("click", e => {
+      const all = e.target.closest("button.allpicks");
+      if (all) {
+        const box = $('.picks-box[data-mid="' + all.dataset.mid + '"]', $("#pr-list"));
+        const open = all.dataset.open === "1";
+        box.innerHTML = '<div class="lbl" style="font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700">' + (open ? "Picks" : "All picks") + "</div>" + picksTable(all.dataset.mid, !open);
+        all.dataset.open = open ? "0" : "1"; all.textContent = open ? "Show all picks" : "Show fewer picks";
+        return;
+      }
       const b = e.target.closest("button.open");
       if (!b) return;
       ex.source = "up"; ex.sel = b.dataset.id; rendered.explorer = false;
       show("explorer"); window.scrollTo({ top: 0 });
     });
-    function line(label, value, tierKey, tiers) {
-      const t = tierKey && tiers[tierKey] ? tierBadge(TIER_LEVEL(tiers[tierKey])) : "";
+    function line(label, value) {
+      const t = "";
       return "<dt>" + label + "</dt><dd>" + value + '</dd><dd class="t">' + t + "</dd>";
     }
     function card(r) {
@@ -1014,7 +1088,7 @@ tr.hl td:first-child { font-weight: 700; }
       const tiers = r.tiers || {};
       const home = esc(D.clubs[r.h]), away = esc(D.clubs[r.a]);
       const g = r.goals;
-      let html = '<article class="pcard"><div class="row1"><span class="when">' + when.time + "</span><span>" + leagueName(r.lg) + '</span><span class="right"><span class="lockpill' + (r.locked ? " on" : "") + '">' + (r.locked ? "Locked" : "Provisional") + "</span>" + (tiers["1x2"] ? tierBadge(TIER_LEVEL(tiers["1x2"])) : "") + "</span></div>" +
+      let html = '<article class="pcard"><div class="row1"><span class="when">' + when.time + "</span><span>" + leagueName(r.lg) + '</span><span class="right"><span class="lockpill' + (r.locked ? " on" : "") + '">' + (r.locked ? "Locked" : "Provisional") + "</span></span></div>" +
         '<div class="teams">' + home + '<span class="v">v</span>' + away + "</div>" +
         '<div class="verdict">' + verdict(r, p) + "</div>" +
         stackbar(p[0], p[1], p[2]) +
@@ -1030,7 +1104,8 @@ tr.hl td:first-child { font-weight: 700; }
         const q = r.fix.p, d = k => Math.abs(q[k] - p[k]) < 0.005 ? "same" : signed((q[k] - p[k]) * 100, 0) + " pts";
         html += '<div class="fix"><span><b>Proposed fix, not live:</b> ' + home + " win " + pct(q[0]) + " (" + d(0) + "), draw " + pct(q[1]) + " (" + d(1) + "), " + away + " win " + pct(q[2]) + " (" + d(2) + ").</span><span>3 or more goals " + pct(r.fix.o25) + "; both score " + pct(r.fix.btts) + "; likely score " + esc(r.fix.score) + ".</span></div>";
       }
-      html += '<button type="button" class="open" data-id="' + esc(r.id) + '">See every model for this match</button></article>';
+      html += '<div class="picks-box" data-mid="' + esc(r.id) + '"><div class="lbl" style="font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700">Picks</div>' + picksTable(r.id, false) + '</div>' +
+        '<div style="display:flex;gap:14px;flex-wrap:wrap"><button type="button" class="open allpicks" data-mid="' + esc(r.id) + '">Show all picks</button><button type="button" class="open" data-id="' + esc(r.id) + '">See every model for this match</button></div></article>';
       return html;
     }
     function draw() {
@@ -1059,7 +1134,7 @@ tr.hl td:first-child { font-weight: 700; }
   };
 
   // ============================================================ PAIRS
-  const FAMS = [{ v: "result", label: "Result" }, { v: "goals", label: "Goals" }, { v: "btts", label: "Both score" }, { v: "corners", label: "Corners" }, { v: "yellows", label: "Yellow cards" }];
+  const FAMS = [{ v: "result", label: "Result" }, { v: "dc", label: "Double chance" }, { v: "eh", label: "Handicap" }, { v: "goals", label: "Goals" }, { v: "btts", label: "Both score" }, { v: "corners", label: "Corners" }, { v: "yellows", label: "Yellow cards" }];
   const pa = { day: null, kind: "either", fams: FAMS.map(f => f.v), n: 10 };
   function bestPairs(ids, kind, fams, n) {
     // Same rule as scripts/pairs_lab.py: highest joint chance first, no pick used twice.
@@ -1073,7 +1148,7 @@ tr.hl td:first-child { font-weight: 700; }
     });
     if (kind !== "same") {
       const flat = [];
-      ids.forEach(mid => M[mid].picks.forEach((p, i) => { if (ok(p)) flat.push([mid, i, p.p]); }));
+      ids.forEach(mid => M[mid].picks.forEach((p, i) => { if (ok(p) && !p.nopair) flat.push([mid, i, p.p]); }));
       flat.sort((x, y) => y[2] - x[2]);
       const top = flat.slice(0, 60);
       for (let x = 0; x < top.length; x++) for (let y = x + 1; y < top.length; y++) {
@@ -1097,7 +1172,7 @@ tr.hl td:first-child { font-weight: 700; }
     if (!pa.day) pa.day = P.days[0].key;
     const T = P.track;
     sec.innerHTML =
-      '<div class="section-head"><h2>Most likely pairs</h2><p>Two outcomes at a time, ranked by the chance that <b>both</b> happen. A pair can come from one match or from two. Picks: result, goals, both teams score, corners and yellow cards, over or under. Chances use the goals fix. No pick is used twice.</p></div>' +
+      '<div class="section-head"><h2>Most likely pairs</h2><p>Two outcomes at a time, ranked by the chance that <b>both</b> happen. A pair can come from one match or from two. Picks: result, double chance, handicap (+2 head start, or to win by 2 or more), goals, both teams score, corners and yellow cards, over or under. Draw no bet is left out of pairs because a draw refunds it; it is on the Predictions cards and in the slip checker. Chances use the goals fix. No pick is used twice.</p></div>' +
       '<div class="banner">A view of how likely things are, not betting advice. The bookmakers beat this model in every past test, and every bet carries their margin; joining two picks charges it twice.</div>' +
       '<div class="panel"><div class="controls">' +
       '<div class="ctl"><span class="lbl">Day (Juba time)</span>' + segHTML("pa-day", P.days.map(d => ({ v: d.key, label: d.label + " (" + d.ids.length + ")" })), pa.day) + "</div>" +
@@ -1138,12 +1213,7 @@ tr.hl td:first-child { font-weight: 700; }
 
   // ============================================================ MY BETS (private record)
   // Shown only when the lab is built with --bets-json (a file kept outside the repository).
-  const PREF = {
-    "Home win": "first", "Draw no bet": "first", "European handicap": "first", "Draw in the first 10 minutes": "first",
-    "Over 1.5 goals": "reason", "Double chance": "reason", "Corners": "reason", "Total bookings (cards)": "reason", "Over 2.5 goals or more": "reason",
-    "Away win": "avoid", "Basketball winner": "avoid", "Under goals": "avoid", "Both teams score": "avoid",
-    "Double chance + goals or both score (combined market)": "avoid", "Bet builder (2 or more markets in one pick)": "never",
-  };
+  const PREF = PREF0;
   const PREF_TXT = { first: "use first", reason: "only with an independent reason", avoid: "avoid unless the evidence is strong", never: "never (bet builder)" };
   const ssp = v => (v < 0 ? MINUS : "") + Math.round(Math.abs(v)).toLocaleString() + " SSP";
   const bkEven = o => 1 / (1 + 0.8 * (o - 1));
@@ -1214,7 +1284,6 @@ tr.hl td:first-child { font-weight: 700; }
     setupChecker();
   };
   function rowOf(rows, label, fn) { const r = rows.find(x => x.label === label); return r ? fn(r) : "no data"; }
-  const PICK_MARKET = k => k === "H" ? "Home win" : k === "A" ? "Away win" : k === "D" ? "Other" : k === "G>1.5" ? "Over 1.5 goals" : k.startsWith("G>") ? "Over 2.5 goals or more" : k.startsWith("G<") ? "Under goals" : k.indexOf("BTTS") >= 0 ? "Both teams score" : k[0] === "C" ? "Corners" : k[0] === "Y" ? "Total bookings (cards)" : "Other";
   function legInput(n) {
     const markets = Object.keys(PREF).concat(["Other"]);
     const P = D.pairs || { matches: {} };
@@ -1234,7 +1303,7 @@ tr.hl td:first-child { font-weight: 700; }
         const v = e.target.value;
         if (v && v !== "own") {
           const [mid, i] = v.split("|"); const pk = D.pairs.matches[mid].picks[Number(i)];
-          $("#ck-p" + n).value = (pk.p * 100).toFixed(1); $("#ck-mkt" + n).value = PICK_MARKET(pk.k);
+          $("#ck-p" + n).value = (pk.p * 100).toFixed(1); $("#ck-mkt" + n).value = pickMarket(pk);
           const o = D.pairs.matches[mid].odds || {};
           if (o[pk.k] && !$("#ck-odds" + n).value) $("#ck-odds" + n).placeholder = "market fair " + (1 / o[pk.k]).toFixed(2);
         }
@@ -1249,7 +1318,10 @@ tr.hl td:first-child { font-weight: 700; }
       const src = $("#ck-src" + n).value, o = Number($("#ck-odds" + n).value), p = Number($("#ck-p" + n).value) / 100, mkt = $("#ck-mkt" + n).value;
       if (!src && n === 2) return null;
       const model = src && src !== "own";
-      return { n, src, model, mid: model ? src.split("|")[0] : null, idx: model ? Number(src.split("|")[1]) : null, o, p, mkt };
+      const mid = model ? src.split("|")[0] : null, idx = model ? Number(src.split("|")[1]) : null;
+      const pk = model ? D.pairs.matches[mid].picks[idx] : null;
+      const refund = pk && pk.fam === "dnb" ? pk.refund : (mkt === "Draw no bet" && !model ? NaN : 0);
+      return { n, src, model, mid, idx, o, p, mkt, refund };
     }).filter(Boolean);
     const box = $("#ck-out");
     if (!legs.length || legs.some(l => !(l.o > 1) || !(l.p > 0 && l.p < 1))) { box.innerHTML = '<p class="caption">Choose a pick, then enter the bookmaker odds and a chance for each pick.</p>'; return; }
@@ -1261,7 +1333,27 @@ tr.hl td:first-child { font-weight: 700; }
       const jt = D.pairs.matches[legs[0].mid].joint[i + "," + j];
       q = jt != null ? jt : NaN;
     }
-    const need = bkEven(O), gap = q - need, ev = q * (1 + 0.8 * (O - 1)) - 1;
+    const need = bkEven(O);
+    const hasRefund = legs.some(l => l.refund > 0 || isNaN(l.refund));
+    // Expected return per unit staked: every leg wins, is refunded (draw no bet) or loses;
+    // the tax takes 20% of any profit.
+    let ev = NaN;
+    if (!sameMatch && legs.every(l => isFinite(l.refund))) {
+      ev = -1;
+      const walk = (j, prob, mult) => {
+        if (j === legs.length) { ev += prob * (mult > 1 ? 1 + 0.8 * (mult - 1) : mult); return; }
+        const l = legs[j], lose = Math.max(1 - l.p - l.refund, 0);
+        walk(j + 1, prob * l.p, mult * l.o);
+        if (l.refund > 0) walk(j + 1, prob * l.refund, mult);
+        walk(j + 1, prob * lose, 0);
+      };
+      walk(0, 1, 1);
+    } else if (sameMatch && isFinite(q)) {
+      ev = q * (1 + 0.8 * (O - 1)) - 1;
+    }
+    // With one draw-no-bet pick, the win chance needed is (1 - refund) / (1 + 0.8 (odds - 1)).
+    const needShown = !hasRefund ? need : (legs.length === 1 && isFinite(legs[0].refund) ? (1 - legs[0].refund) / (1 + 0.8 * (O - 1)) : NaN);
+    const gap = hasRefund ? (legs.length === 1 ? q - needShown : NaN) : q - need;
     const allModel = legs.every(l => l.model);
     const ok = (good, text) => '<li><span class="status ' + (good ? "good" : "bad") + '">' + (good ? "passes" : "fails") + "</span> " + text + "</li>";
     const warn = text => '<li><span class="status flag">check</span> ' + text + "</li>";
@@ -1272,13 +1364,13 @@ tr.hl td:first-child { font-weight: 700; }
         return pref === "never" ? ok(false, "Pick " + l.n + ": bet builder (rule 2)") : pref === "avoid" ? ok(false, "Pick " + l.n + ": " + esc(l.mkt) + " is on the avoid list (rule 5)") : pref === "first" ? ok(true, "Pick " + l.n + ": " + esc(l.mkt) + ", use first (rule 5)") : warn("Pick " + l.n + ": " + esc(l.mkt) + ", only with an independent reason (rule 5)");
       }).join("") +
       (sameMatch ? ok(false, "Both picks from one match: this usually needs a bet builder (rules 2 and 8)") : "") +
-      (allModel ? ok(gap > 0, "Independent chance " + (isFinite(q) ? pct(q, 1) : "n/a") + " against break-even " + pct(need, 1) + " (rule 6)") : warn("At least one chance is your own estimate, not an independent one (rule 6)"));
-    const pass = O <= 1.70 + 1e-9 && legs.every(l => l.o <= 1.70 + 1e-9 && PREF[l.mkt] !== "never" && PREF[l.mkt] !== "avoid") && !sameMatch && allModel && gap > 0;
+      (allModel ? (hasRefund ? ok(ev > 0, "Expected return " + (isFinite(ev) ? signed(ev * 100, 1) + " per 100 staked" : "n/a") + ", counting the refund on a draw (rule 6)") : ok(gap > 0, "Independent chance " + (isFinite(q) ? pct(q, 1) : "n/a") + " against break-even " + pct(need, 1) + " (rule 6)")) : warn("At least one chance is your own estimate, not an independent one (rule 6)"));
+    const pass = O <= 1.70 + 1e-9 && legs.every(l => l.o <= 1.70 + 1e-9 && PREF[l.mkt] !== "never" && PREF[l.mkt] !== "avoid") && !sameMatch && allModel && ev > 0;
     box.innerHTML = '<div class="kpis" style="margin-top:12px">' +
       kpi("Combined odds", O.toFixed(2), legs.length === 2 ? "Two picks multiplied." : "Single pick.") +
-      kpi("Chance it all comes true", isFinite(q) ? pct(q, 1) : "n/a", sameMatch ? "Joint chance from the score grid." : legs.length === 2 ? "Two matches: chances multiplied." : "") +
-      kpi("Needed after tax", pct(need, 1), "Break-even for odds " + O.toFixed(2) + ".") +
-      kpi("Gap", isFinite(gap) ? signed(gap * 100, 1) + " pts" : "n/a", isFinite(ev) ? "If the chance is right: " + signed(ev * 100, 1) + " SSP back per 100 SSP staked, on average." : "") +
+      kpi("Chance it all comes true", isFinite(q) ? pct(q, 1) : "n/a", sameMatch ? "Joint chance from the score grid." : hasRefund ? "Win chance; a draw refunds the draw-no-bet pick." : legs.length === 2 ? "Two matches: chances multiplied." : "") +
+      kpi("Needed after tax", isFinite(needShown) ? pct(needShown, 1) : "see return", hasRefund ? "Win chance needed, counting the refund on a draw." : "Break-even for odds " + O.toFixed(2) + ".") +
+      kpi("Gap", isFinite(gap) ? signed(gap * 100, 1) + " pts" : (hasRefund ? "see return" : "n/a"), isFinite(ev) ? "If the chance is right: " + signed(ev * 100, 1) + " SSP back per 100 SSP staked, on average." : "") +
       '</div><ul class="verdicts" style="margin-top:10px">' + list + "</ul>" +
       '<p style="margin:10px 0 0"><b>' + (pass ? "This slip passes my rules." : "This slip does not pass my rules: no bet.") + "</b> " + (pass ? "Passing is not a promise: a " + pct(q) + " chance still loses " + pct(1 - q) + " of the time." : "") + "</p>";
   }

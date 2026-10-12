@@ -4,7 +4,8 @@ Lang's rules (10 Oct 2026):
 - a pair is two picks, from the same match or from two matches;
 - picks are the published lines, both sides: home win, draw, away win; over or under
   1.5, 2.5, 3.5 goals; both teams score yes or no; over or under 8.5 to 11.5 corners;
-  over or under 3.5 to 5.5 yellow cards;
+  over or under 3.5 to 5.5 yellow cards; and since 12 Oct 2026 double chance, European
+  handicap (+2 head start, or to win by 2 or more) and draw no bet;
 - ranked by the chance that both happen, using the goals fix shape_v1;
 - no pick used twice.
 
@@ -54,6 +55,16 @@ def picks(mat: np.ndarray, cpmf: np.ndarray | None, ypmf: np.ndarray | None,
     for key, label, mask in (("H", f"{home} win", HOME), ("D", "Draw", DRAW),
                              ("A", f"{away} win", AWAY)):
         out.append({"k": key, "fam": "result", "label": label, "mask": mask})
+    for key, label, mask in (("1X", f"{home} or draw", HOME | DRAW),
+                             ("X2", f"Draw or {away}", DRAW | AWAY),
+                             ("12", f"{home} or {away}", HOME | AWAY)):
+        out.append({"k": key, "fam": "dc", "label": label, "mask": mask})
+    hg, ag = K[:, None], K[None, :]
+    for key, label, mask in (("EH+2H", f"{home} +2 handicap", hg + 2 > ag),
+                             ("EH+2A", f"{away} +2 handicap", ag + 2 > hg),
+                             ("EH-1H", f"{home} to win by 2 or more", hg > ag + 1),
+                             ("EH-1A", f"{away} to win by 2 or more", ag > hg + 1)):
+        out.append({"k": key, "fam": "eh", "label": label, "mask": mask})
     for line in GOAL_LINES:
         out.append({"k": f"G>{line}", "fam": "goals", "label": f"{_n(line)} or more goals",
                     "mask": TOTAL > line})
@@ -65,6 +76,13 @@ def picks(mat: np.ndarray, cpmf: np.ndarray | None, ypmf: np.ndarray | None,
     out.append({"k": "NoBTTS", "fam": "btts", "label": "Not both teams score", "mask": ~both})
     for p in out:
         p["p"] = float(mat[p["mask"]].sum())
+    # Draw no bet: the stake comes back on a draw, so it is not a yes-or-no pick. It
+    # carries its win and refund chances and stays out of the pairs.
+    ph, pd_, pa = float(mat[HOME].sum()), float(mat[DRAW].sum()), float(mat[AWAY].sum())
+    out.append({"k": "DNB-H", "fam": "dnb", "label": f"Draw no bet: {home}", "p": ph,
+                "refund": pd_, "nopair": True})
+    out.append({"k": "DNB-A", "fam": "dnb", "label": f"Draw no bet: {away}", "p": pa,
+                "refund": pd_, "nopair": True})
     for fam, pmf, lines, noun in (("corners", cpmf, CORNER_LINES, "corners"),
                                   ("yellows", ypmf, YELLOW_LINES, "yellow cards")):
         if pmf is None:
@@ -84,7 +102,9 @@ def picks(mat: np.ndarray, cpmf: np.ndarray | None, ypmf: np.ndarray | None,
 def same_match_joint(a: dict, b: dict, mat: np.ndarray) -> float | None:
     """Joint chance of two picks from one match, or None when the pair is not
     allowed (same count twice, impossible together, or one implies the other)."""
-    if a["fam"] == b["fam"] and a["fam"] in ("result", "goals", "btts", "corners", "yellows"):
+    if a.get("nopair") or b.get("nopair"):
+        return None
+    if a["fam"] == b["fam"]:
         return None
     if "mask" in a and "mask" in b:
         joint = float(mat[a["mask"] & b["mask"]].sum())
@@ -122,7 +142,7 @@ def best_pairs(blocks: dict[str, dict], kind: str = "either", families: set[str]
                     cands.append((v, (mid, i), (mid, j)))
     if kind in ("either", "two"):
         flat = [(mid, i, p["p"]) for mid in ids for i, p in enumerate(blocks[mid]["picks"])
-                if allowed(p)]
+                if allowed(p) and not p.get("nopair")]
         flat.sort(key=lambda x: -x[2])
         top = flat[:60]  # the best two-match pairs only use the strongest picks
         for x in range(len(top)):
@@ -143,6 +163,12 @@ def best_pairs(blocks: dict[str, dict], kind: str = "either", families: set[str]
 
 def happened(pick: dict, hg: int, ag: int, corners: float, yellows: float) -> bool | None:
     k = pick["k"]
+    simple = {"1X": hg >= ag, "X2": hg <= ag, "12": hg != ag, "EH+2H": hg + 2 > ag,
+              "EH+2A": ag + 2 > hg, "EH-1H": hg > ag + 1, "EH-1A": ag > hg + 1}
+    if k in simple:
+        return bool(simple[k])
+    if k in ("DNB-H", "DNB-A"):
+        return None if hg == ag else (hg > ag) == (k == "DNB-H")
     if k == "H":
         return hg > ag
     if k == "D":
@@ -210,6 +236,37 @@ def track_record(fixed: np.ndarray, gf: pd.DataFrame, backtests: Path,
             "promised": float(t["p"].mean()), "won": float(t["hit"].mean()),
             "same_share": float(t["same"].mean()), "bands": bands,
             "by_rank": by_rank.round(4).to_dict("records")}
+
+
+def pick_record(fixed: np.ndarray, gf: pd.DataFrame, backtests: Path,
+                matches: pd.DataFrame) -> dict[str, list[list[float]]]:
+    """How often picks of each kind came true in 2023/24 to 2025/26, by the chance
+    the model gave them (5-point bands). The lab shows this as the confidence of a
+    pick: "forecasts like this came true 64% of the time". Draw no bet is judged on
+    the matches that were not drawn, by the chance of winning given no draw."""
+    corners = pd.read_parquet(backtests / "corners_total_poisson_walkforward_2021_2025.parquet"
+                              ).set_index("match_id")
+    cards = pd.read_parquet(backtests / "cards_nb_walkforward_2021_2025.parquet").set_index(
+        "match_id")
+    m = matches.set_index("match_id")
+    tally: dict[str, np.ndarray] = {}
+    for idx, r in gf[gf["season"].isin(TEST)].iterrows():
+        mid = r["match_id"]
+        ps = picks(fixed[idx], corners.at[mid, "pmf"] if mid in corners.index else None,
+                   cards.at[mid, "pmf"] if mid in cards.index else None, "", "")
+        hg, ag = int(r["hg"]), int(r["ag"])
+        c = float(m.at[mid, "home_corners"] + m.at[mid, "away_corners"])
+        y = float(m.at[mid, "home_yellows"] + m.at[mid, "away_yellows"])
+        for p in ps:
+            hit = happened(p, hg, ag, c, y)
+            if hit is None:
+                continue
+            q = p["p"] / (1 - p["refund"]) if p["fam"] == "dnb" else p["p"]
+            t = tally.setdefault(p["fam"], np.zeros((20, 2)))
+            b = min(int(q * 20), 19)
+            t[b] += (1, float(hit))
+    return {fam: [[b / 20, int(n), int(k)] for b, (n, k) in enumerate(t) if n > 0]
+            for fam, t in tally.items()}
 
 
 def bookmaker(raw: Path | None) -> dict[str, dict]:
