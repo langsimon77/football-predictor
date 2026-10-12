@@ -33,3 +33,17 @@ Reported, not judged: fast Dixon-Coles, the challengers and the stack (live weig
 - A league that passes G1 to G5 and L is proposed for background running of its goals markets. Corners join if C1 passes, yellows if K1 passes.
 - A failed check means no proposal for that market. Any fix would be a new proposal with its own test.
 - Background running means forecasts locked and scored daily but not published. Publishing is a later decision for Lang, on that live record.
+
+## Amendment 1, 13 Oct 2026, before any trial result was scored or downloaded
+
+**Why.** Before scoring the trial leagues, I ran the scoring code on the EPL and La Liga as a reference. Judged one league at a time, the two live leagues fail 4 of their 16 checks: the EPL fails G4 (over 2.5 against the base rate, −0.0072, interval −0.0168 to +0.0022), C1 (corners, −0.0053, −0.0126 to +0.0021) and K1 (yellows, −0.0117, −0.0257 to +0.0012); La Liga fails G2 (against Elo, −0.0004, −0.0027 to +0.0020). The live leagues were accepted on both leagues pooled (2,280 test matches), where all their checks pass. A league holds about 1,100 test matches, so its intervals are about 1.4 times wider. Judged one at a time, the rule above rejects models that the live leagues' own evidence accepted.
+
+At this point, the trial runs had produced only the Elo, fast Dixon-Coles and base-rate forecasts on this Mac, and none had been scored. The GitHub runs were still running or not yet downloaded.
+
+**New rule, replacing "Checks, per league".**
+1. Checks G1 to G4, C1, K1 and L are applied to Serie A and Ligue 1 pooled (about 2,000 test matches), with the bars in the table above. This is how the EPL and La Liga were judged.
+2. G5 applies to each league.
+3. A league is left out if it clearly fails a check by itself: its own interval lies wholly on the wrong side of the bar (lower end above 0 for G1, G4, C1 and K1; lower end above +0.002 for G2), or its own mean RPS gap to the sharp close exceeds +0.010 (G3).
+4. Per-league results are reported in full.
+
+With the same code, the EPL and La Liga pooled pass every check, and neither league clearly fails any check by itself.
