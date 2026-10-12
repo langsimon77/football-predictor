@@ -14,13 +14,19 @@
 - Dashboard: all 12 provisional matches carry the fix and all 9 models; the what-if receives the fix. CI green on 29bb322. Model Lab refreshed.
 - All 7 locks again carry the unanswered-question flag (Issue #7 unanswered).
 
+### Done 12 Oct 2026
+- Fast results live: football-data.org scores and Lang's chat entries (`data/manual/results_manual.csv`) fill in until football-data.co.uk publishes; first entries: Palace 3-1 Forest, Hull 2-2 Everton, Liverpool 0-3 Man City. Rayo v Athletic still had no result in any source on 12 Oct.
+- Model Lab: double chance, European handicap and draw no bet picks; confidence shown as a track-record percentage with the lowest odds that pass Lang's rules; a private Bet log tab (owner-only database) that Claude settles on request.
+- Approved order for new leagues: Serie A and Ligue 1 first (same data as La Liga), Champions League afterwards as its own project.
+
 ### Open questions for Lang
 1. None open. Please answer the daily question Issue: unanswered questions cap confidence at Medium (all nine 9 Oct locks were capped).
 
 ### Next actions
 | Action | Owner |
 |---|---|
-| First weekly report with live scores, Mon 12 Oct. | Automatic |
+| Serie A and Ligue 1: data audit, team mapping, walk-forward backtests on GitHub, background running, then Lang decides on publishing. | Claude, next |
+| Settle Lang's logged bets when asked (procedure in Claude's memory). | Claude, on request |
 | First monthly `shape_v1` refit, Sun 1 Nov (logged in `data/shape/shape_v1.json`). | Automatic |
 | News-on against news-off test after 10 gameweeks; `shape_v1` against its plain copy at the end of 2026/27. | Claude, then Lang |
 
