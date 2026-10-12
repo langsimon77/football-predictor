@@ -21,15 +21,13 @@
 - Serie A and Ligue 1, step 1 done (data only, no live effect): league table with live and trial status (`src/fp/leagues.py`); trial tables in `data/processed/trial/` (`python -m fp.pipeline.data --trial`); 67 clubs and 187 spellings mapped; three matches with no football result left out (`data/manual/left_out_matches.csv`); CI builds the trial tables and probes football-data.org for `SA` and `FL1`. Findings: `docs/DATA_SOURCES.md` section 6; lesson: LEARN chapter 9.
 
 ### Open questions for Lang
-1. Derby pairs for Serie A and Ligue 1 (feed the cards model and the challengers), proposed 12 Oct 2026:
-   - Italy (14): Inter v Milan, Roma v Lazio, Juventus v Torino, Genoa v Sampdoria, Verona v Chievo, Juventus v Inter, Napoli v Roma, Fiorentina v Juventus, Fiorentina v Bologna, Fiorentina v Empoli, Fiorentina v Pisa, Napoli v Salernitana, Napoli v Benevento, Atalanta v Brescia.
-   - France (21): PSG v Marseille, Lyon v Saint-Etienne, Marseille v Lyon, Nice v Monaco, Lens v Lille, PSG v Paris FC, Bordeaux v Toulouse, Bordeaux v Nantes, Metz v Nancy, Ajaccio v Bastia, Le Havre v Caen, Auxerre v Dijon, Reims v Troyes, Montpellier v Nimes, and the Breton derbies Nantes v Rennes, Rennes v Brest, Rennes v Lorient, Rennes v Guingamp, Brest v Lorient, Brest v Guingamp, Lorient v Guingamp.
+1. None open. Derby pairs for Serie A (14) and Ligue 1 (21) approved by Lang on 12 Oct 2026 (`data/manual/derbies.csv`).
 2. Please answer the daily question Issue: unanswered questions cap confidence at Medium (all nine 9 Oct locks were capped).
 
 ### Next actions
 | Action | Owner |
 |---|---|
-| Serie A and Ligue 1, step 2: walk-forward backtests of every model on 2021/22 to 2025/26 on GitHub (goals first; cards after Lang answers the derby list), reported against the same baselines as the EPL and La Liga. Then Lang decides on background running, then on publishing. | Claude, next |
+| Serie A and Ligue 1, step 2: walk-forward backtests of every model on 2021/22 to 2025/26 on GitHub (goals, corners, cards and the challengers; derby list approved), reported against the same baselines as the EPL and La Liga. Then Lang decides on background running, then on publishing. | Claude, next |
 | Settle Lang's logged bets when asked (procedure in Claude's memory). | Claude, on request |
 | First monthly `shape_v1` refit, Sun 1 Nov (logged in `data/shape/shape_v1.json`). | Automatic |
 | News-on against news-off test after 10 gameweeks; `shape_v1` against its plain copy at the end of 2026/27. | Claude, then Lang |
