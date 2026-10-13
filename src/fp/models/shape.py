@@ -140,14 +140,14 @@ def load(store: Path = STORE) -> dict | None:
 
 
 def current(matches: pd.DataFrame, ledger: pd.DataFrame, now: pd.Timestamp,
-            store: Path = STORE, save: bool = True) -> Shape:
+            store: Path = STORE, save: bool = True, backtest: Path = BACKTEST) -> Shape:
     """This month's numbers: refitted at the first run of a new month, else read."""
     data = load(store)
     month = f"{now:%Y-%m}"
     if data is not None and data["current"]["month"] == month:
         c = data["current"]
         return Shape(c["vh"], c["va"], c["rho"], c["s"])
-    hist = history(matches, ledger, now)
+    hist = history(matches, ledger, now, backtest)
     if len(hist) < MIN_HISTORY:
         log.warning("shape_v1: only %d matches of history; using Poisson this month", len(hist))
         sh = POISSON

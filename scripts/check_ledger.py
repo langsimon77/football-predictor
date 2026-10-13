@@ -1,7 +1,8 @@
-"""CI guard: the ledger may only grow. No locked row may change or disappear.
+"""CI guard: the ledgers may only grow. No locked row may change or disappear.
 
-Compares ledger/predictions.parquet in the working tree with the version at a
-base commit (BASE_SHA env var, default HEAD~1). Passes if there is no ledger yet.
+Compares each ledger (the live one and, since 13 Oct 2026, the trial one in
+ledger/trial/) in the working tree with its version at a base commit (BASE_SHA env
+var, default HEAD~1). Passes for a ledger that does not exist yet.
 """
 
 from __future__ import annotations
@@ -15,12 +16,12 @@ import pandas as pd
 
 from fp import ROOT, ledger
 
-LEDGER_PATH = "ledger/predictions.parquet"
+LEDGER_PATHS = ("ledger/predictions.parquet", "ledger/trial/predictions.parquet")
 
 
-def at_commit(sha: str) -> pd.DataFrame | None:
+def at_commit(sha: str, path: str) -> pd.DataFrame | None:
     result = subprocess.run(
-        ["git", "show", f"{sha}:{LEDGER_PATH}"], cwd=ROOT, capture_output=True, check=False
+        ["git", "show", f"{sha}:{path}"], cwd=ROOT, capture_output=True, check=False
     )
     if result.returncode != 0:
         return None  # no ledger at that commit
@@ -28,20 +29,23 @@ def at_commit(sha: str) -> pd.DataFrame | None:
 
 
 def main() -> int:
-    if not ledger.PREDICTIONS.exists():
-        print("ledger check: no ledger yet, nothing to check")
-        return 0
-    current = ledger.load()
-    ledger.verify_chain(current)
     base_sha = os.environ.get("BASE_SHA") or "HEAD~1"
     if set(base_sha) == {"0"}:  # first push to a branch
         base_sha = "HEAD~1"
-    old = at_commit(base_sha)
-    if old is not None:
-        ledger.verify_append_only(old, current)
-        print(f"ledger check: {len(old)} rows at {base_sha[:7]}, {len(current)} now; append-only")
-    else:
-        print(f"ledger check: chain OK over {len(current)} rows (no ledger at {base_sha[:7]})")
+    for path in LEDGER_PATHS:
+        if not (ROOT / path).exists():
+            print(f"ledger check: no {path} yet, nothing to check")
+            continue
+        current = ledger.load(ROOT / path)
+        ledger.verify_chain(current)
+        old = at_commit(base_sha, path)
+        if old is not None:
+            ledger.verify_append_only(old, current)
+            print(f"ledger check: {path}: {len(old)} rows at {base_sha[:7]}, {len(current)} now; "
+                  "append-only")
+        else:
+            print(f"ledger check: {path}: chain OK over {len(current)} rows "
+                  f"(none at {base_sha[:7]})")
     return 0
 
 
