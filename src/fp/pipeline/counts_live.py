@@ -72,13 +72,16 @@ class LeagueCounts:
 
 
 def fit_league(matches: pd.DataFrame, features: pd.DataFrame, league: str, now: pd.Timestamp,
-               store: Path = STORE) -> LeagueCounts:
+               store: Path = STORE, targets: tuple[str, ...] = ("corners_total", "cards")
+               ) -> LeagueCounts:
     lg = matches[matches["league"] == league]
     known = known_as_of(lg, now)
     teams = sorted(set(lg["home_id"]) | set(lg["away_id"]))
-    out: dict[str, cn.CountPosterior | None] = {}
+    out: dict[str, cn.CountPosterior | None] = {"corners_total": None, "cards": None}
     fallbacks = []
     for target, to_rows in (("corners_total", cn.total_corner_rows), ("cards", cn.card_rows)):
+        if target not in targets:
+            continue
         post = cn.fit_checked(to_rows(known, features), now, teams, params(target, league))
         log.info("%s %s fit %.1fs %s", league, target, post.seconds, post.diagnostics)
         if post.ok:

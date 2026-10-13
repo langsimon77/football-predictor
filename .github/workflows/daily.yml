@@ -107,6 +107,18 @@ jobs:
             uv run python -m fp.pipeline.daily
           fi
 
+      - name: Leagues on trial in the background (Serie A, Ligue 1); never blocks the live run
+        id: trial
+        continue-on-error: true
+        env:
+          FOOTBALL_DATA_ORG_TOKEN: ${{ secrets.FOOTBALL_DATA_ORG_TOKEN }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            uv run python -m fp.pipeline.trial --dry-run
+          else
+            uv run python -m fp.pipeline.trial
+          fi
+
       - name: Ledger is append-only against the last commit
         env:
           BASE_SHA: HEAD
@@ -121,7 +133,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           for path in ledger reports data/manual/answers.yaml data/manual/managers.csv \
-                      app/data/ratings_history.csv data/shape/shape_v1.json; do
+                      app/data/ratings_history.csv data/shape/shape_v1.json \
+                      data/shape/shape_v1_trial.json; do
             [ -e "$path" ] && git add "$path"
           done
           if git diff --cached --quiet; then
@@ -158,6 +171,15 @@ jobs:
             } > "$RUNNER_TEMP/issue.md"
             gh issue create --title "Daily run degraded: $(date -u +%F)" --body-file "$RUNNER_TEMP/issue.md"
           fi
+
+      - name: Open an issue if the trial leagues step failed
+        if: steps.trial.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "Trial leagues step failed: $(date -u +%F)" \
+            --body "Serie A and Ligue 1 run in the background only; the live run was not affected. Log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
       - name: Open an issue if the run failed
         if: failure()

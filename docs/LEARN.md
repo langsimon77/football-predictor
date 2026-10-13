@@ -722,3 +722,9 @@ The result, by that rule, is no. Home, draw, away works as well as in the live l
 
 The rule treated all goals markets as one block, because they all come from the same table of scorelines. So the block fails, even though home, draw, away passes. Running only the parts that passed would be a new proposal, and a new proposal needs its own test.
 
+### 9.5 Running in the background
+
+Serie A and Ligue 1 now run every day after the live leagues, for the markets that passed: home, draw, away (so double chance too) and yellow cards. Their forecasts lock 24 to 48 hours before kickoff, like the live ones, but into a separate ledger (`ledger/trial/`) that nothing publishes. If this step breaks, the live run still finishes, and an Issue tells us.
+
+Why wait instead of publishing now? A backtest is a replay. A live record is the real thing: kickoff times change, results arrive late, data sources stall. After 300 scored matches (about early January), I check four things written down today, before the first lock: beats base rates, not clearly worse than Elo, yellows better than the league average, and locks on time. Then you decide on publishing.
+

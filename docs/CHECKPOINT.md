@@ -22,14 +22,16 @@
 
 - Serie A and Ligue 1, step 2 done (12 to 13 Oct): every live model backtested on both leagues, 2021/22 to 2025/26, live code and settings (`data/backtests/trial/`; GitHub runs 38310065127, 38310068965, 38310073216, 38310077149). Rules fixed beforehand, with one amendment made before any trial result was scored (`data/audit/preregistration_trial_2026_10.md`). Result (`reports/trial_backtest_2026_10.md`): home, draw, away and yellows pass; over 2.5 goals and corners fail; so by the rule neither league is proposed for background running. Pooled code now follows the leagues in the data (live outputs identical with a fixed hash seed); backtest workflows accept trial leagues.
 
+- Lang chose "Run what passed" (13 Oct): Serie A and Ligue 1 home, draw, away (with double chance) and yellows run in the background daily (`src/fp/pipeline/trial.py`, ledger `ledger/trial/`), not published. Publishing review after 300 scored matches by rules fixed before the first lock (`data/audit/preregistration_trial_live_2026_10.md`).
+
 ### Open questions for Lang
-1. Serie A and Ligue 1, what next: keep them on trial (the rule's answer); or a new, separately tested proposal to run home, draw, away (with double chance) and yellows in the background, leaving goal lines, both teams score and corners out; or first a model project on goal totals and corners for these leagues.
+1. None open on Serie A and Ligue 1 until the publishing review (about early January 2027).
 2. Please answer the daily question Issue: unanswered questions cap confidence at Medium (all nine 9 Oct locks were capped).
 
 ### Next actions
 | Action | Owner |
 |---|---|
-| Serie A and Ligue 1: Lang chooses what next (open question 1). | Lang |
+| Serie A and Ligue 1 background run: check the first trial locks (Thu 15 Oct run, for Fri 16 Oct kickoffs) and results; publishing review after 300 scored matches. | Claude |
 | Settle Lang's logged bets when asked (procedure in Claude's memory). | Claude, on request |
 | First monthly `shape_v1` refit, Sun 1 Nov (logged in `data/shape/shape_v1.json`). | Automatic |
 | News-on against news-off test after 10 gameweeks; `shape_v1` against its plain copy at the end of 2026/27. | Claude, then Lang |

@@ -54,12 +54,13 @@ def manual_scores(path: Path = MANUAL) -> pd.DataFrame:
         source="manual")
 
 
-def api_scores(fixtures: pd.DataFrame, offline: bool = False) -> pd.DataFrame:
-    """Final scores of FINISHED Premier League and La Liga matches."""
+def api_scores(fixtures: pd.DataFrame, offline: bool = False,
+               competitions: dict[str, str] = COMPETITIONS) -> pd.DataFrame:
+    """Final scores of FINISHED matches (default: Premier League and La Liga)."""
     season = int(fixtures["season"].max())
     keyed = fixtures.set_index(["league", "home_id", "away_id"])["match_id"]
     rows = []
-    for code, league in COMPETITIONS.items():
+    for code, league in competitions.items():
         frame = api.read_matches(api.download_matches(code, season, refresh=not offline))
         frame = frame[(frame["status"] == "FINISHED") & frame["home_goals"].notna()]
         for r in frame.itertuples():
@@ -84,11 +85,12 @@ def openfootball_scores(fixtures: pd.DataFrame) -> pd.DataFrame:
     return s[["match_id", *GOALS]].assign(source="openfootball")
 
 
-def collect(fixtures: pd.DataFrame, offline: bool = False) -> list[pd.DataFrame]:
+def collect(fixtures: pd.DataFrame, offline: bool = False,
+            competitions: dict[str, str] = COMPETITIONS) -> list[pd.DataFrame]:
     """Every fast source, best first. A source that fails is skipped and logged."""
     out = [manual_scores()]
     try:
-        out.append(api_scores(fixtures, offline))
+        out.append(api_scores(fixtures, offline, competitions))
     except Exception as error:  # the run goes on with the other sources
         log.warning("football-data.org scores unavailable (%s)", type(error).__name__)
     out.append(openfootball_scores(fixtures))
