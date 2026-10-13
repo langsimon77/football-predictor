@@ -16,7 +16,7 @@ from typing import cast
 import numpy as np
 import pandas as pd
 
-from fp import ROOT
+from fp import ROOT, leagues
 from fp.models import elo
 from fp.models.priors import season_teams
 from fp.validate.leakage import check_features, lock_time
@@ -153,8 +153,9 @@ def match_features(matches: pd.DataFrame) -> pd.DataFrame:
     state = rolling_state(matches)
     frame = frame.join(rolling_at(frame, state, "home_id", "home_"), on="match_id")
     frame = frame.join(rolling_at(frame, state, "away_id", "away_"), on="match_id")
-    gaps = pd.concat([elo_gap_at_lock(matches, lg) for lg in ("EPL", "LaLiga")])
-    imp = pd.concat([importance_at_lock(matches, lg) for lg in ("EPL", "LaLiga")])
+    present = leagues.codes_in(matches["league"])
+    gaps = pd.concat([elo_gap_at_lock(matches, lg) for lg in present])
+    imp = pd.concat([importance_at_lock(matches, lg) for lg in present])
     frame["elo_gap"] = frame["match_id"].map(gaps)
     frame["important"] = frame["match_id"].map(imp).fillna(0).astype(int)
     pairs = derby_pairs()

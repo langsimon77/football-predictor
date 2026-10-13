@@ -8,6 +8,7 @@ leagues on 12 Oct 2026; they stay on trial until Lang approves publishing.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 
 
@@ -53,3 +54,13 @@ def season_length(code: str, season: int) -> int:
     """Matches in a full season, or in a season stopped early."""
     n = clubs(code, season)
     return CUT_SHORT.get((code, season), n * (n - 1))
+
+
+def codes_in(values: Iterable[str]) -> list[str]:
+    """League codes present in a column, in this table's order (EPL first).
+
+    Code that pools leagues loops over this, so a live table gives exactly the
+    live leagues and a trial table exactly the trial ones.
+    """
+    present = set(values)
+    return [lg.code for lg in ALL if lg.code in present]

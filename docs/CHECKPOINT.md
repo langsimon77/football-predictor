@@ -20,14 +20,16 @@
 - Approved order for new leagues: Serie A and Ligue 1 first (same data as La Liga), Champions League afterwards as its own project.
 - Serie A and Ligue 1, step 1 done (data only, no live effect): league table with live and trial status (`src/fp/leagues.py`); trial tables in `data/processed/trial/` (`python -m fp.pipeline.data --trial`); 67 clubs and 187 spellings mapped; three matches with no football result left out (`data/manual/left_out_matches.csv`); CI builds the trial tables and probes football-data.org for `SA` and `FL1`. Findings: `docs/DATA_SOURCES.md` section 6; lesson: LEARN chapter 9.
 
+- Serie A and Ligue 1, step 2 done (12 to 13 Oct): every live model backtested on both leagues, 2021/22 to 2025/26, live code and settings (`data/backtests/trial/`; GitHub runs 38310065127, 38310068965, 38310073216, 38310077149). Rules fixed beforehand, with one amendment made before any trial result was scored (`data/audit/preregistration_trial_2026_10.md`). Result (`reports/trial_backtest_2026_10.md`): home, draw, away and yellows pass; over 2.5 goals and corners fail; so by the rule neither league is proposed for background running. Pooled code now follows the leagues in the data (live outputs identical with a fixed hash seed); backtest workflows accept trial leagues.
+
 ### Open questions for Lang
-1. None open. Derby pairs for Serie A (14) and Ligue 1 (21) approved by Lang on 12 Oct 2026 (`data/manual/derbies.csv`).
+1. Serie A and Ligue 1, what next: keep them on trial (the rule's answer); or a new, separately tested proposal to run home, draw, away (with double chance) and yellows in the background, leaving goal lines, both teams score and corners out; or first a model project on goal totals and corners for these leagues.
 2. Please answer the daily question Issue: unanswered questions cap confidence at Medium (all nine 9 Oct locks were capped).
 
 ### Next actions
 | Action | Owner |
 |---|---|
-| Serie A and Ligue 1, step 2: walk-forward backtests of every model on 2021/22 to 2025/26 on GitHub (goals, corners, cards and the challengers; derby list approved), reported against the same baselines as the EPL and La Liga. Then Lang decides on background running, then on publishing. | Claude, next |
+| Serie A and Ligue 1: Lang chooses what next (open question 1). | Lang |
 | Settle Lang's logged bets when asked (procedure in Claude's memory). | Claude, on request |
 | First monthly `shape_v1` refit, Sun 1 Nov (logged in `data/shape/shape_v1.json`). | Automatic |
 | News-on against news-off test after 10 gameweeks; `shape_v1` against its plain copy at the end of 2026/27. | Claude, then Lang |

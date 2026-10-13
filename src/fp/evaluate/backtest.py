@@ -14,6 +14,7 @@ from typing import cast
 import numpy as np
 import pandas as pd
 
+from fp import leagues
 from fp.evaluate import metrics
 from fp.models import dixon_coles as dc
 from fp.models import elo
@@ -82,7 +83,8 @@ def predict_league(matches: pd.DataFrame, league: str, cfg: Config,
 
 def run(matches: pd.DataFrame, cfg: Config) -> pd.DataFrame:
     prior = PromotedPrior(matches)
-    return pd.concat([predict_league(matches, lg, cfg, prior) for lg in ("EPL", "LaLiga")],
+    return pd.concat([predict_league(matches, lg, cfg, prior)
+                      for lg in leagues.codes_in(matches["league"])],
                      ignore_index=True)
 
 

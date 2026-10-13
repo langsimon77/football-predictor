@@ -6,6 +6,11 @@ name: Challenger backtest
 
 on:
   workflow_dispatch:
+    inputs:
+      trial:
+        description: "The leagues on trial (Serie A, Ligue 1) instead of the live ones"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -33,10 +38,17 @@ jobs:
           restore-keys: raw-
 
       - name: Build data
-        run: make data
+        run: |
+          make data
+          if [ "${{ inputs.trial }}" = "true" ]; then uv run python -m fp.pipeline.data --trial; fi
 
       - name: Walk-forward backtest, 2021/22 to 2025/26
-        run: uv run python -m fp.evaluate.backtest_ml --out out/challengers_walkforward_2021_2025.parquet
+        run: |
+          if [ "${{ inputs.trial }}" = "true" ]; then
+            uv run python -m fp.evaluate.backtest_ml --trial --out out/challengers_trial_walkforward_2021_2025.parquet
+          else
+            uv run python -m fp.evaluate.backtest_ml --out out/challengers_walkforward_2021_2025.parquet
+          fi
 
       - uses: actions/upload-artifact@v7
         with:

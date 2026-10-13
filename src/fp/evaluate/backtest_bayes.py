@@ -21,7 +21,7 @@ from typing import cast
 
 import pandas as pd
 
-from fp.ingest.matches import PROCESSED
+from fp.ingest.matches import processed_dir
 from fp.models import bayes_dc
 from fp.models.priors import season_teams
 from fp.models.promotion import fit_promotion_model, promoted_priors
@@ -97,8 +97,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--sampler", default="nutpie")
     ap.add_argument("--until", help="stop after this date (smoke test)")
     args = ap.parse_args(argv)
-    matches = pd.read_parquet(PROCESSED / "matches.parquet")
-    second_tier = pd.read_parquet(PROCESSED / "second_tier.parquet")
+    tables = processed_dir(args.league)  # trial leagues read their own tables
+    matches = pd.read_parquet(tables / "matches.parquet")
+    second_tier = pd.read_parquet(tables / "second_tier.parquet")
     params = bayes_dc.BayesParams(xi=args.xi, use_sot=args.sot, dynamic=args.dynamic,
                                   period_days=args.period_days, sampler=args.sampler)
     start = time.time()

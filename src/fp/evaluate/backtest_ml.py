@@ -7,6 +7,7 @@
    their own lock-time features.
 
     uv run python -m fp.evaluate.backtest_ml --out PATH [--seasons 2021 2022 2023 2024 2025]
+        [--trial]
 """
 
 from __future__ import annotations
@@ -21,7 +22,7 @@ from pathlib import Path
 import pandas as pd
 
 from fp.features import ml_features
-from fp.ingest.matches import PROCESSED
+from fp.ingest.matches import PROCESSED, TRIAL_DIR
 from fp.models import ml
 
 log = logging.getLogger(__name__)
@@ -64,9 +65,10 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--seasons", nargs="+", type=int, default=[2021, 2022, 2023, 2024, 2025])
+    ap.add_argument("--trial", action="store_true", help="the leagues on trial (fp.leagues)")
     args = ap.parse_args(argv)
     start = time.time()
-    matches = pd.read_parquet(PROCESSED / "matches.parquet")
+    matches = pd.read_parquet((TRIAL_DIR if args.trial else PROCESSED) / "matches.parquet")
     features = ml_features.build(matches)
     models = [m for m in ml.MODELS if m != "xgboost" or ml.xgboost_available()]
     if "xgboost" not in models:

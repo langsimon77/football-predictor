@@ -25,7 +25,7 @@ from typing import cast
 import pandas as pd
 
 from fp.features import rolling
-from fp.ingest.matches import PROCESSED
+from fp.ingest.matches import processed_dir
 from fp.models import counts_nb as cn
 from fp.validate.leakage import check_features, known_as_of, lock_time
 
@@ -102,7 +102,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--poisson", action="store_true")
     ap.add_argument("--sampler", default="numpyro")
     args = ap.parse_args(argv)
-    matches = pd.read_parquet(PROCESSED / "matches.parquet")
+    matches = pd.read_parquet(processed_dir(args.league) / "matches.parquet")
     features = rolling.match_features(matches)
     params = cn.CountParams(target=args.target, poisson=args.poisson, sampler=args.sampler,
                             use_referee=args.target == "cards" and args.league == "EPL")

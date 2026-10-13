@@ -115,9 +115,12 @@ def latest_shape(now: pd.Timestamp | None = None) -> tuple[Shape, int]:
 
 
 # ------------------------------------------------------------ data
-def goals_frame(path: Path = BT / "dc_bayes_v1_walkforward_2021_2025.parquet") -> pd.DataFrame:
+def goals_frame(path: Path = BT / "dc_bayes_v1_walkforward_2021_2025.parquet",
+                matches: pd.DataFrame | None = None) -> pd.DataFrame:
     from fp.ingest.matches import PROCESSED
-    m = pd.read_parquet(PROCESSED / "matches.parquet").set_index("match_id")
+    if matches is None:
+        matches = pd.read_parquet(PROCESSED / "matches.parquet")
+    m = matches.set_index("match_id")
     d = pd.read_parquet(path)
     d = d.assign(kickoff_utc=d["match_id"].map(m["kickoff_utc"]),
                  hg=d["match_id"].map(m["home_goals"]).astype(int),

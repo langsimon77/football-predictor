@@ -713,3 +713,12 @@ The rule is about football, not about paperwork. Verona v Roma (2020) was also g
 ### 9.3 Checking a new source against an old one
 
 Two sources that agree are worth more than one. For every season since 2016/17, the club lists from football-data.co.uk and openfootball match, and so does every 2026/27 score so far. Kickoff times agree exactly for 91% to 100% of matches each season. Most differences are five minutes. A wrong time zone would have shown up as a gap of one or two hours on every match.
+
+### 9.4 Changing a rule honestly, and a test that said no
+
+Before testing Serie A and Ligue 1, I wrote down what "good enough" means (`data/audit/preregistration_trial_2026_10.md`). Then I ran the scoring code on the EPL and La Liga first, as a check of the code. It showed a problem with my rule: judged one league at a time, the EPL and La Liga themselves would fail 4 of 16 checks. One league has about 1,100 test matches, and that is not enough to tell small differences from luck. The live leagues had been judged on both leagues together. So I changed the rule to "both trial leagues together", wrote down why, and committed it before I had seen a single Serie A or Ligue 1 score. A rule may change before the results are seen. After that, it may not.
+
+The result, by that rule, is no. Home, draw, away works as well as in the live leagues: it beats Elo and base rates, and it trails the sharp market by the same amount (0.0057 RPS, against 0.0053 in the live leagues). Yellow cards work well. But the over 2.5 goals forecast does not clearly beat a plain league average, and nor does the corners forecast. Partly this is the leagues: even the sharp market beats the over 2.5 average by only about half as much as in England and Spain, and in Serie A not clearly at all. Goal totals there are close to a coin toss for everyone.
+
+The rule treated all goals markets as one block, because they all come from the same table of scorelines. So the block fails, even though home, draw, away passes. Running only the parts that passed would be a new proposal, and a new proposal needs its own test.
+

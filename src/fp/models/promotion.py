@@ -20,6 +20,7 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
+from fp import leagues
 from fp.models import dixon_coles as dc
 from fp.models.priors import promoted, season_teams
 
@@ -81,7 +82,7 @@ def _ols(x: np.ndarray, y: np.ndarray) -> tuple[float, float, float]:
 
 def fit_promotion_model(matches: pd.DataFrame, second_tier: pd.DataFrame) -> PromotionModel:
     rows = []
-    for league in ("EPL", "LaLiga"):
+    for league in leagues.codes_in(matches["league"]):
         teams = season_teams(matches, league)
         for season in ESTIMATION_SEASONS:
             lower = second_tier_ratings(second_tier, league, season - 1)
