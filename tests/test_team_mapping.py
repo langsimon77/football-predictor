@@ -126,9 +126,18 @@ def test_both_sources_agree_on_the_twenty_clubs(division, start_year):
     assert of_ids == fd_ids, {"only_openfootball": of_ids - fd_ids, "only_fd": fd_ids - of_ids}
 
 
+LAG_DAYS = 7  # how far one source may run ahead of the other
+
+
 @pytest.mark.parametrize("division", sorted(TOP_TIER))
 def test_current_season_results_agree_across_sources(division):
-    """Every 2026/27 match played so far has the same date and score in both sources."""
+    """Every 2026/27 match both sources have played has the same date and score in both.
+
+    One source may publish a round a day or two before the other (13 Oct 2026:
+    football-data.co.uk had the 10 to 12 Oct round, openfootball not yet). A match
+    only one source has is allowed if it is recent; an older one means a club name
+    maps wrongly.
+    """
     year = fd.CURRENT_SEASON
     of = load_openfootball(division, year).dropna(subset=["home_goals"])
     of = pd.DataFrame({
@@ -147,9 +156,13 @@ def test_current_season_results_agree_across_sources(division):
     merged = fdc.merge(
         of, on=["home", "away"], how="outer", suffixes=("_fd", "_of"), indicator=True
     )
-    assert (merged["_merge"] == "both").all(), merged[merged["_merge"] != "both"]
-    assert (merged["date_fd"] == merged["date_of"]).all()
-    assert (merged["score_fd"] == merged["score_of"]).all()
+    both = merged[merged["_merge"] == "both"]
+    assert (both["date_fd"] == both["date_of"]).all(), both[both["date_fd"] != both["date_of"]]
+    assert (both["score_fd"] == both["score_of"]).all(), both[both["score_fd"] != both["score_of"]]
+    one_sided = merged[merged["_merge"] != "both"]
+    newest = pd.Timestamp(max(fdc["date"].max(), of["date"].max()))
+    played = pd.to_datetime(one_sided["date_fd"].fillna(one_sided["date_of"]))
+    assert (played >= newest - pd.Timedelta(days=LAG_DAYS)).all(), one_sided
 
 
 @pytest.mark.parametrize("code", ["PL", "PD", "SA", "FL1"])
