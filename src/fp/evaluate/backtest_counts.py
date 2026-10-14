@@ -39,15 +39,18 @@ def referee_known_at_lock(kickoff_utc: pd.Series) -> pd.Series:
 
 
 def predict_league(matches: pd.DataFrame, features: pd.DataFrame, target: str, league: str,
-                   seasons: list[int], params: cn.CountParams
+                   seasons: list[int], params: cn.CountParams, referee_always: bool = False
                    ) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """referee_always: keep every appointment, as if each forecast were updated once the
+    referee is known (after the lock, before kickoff). For measuring what that update is
+    worth (data/audit/preregistration_counts_safety_2026_10.md); never for locked rows."""
     lg = matches[matches["league"] == league]
     teams = sorted(set(lg["home_id"]) | set(lg["away_id"]))
     to_rows = {"corners": cn.corner_rows, "corners_total": cn.total_corner_rows,
                "cards": cn.card_rows}[target]
     targets = lg[lg["season"].isin(seasons)].copy()
     targets["lock_utc"] = lock_time(targets["kickoff_utc"])
-    if target == "cards":
+    if target == "cards" and not referee_always:
         # Hide appointments the live system would not have had at lock time.
         targets.loc[~referee_known_at_lock(targets["kickoff_utc"]), "referee"] = None
 
@@ -101,6 +104,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--poisson", action="store_true")
     ap.add_argument("--sampler", default="numpyro")
+    ap.add_argument("--referee-always", action="store_true",
+                    help="cards: every referee known (value of a late update; not for locks)")
     args = ap.parse_args(argv)
     matches = pd.read_parquet(processed_dir(args.league) / "matches.parquet")
     features = rolling.match_features(matches)
@@ -108,7 +113,7 @@ def main(argv: list[str] | None = None) -> int:
                             use_referee=args.target == "cards" and args.league == "EPL")
     start = time.time()
     preds, fits = predict_league(matches, features, args.target, args.league, args.seasons,
-                                 params)
+                                 params, args.referee_always)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     preds.to_parquet(args.out, index=False)
     fits.to_parquet(args.out.with_suffix(".fits.parquet"), index=False)
