@@ -257,6 +257,64 @@ def upcoming_block(pages: Path, names: dict[str, int], short: dict[str, str],
     return {"rows": rows, "meta": json.loads((pages / "meta.json").read_text())}
 
 
+TRIAL_UPCOMING = ROOT / "ledger" / "trial" / "upcoming.parquet"
+TRIAL_LEAGUE_NAMES = {"SerieA": "Serie A", "Ligue1": "Ligue 1"}
+
+
+def trial_picks(r, home: str, away: str) -> list[dict]:
+    """Serie A and Ligue 1 picks for the markets that passed their backtest only:
+    home, draw, away; double chance and draw no bet (both from those three numbers);
+    yellow cards. Labels and keys follow scripts/pairs_lab.py."""
+    ph, pd_, pa = float(r.p_home), float(r.p_draw), float(r.p_away)
+    out = [{"k": "H", "fam": "result", "label": f"{home} win", "p": ph},
+           {"k": "D", "fam": "result", "label": "Draw", "p": pd_},
+           {"k": "A", "fam": "result", "label": f"{away} win", "p": pa},
+           {"k": "1X", "fam": "dc", "label": f"{home} or draw", "p": ph + pd_},
+           {"k": "X2", "fam": "dc", "label": f"Draw or {away}", "p": pd_ + pa},
+           {"k": "12", "fam": "dc", "label": f"{home} or {away}", "p": ph + pa},
+           {"k": "DNB-H", "fam": "dnb", "label": f"Draw no bet: {home}", "p": ph,
+            "refund": pd_, "nopair": True},
+           {"k": "DNB-A", "fam": "dnb", "label": f"Draw no bet: {away}", "p": pa,
+            "refund": pd_, "nopair": True}]
+    for line in pairs_lab.YELLOW_LINES:
+        over = getattr(r, f"p_yellows_over_{str(line).replace('.', '_')}")
+        if pd.isna(over):
+            continue
+        out.append({"k": f"Y>{line}", "fam": "yellows",
+                    "label": f"{pairs_lab._n(line)} or more yellow cards", "p": float(over)})
+        out.append({"k": f"Y<{line}", "fam": "yellows",
+                    "label": f"{int(line)} yellow cards or fewer", "p": 1 - float(over)})
+    for p in out:
+        p["p"] = round(p["p"], 5)
+        p["g"] = "trial"
+    return out
+
+
+def trial_block(path: Path, short: dict[str, str], pairs: dict) -> dict | None:
+    """Serie A and Ligue 1 (added to the predictions at Lang's request, 14 Oct 2026):
+    cards for the Predictions page, and their picks added to the slip checker."""
+    if not path.exists():
+        return None
+    up = pd.read_parquet(path).sort_values("kickoff_utc")
+    rows = []
+    for r in up.itertuples():
+        home, away = short.get(r.home_id, r.home_id), short.get(r.away_id, r.away_id)
+        kick = f"{pd.Timestamp(r.kickoff_utc):%Y-%m-%dT%H:%MZ}"
+        lg = TRIAL_LEAGUE_NAMES.get(r.league, r.league)
+        pairs["matches"][r.match_id] = {"h": home, "a": away, "lg": lg, "kickoff": kick,
+                                        "locked": bool(r.locked), "odds": {}, "joint": {},
+                                        "picks": trial_picks(r, home, away), "g": "trial"}
+        rows.append({"id": r.match_id, "lg": lg, "h": home, "a": away, "kickoff": kick,
+                     "round": r.round, "locked": bool(r.locked),
+                     "p": milli([r.p_home, r.p_draw, r.p_away]),
+                     "yellows": None if pd.isna(r.exp_yellows) else round(float(r.exp_yellows), 2),
+                     "y45": None if pd.isna(r.p_yellows_over_4_5)
+                     else round(float(r.p_yellows_over_4_5), 4)})
+    as_of = up["as_of_utc"].max() if len(up) else None
+    return {"rows": rows, "as_of": f"{pd.Timestamp(as_of):%Y-%m-%d %H:%M} UTC" if as_of is not None
+            and pd.notna(as_of) else None}
+
+
 def simulator_block(matches: pd.DataFrame, fixtures: pd.DataFrame, names: dict[str, int],
                     now: pd.Timestamp) -> dict:
     second = pd.read_parquet(PROCESSED / "second_tier.parquet")
@@ -349,6 +407,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("out", type=Path)
     ap.add_argument("--pages-dir", type=Path, required=True)
     ap.add_argument("--allow-stale", action="store_true")
+    ap.add_argument("--trial-upcoming", type=Path, default=TRIAL_UPCOMING,
+                    help="Serie A and Ligue 1 forecasts (written by fp.pipeline.trial)")
     ap.add_argument("--bets-json", type=Path, default=None,
                     help="optional private betting-record summary, kept outside this repository")
     args = ap.parse_args(argv)
@@ -370,6 +430,14 @@ def main(argv: list[str] | None = None) -> int:
     pairs = pairs_lab.upcoming(args.pages_dir, sh, short, odds_files[-1] if odds_files else None)
     pairs["track"] = pairs_lab.track_record(fixed, gf, BACKTESTS, matches, short)
     pairs["record"] = pairs_lab.pick_record(fixed, gf, BACKTESTS, matches)
+    # Safety margin for every pick family (reports/pick_safety_2026_10.md).
+    safety = ROOT / "data" / "audit" / "pick_safety_2026_10.json"
+    if safety.exists():
+        safety_data = json.loads(safety.read_text(encoding="utf-8"))
+        pairs["safety"] = safety_data["safety_table"]
+        if "trial" in safety_data:
+            pairs["safety_trial"] = safety_data["trial"]["safety_table"]
+            pairs["record_trial"] = safety_data["trial"]["record"]
     pairs["odds_file"] = odds_files[-1].parent.name if odds_files else None
     data = {
         "built": f"{pd.Timestamp.now(tz='UTC'):%Y-%m-%d %H:%M} UTC",
@@ -380,6 +448,7 @@ def main(argv: list[str] | None = None) -> int:
         "bets": (json.loads(args.bets_json.read_text(encoding="utf-8"))
                  if args.bets_json is not None else None),
         "up": upcoming_block(args.pages_dir, names, short, proposal),
+        "trial": trial_block(args.trial_upcoming, short, pairs),
         "sim": simulator_block(matches, fixtures, names, now),
         "ev": evidence_block(),
     }
