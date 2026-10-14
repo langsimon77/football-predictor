@@ -1205,7 +1205,12 @@ table.picks td:first-child { font-weight: 700; }
 
   // ============================================================ PAIRS
   const FAMS = [{ v: "result", label: "Result" }, { v: "dc", label: "Double chance" }, { v: "eh", label: "Handicap" }, { v: "goals", label: "Goals" }, { v: "btts", label: "Both score" }, { v: "corners", label: "Corners" }, { v: "yellows", label: "Yellow cards" }];
-  const pa = { day: null, kind: "either", fams: FAMS.map(f => f.v), n: 10 };
+  const pa = { day: null, kind: "either", fams: FAMS.map(f => f.v), n: 10, lgs: "all" };
+  function inLeagues(mid) {
+    // "all", "main" (Premier League and La Liga) or "trial" (Serie A and Ligue 1).
+    const g = D.pairs.matches[mid].g === "trial" ? "trial" : "main";
+    return pa.lgs === "all" || pa.lgs === g;
+  }
   function bestPairs(ids, kind, fams, n) {
     // Same rule as scripts/pairs_lab.py: highest joint chance first, no pick used twice.
     const M = D.pairs.matches, ok = p => fams.indexOf(p.fam) >= 0, cands = [];
@@ -1242,10 +1247,11 @@ table.picks td:first-child { font-weight: 700; }
     if (!pa.day) pa.day = P.days[0].key;
     const T = P.track;
     sec.innerHTML =
-      '<div class="section-head"><h2>Most likely pairs</h2><p>Two outcomes at a time, ranked by the chance that <b>both</b> happen. A pair can come from one match or from two. Picks: result, double chance, handicap (+2 head start, or to win by 2 or more), goals, both teams score, corners and yellow cards, over or under. Draw no bet is left out of pairs because a draw refunds it; it is on the Predictions cards and in the slip checker. Chances use the goals fix. No pick is used twice.</p></div>' +
+      '<div class="section-head"><h2>Most likely pairs</h2><p>Two outcomes at a time, ranked by the chance that <b>both</b> happen. A pair can come from one match or from two. Picks: result, double chance, handicap (+2 head start, or to win by 2 or more), goals, both teams score, corners and yellow cards, over or under. Draw no bet is left out of pairs because a draw refunds it; it is on the Predictions cards and in the slip checker. Chances use the goals fix. No pick is used twice. <b>Serie A and Ligue 1</b> bring only the markets that passed testing there (result, double chance, yellow cards); their picks pair with picks from other matches, and the track record at the bottom is for Premier League and La Liga pairs.</p></div>' +
       '<div class="banner">A view of how likely things are, not betting advice. The bookmakers beat this model in every past test, and every bet carries their margin; joining two picks charges it twice.</div>' +
       '<div class="panel"><div class="controls">' +
       '<div class="ctl"><span class="lbl">Day (Juba time)</span>' + segHTML("pa-day", P.days.map(d => ({ v: d.key, label: d.label + " (" + d.ids.length + ")" })), pa.day) + "</div>" +
+      (D.trial && D.trial.rows.length ? '<div class="ctl"><span class="lbl">Leagues</span>' + segHTML("pa-lgs", [{ v: "all", label: "All" }, { v: "main", label: "Premier League and La Liga" }, { v: "trial", label: "Serie A and Ligue 1" }], pa.lgs) + "</div>" : "") +
       '<div class="ctl"><span class="lbl">Pairs from</span>' + segHTML("pa-kind", [{ v: "either", label: "Either" }, { v: "same", label: "One match" }, { v: "two", label: "Two matches" }], pa.kind) + "</div>" +
       '<div class="ctl"><span class="lbl">Show</span>' + segHTML("pa-n", [{ v: "5", label: "5" }, { v: "10", label: "10" }, { v: "15", label: "15" }], String(pa.n)) + "</div>" +
       "</div>" +
@@ -1261,17 +1267,18 @@ table.picks td:first-child { font-weight: 700; }
         explain("<p>If the chances are honest, the last two columns should be close. These past forecasts are the same walk-forward forecasts used everywhere in this lab, with the goals fix replayed as it would have run. Corners and yellow-card chances in the same match are combined as if unrelated, so pairs that mix them may be a little off.</p>") + "</div>" : "");
     bindSeg("pa-day", v => { pa.day = v; draw(); });
     bindSeg("pa-kind", v => { pa.kind = v; draw(); });
+    if (D.trial && D.trial.rows.length) bindSeg("pa-lgs", v => { pa.lgs = v; draw(); });
     bindSeg("pa-n", v => { pa.n = Number(v); draw(); });
     bindChips("pa-fams", vals => { pa.fams = vals; draw(); });
     function leg(mid, i) {
       const m = P.matches[mid], pk = m.picks[i];
       const w = juba(m.kickoff);
       const bm = m.odds && m.odds[pk.k] != null ? " &middot; bookmakers " + pct(m.odds[pk.k]) : "";
-      return '<div class="leg"><b>' + esc(pk.label) + '</b><span>' + esc(m.h) + " v " + esc(m.a) + " &middot; " + w.time + " &middot; model " + pct(pk.p) + bm + "</span></div>";
+      return '<div class="leg"><b>' + esc(pk.label) + '</b><span>' + esc(m.h) + " v " + esc(m.a) + " &middot; " + esc(m.lg || "") + " &middot; " + w.time + " &middot; model " + pct(pk.p) + bm + "</span></div>";
     }
     function draw() {
       const day = P.days.find(d => d.key === pa.day) || P.days[0];
-      const list = bestPairs(day.ids, pa.kind, pa.fams, pa.n);
+      const list = bestPairs(day.ids.filter(inLeagues), pa.kind, pa.fams, pa.n);
       $("#pa-list").innerHTML = list.length ? '<div class="pairs">' + list.map((c, r) => {
         const same = c.a[0] === c.b[0];
         return '<article class="pair"><div class="rank">#' + (r + 1) + ' <span class="tagline">' + (same ? "one match" : "two matches") + "</span>" + (P.matches[c.a[0]].locked && P.matches[c.b[0]].locked ? "" : ' <span class="tagline">includes a provisional forecast</span>') + '</div><div class="joint">' + pct(c.p) + "<small>both happen</small></div>" +

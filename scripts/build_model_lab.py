@@ -310,6 +310,13 @@ def trial_block(path: Path, short: dict[str, str], pairs: dict) -> dict | None:
                      "yellows": None if pd.isna(r.exp_yellows) else round(float(r.exp_yellows), 2),
                      "y45": None if pd.isna(r.p_yellows_over_4_5)
                      else round(float(r.p_yellows_over_4_5), 4)})
+    # The Pairs page lists matches by Juba day: add these matches to their days.
+    days = {d["key"]: d for d in pairs["days"]}
+    for r in up.itertuples():
+        day = pd.Timestamp(r.kickoff_utc).tz_convert(pairs_lab.JUBA)
+        days.setdefault(f"{day:%Y-%m-%d}", {"key": f"{day:%Y-%m-%d}", "label": f"{day:%a %d %b}",
+                                            "ids": []})["ids"].append(r.match_id)
+    pairs["days"] = [days[k] for k in sorted(days)]
     as_of = up["as_of_utc"].max() if len(up) else None
     return {"rows": rows, "as_of": f"{pd.Timestamp(as_of):%Y-%m-%d %H:%M} UTC" if as_of is not None
             and pd.notna(as_of) else None}
