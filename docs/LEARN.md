@@ -728,3 +728,41 @@ Serie A and Ligue 1 now run every day after the live leagues, for the markets th
 
 Why wait instead of publishing now? A backtest is a replay. A live record is the real thing: kickoff times change, results arrive late, data sources stall. After 300 scored matches (about early January), I check four things written down today, before the first lock: beats base rates, not clearly worse than Elo, yellows better than the league average, and locks on time. Then you decide on publishing.
 
+## Chapter 10: Testing an outside model honestly
+
+### 10.1 Same model, different care
+
+The model you pointed me to (MLGonzo's `dixon_coles.py`) is a Dixon-Coles model, the same family as our published model and our fast challenger. Its maths matches ours exactly; I checked that its likelihood and mine agree to twelve decimal places. The difference is care with little data. Our models pull a club's rating towards a sensible starting point (a "ridge" and a promoted-club prior) until the club has played enough. The reference does not. So after Nottingham Forest's first Premier League match of 2022/23, it gave them a 0.0% chance of beating West Ham at home. Forest won, and a 0% forecast that comes true costs a huge amount of log loss.
+
+### 10.2 Choosing on old seasons, testing once on new ones
+
+I chose the two settings (how fast old results fade, and how much of each model to blend) on 2021/22 and 2022/23 only, and wrote the test rule down before running it. The best blend on those seasons was 100% our model and 0% the reference. On the test seasons (2023/24 to 2025/26), the reference alone was worse than our model. So nothing changed: the published model stays, and the reference stays a comparison tool.
+
+Combining two models helps when each knows something the other does not. Here the reference knew nothing ours did not, and had one weakness ours had already fixed.
+
+## Chapter 11: A safety factor for corners and yellow cards
+
+### 11.1 What the safety factor is
+
+You know safety factors from engineering: design for a load higher than you expect. Here the "load" is the chance a pick comes true. The model might say 79% for "5 yellow cards or fewer". In testing, picks like it came true 77% of the time over 616 matches, and the low end of what that record can support (one-sided 90%) is 73%. The **safe chance** is the lower of the model's number and that low end: 73%. The Model Lab now prices corners and yellows picks from the safe chance, so the "lowest odds" it shows already include the margin (1.46 instead of 1.34 in this example).
+
+### 11.2 Did it work?
+
+I built the safe chances from 2021/22 and 2022/23 only, then checked them on 2023/24 to 2025/26. In 27 of 30 groups, the picks came true at least as often as the safe chance said. That met the bar I set beforehand (90%).
+
+### 11.3 What it does not do
+
+It does not make the model more accurate. The corners and yellows models were already honest: when they said 77%, it happened about 77% of the time. The margin makes your decisions more cautious: fewer picks pass, and those that pass need a better price. Yellow cards remain the stronger market for the model: it beats a plain league average on every line, by about three times as much as for corners.
+
+### 11.4 The referee test
+
+The text you pasted said the referee is the single most predictive variable for cards. I tested it on the EPL, the only league here with referee names: the same model, once with the referee known only when it is known at lock (37% of matches, as now), once with every referee known. The difference was nil (−0.0001, range −0.0010 to +0.0008). Referees do differ, but once the model knows each club's discipline, its fouls and what is at stake, the referee adds almost nothing. So there is no reason to wait for the appointment before judging a cards pick.
+
+### 11.5 The margin for every pick
+
+The same idea now covers every pick on the Model Lab. I checked each kind of pick separately on new seasons. Double chance, goal lines, both teams score and yellow cards stayed safe with the 90% margin. Home, draw, away, handicaps, draw no bet and corners needed a slightly wider one (95%): with 90%, two or three of their groups came true a little less often than the safe chance said. For example, Chelsea +2 handicap at 84% now needs a price of 1.28 instead of 1.23.
+
+### 9.6 Serie A and Ligue 1 in your predictions
+
+From 14 Oct 2026 the Model Lab shows Serie A and Ligue 1 next to the EPL and La Liga, but only for what passed testing in those leagues: home, draw, away (so double chance and draw no bet too) and yellow cards. Their goals and corners forecasts failed, so the cards say "not shown" rather than show numbers we cannot stand behind. Each pick's track record and safety margin come from Serie A and Ligue 1's own history, not from England and Spain. The live check after 300 scored matches still runs.
+

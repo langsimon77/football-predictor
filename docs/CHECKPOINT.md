@@ -24,14 +24,21 @@
 
 - Lang chose "Run what passed" (13 Oct): Serie A and Ligue 1 home, draw, away (with double chance) and yellows run in the background daily (`src/fp/pipeline/trial.py`, ledger `ledger/trial/`), not published. Publishing review after 300 scored matches by rules fixed before the first lock (`data/audit/preregistration_trial_live_2026_10.md`).
 
+- 14 Oct 2026: reference Dixon-Coles (MLGonzo/football_stats) adapted and tested at Lang's request; not adopted (`reports/dc_reference_2026_10.md`). Left uncommitted on the local branch `dc-reference`, as the request asked.
+- 14 Oct 2026: corners and yellows (`reports/counts_safety_2026_10.md`): safety margin for picks passed its check and is live in the Model Lab (version 10); every corners and yellows line beats the league average (yellows about three times more); an EPL referee update adds nothing (not proposed). Code and results uncommitted in the same working tree.
+
+- 14 Oct 2026 (later): safety margin on every pick (Model Lab version 11); Serie A and Ligue 1 in the Model Lab for their tested markets (version 12); Champions League approved for goals markets only: step 1 started (`fp.ingest.uefa` reads 3,621 European matches); next, one ID per club across European and domestic sources.
+
 ### Open questions for Lang
-1. None open on Serie A and Ligue 1 until the publishing review (about early January 2027).
+1. Serie A and Ligue 1 live review after 300 scored matches (about early January 2027).
+2. Uncommitted work on the local branch `dc-reference`: the reference Dixon-Coles comparison, the safety margins, Serie A and Ligue 1 in the Model Lab (and the background run's new upcoming export), and the UEFA reader. The daily run only writes the Serie A and Ligue 1 export once this is committed and merged.
 2. Please answer the daily question Issue: unanswered questions cap confidence at Medium (all nine 9 Oct locks were capped).
 
 ### Next actions
 | Action | Owner |
 |---|---|
 | Serie A and Ligue 1 background run: check the first trial locks (Thu 15 Oct run, for Fri 16 Oct kickoffs) and results; publishing review after 300 scored matches. | Claude |
+| Champions League step 1: map every club in the European files (377 names) and their domestic leagues to one ID; then the walk-forward test. | Claude, next |
 | Settle Lang's logged bets when asked (procedure in Claude's memory). | Claude, on request |
 | First monthly `shape_v1` refit, Sun 1 Nov (logged in `data/shape/shape_v1.json`). | Automatic |
 | News-on against news-off test after 10 gameweeks; `shape_v1` against its plain copy at the end of 2026/27. | Claude, then Lang |

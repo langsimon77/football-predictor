@@ -6,6 +6,7 @@ import json
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from fp import ledger
 from fp.models import posterior_store, shape
@@ -58,3 +59,23 @@ def test_trial_files_are_apart_from_live_files():
     assert not live & mine
     assert trial.LEDGER.parent.name == "trial" and trial.STORE.name == "trial"
     assert set(trial.COMPETITIONS.values()) == {"SerieA", "Ligue1"}
+
+
+def test_model_lab_shows_only_tested_markets_for_trial_leagues():
+    import sys as _sys
+    from pathlib import Path as _Path
+    from types import SimpleNamespace
+
+    _sys.path.insert(0, str(_Path(__file__).resolve().parents[1] / "scripts"))
+    import build_model_lab
+
+    r = SimpleNamespace(p_home=0.5, p_draw=0.3, p_away=0.2, p_yellows_over_3_5=0.6,
+                        p_yellows_over_4_5=0.4, p_yellows_over_5_5=0.2)
+    picks = build_model_lab.trial_picks(r, "Roma", "Genoa")
+    assert {p["fam"] for p in picks} == {"result", "dc", "dnb", "yellows"}
+    assert all(p["g"] == "trial" for p in picks)
+    by = {p["k"]: p for p in picks}
+    assert by["1X"]["p"] == pytest.approx(0.8) and by["12"]["p"] == pytest.approx(0.7)
+    assert by["DNB-H"]["refund"] == pytest.approx(0.3)
+    assert by["Y>4.5"]["label"] == "5 or more yellow cards"
+    assert by["Y<4.5"]["p"] == pytest.approx(0.6)

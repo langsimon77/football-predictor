@@ -990,13 +990,41 @@ table.picks td:first-child { font-weight: 700; }
     if (pk.fam === "yellows") return "Total bookings (cards)";
     return "Other";
   }
+  function safeP(pk) {
+    // Every pick: the lower of the model's chance and the low end (one-sided 90% or 95%,
+    // per family) of how often picks like it came true in testing
+    // (reports/pick_safety_2026_10.md). Draw no bet is judged on matches not drawn.
+    const S = safetyTable(pk);
+    if (!S) return pk.p;
+    const dnb = pk.fam === "dnb", q = dnb ? pk.p / Math.max(1 - pk.refund, 1e-9) : pk.p;
+    const b = Math.min(Math.floor(q * 20), 19) / 20;
+    const row = S.find(r => Math.abs(r[0] - b) < 1e-9);
+    if (!row || !isFinite(row[3])) return NaN;
+    const safe = Math.min(q, row[3]);
+    return dnb ? safe * (1 - pk.refund) : safe;
+  }
+  function safetyTable(pk) {
+    // Serie A and Ligue 1 picks (pk.g "trial") use their own leagues' margins and record.
+    const P = D.pairs || {};
+    const T = pk.g === "trial" ? P.safety_trial : P.safety;
+    return T ? T[pk.fam] : null;
+  }
+  function hasSafety(pk) { return !!safetyTable(pk); }
   function minOdds(pk) {
     // Lowest odds at which the pick pays over time after the 20% tax, if the chance is right.
+    // Corners and yellows use the safe chance, so the price includes a safety margin.
+    const p = safeP(pk);
+    if (!(isFinite(p) && p > 0)) return Infinity;
+    if (pk.fam === "dnb") { const lose = Math.max(1 - p - pk.refund, 0); return 1 + lose / (0.8 * p); }
+    return 1 + (1 / p - 1) / 0.8;
+  }
+  function plainOdds(pk) {
     if (pk.fam === "dnb") { const lose = Math.max(1 - pk.p - pk.refund, 0); return 1 + lose / (0.8 * pk.p); }
     return 1 + (1 / pk.p - 1) / 0.8;
   }
   function recordFor(pk) {
-    const R = (D.pairs && D.pairs.record) ? D.pairs.record[pk.fam] : null;
+    const P = D.pairs || {};
+    const R = (pk.g === "trial" ? P.record_trial : P.record) ? (pk.g === "trial" ? P.record_trial : P.record)[pk.fam] : null;
     if (!R) return null;
     const q = pk.fam === "dnb" ? pk.p / Math.max(1 - pk.refund, 1e-9) : pk.p;
     const b = Math.min(Math.floor(q * 20), 19) / 20;
@@ -1007,8 +1035,10 @@ table.picks td:first-child { font-weight: 700; }
     const pref = PREF0[pickMarket(pk)] || "reason";
     const need = minOdds(pk);
     if (pref === "avoid" || pref === "never") return { ok: false, text: "No: " + pickMarket(pk).toLowerCase() + " is on your avoid list" };
-    if (need > 1.70 + 1e-9) return { ok: false, text: "No: it would need odds of " + need.toFixed(2) + ", above your 1.70 cap" };
-    return { ok: true, text: "Only at odds of " + need.toFixed(2) + " or more" + (pref === "reason" ? " (and only with a reason)" : "") };
+    const margin = hasSafety(pk) ? " with the safety margin (" + plainOdds(pk).toFixed(2) + " without)" : (pk.g === "trial" ? " (no reliable safety margin in this league)" : "");
+    if (!isFinite(need)) return { ok: false, text: "No: too little track record for a safe chance" };
+    if (need > 1.70 + 1e-9) return { ok: false, text: "No: it would need odds of " + need.toFixed(2) + margin + ", above your 1.70 cap" };
+    return { ok: true, text: "Only at odds of " + need.toFixed(2) + " or more" + margin + (pref === "reason" ? " (and only with a reason)" : "") };
   }
   function recordText(pk) {
     const r = recordFor(pk);
@@ -1024,7 +1054,7 @@ table.picks td:first-child { font-weight: 700; }
     const shown = all ? ps : ps.filter(x => x.v.ok).slice(0, 5);
     if (!shown.length) return "<p class='caption'>No pick here can pass your rules.</p>";
     return "<div class='table-wrap'><table class='picks'><thead><tr><th>Pick</th><th class='num'>Chance</th><th class='num'>Came true in testing</th><th>Your rules</th></tr></thead><tbody>" +
-      shown.map(x => "<tr><td>" + esc(x.pk.label) + "</td><td class='num'>" + pct(x.pk.p) + (x.pk.fam === "dnb" ? "<span class='ci'> win, " + pct(x.pk.refund) + " refund</span>" : "") + "</td><td class='num'>" + recordText(x.pk) + "</td><td>" + (x.v.ok ? "<span class='status flag'>" : "<span class='status bad'>") + esc(x.v.text) + "</span></td></tr>").join("") + "</tbody></table></div>";
+      shown.map(x => "<tr><td>" + esc(x.pk.label) + "</td><td class='num'>" + pct(x.pk.p) + (x.pk.fam === "dnb" ? "<span class='ci'> win, " + pct(x.pk.refund) + " refund</span>" : "") + (hasSafety(x.pk) && isFinite(safeP(x.pk)) ? "<span class='ci'> safe " + pct(safeP(x.pk)) + "</span>" : "") + "</td><td class='num'>" + recordText(x.pk) + "</td><td>" + (x.v.ok ? "<span class='status flag'>" : "<span class='status bad'>") + esc(x.v.text) + "</span></td></tr>").join("") + "</tbody></table></div>";
   }
 
   // ============================================================ PREDICTIONS
@@ -1069,11 +1099,11 @@ table.picks td:first-child { font-weight: 700; }
       kpi("Biggest favourite", fav ? esc(D.clubs[fav.side]) + " <small>" + pct(fav.p) + "</small>" : "none", fav ? "Against " + D.clubs[fav.side === fav.r.h ? fav.r.a : fav.r.h] + "." : "") +
       "</div>" +
       '<div class="panel"><div class="controls">' +
-      '<div class="ctl"><span class="lbl">League</span>' + segHTML("pr-league", [{ v: "both", label: "Both" }, { v: "0", label: "Premier League" }, { v: "1", label: "La Liga" }], pr.league) + "</div>" +
+      '<div class="ctl"><span class="lbl">League</span>' + segHTML("pr-league", [{ v: "both", label: "All" }, { v: "0", label: "Premier League" }, { v: "1", label: "La Liga" }].concat(D.trial && D.trial.rows.length ? [{ v: "trial", label: "Serie A and Ligue 1" }] : []), pr.league) + "</div>" +
       '<div class="ctl"><span class="lbl">Order</span>' + segHTML("pr-sort", [{ v: "time", label: "Kickoff" }, { v: "conf", label: "Clearest favourite" }, { v: "close", label: "Closest call" }], pr.sort) + "</div>" +
       (hasFix ? '<label class="toggle"><input type="checkbox" id="pr-fix"' + (pr.fix ? " checked" : "") + "> Also show the proposed fix (not live)</label>" : "") +
       "</div>" +
-      explain("<p>Each card shows the chances of a home win, a draw and an away win (blue, grey, red), the single most likely score, and the expected goals, corners and yellow cards. The likely score is only the best single guess: even the top score happens in only about one match in eight. <b>3 or more goals</b> is the over 2.5 line; <b>10 or more corners</b> is over 9.5; <b>5 or more yellow cards</b> is over 4.5. Under each card, <b>Picks</b> lists the most likely picks that could pass your rules: the chance the model gives, how often forecasts like it <b>came true in testing</b> (2023/24 to 2025/26, same kind of pick, chance within the same 5-point band), and the lowest odds at which it pays over time after the 20% tax. If the bookmaker offers less, it fails your rules. Press <b>Show all picks</b> to see every pick, including those on your avoid list. This is not a recommendation to bet.</p>") +
+      explain("<p>Each card shows the chances of a home win, a draw and an away win (blue, grey, red), the single most likely score, and the expected goals, corners and yellow cards. The likely score is only the best single guess: even the top score happens in only about one match in eight. <b>3 or more goals</b> is the over 2.5 line; <b>10 or more corners</b> is over 9.5; <b>5 or more yellow cards</b> is over 4.5. Under each card, <b>Picks</b> lists the most likely picks that could pass your rules: the chance the model gives, how often forecasts like it <b>came true in testing</b> (2023/24 to 2025/26, same kind of pick, chance within the same 5-point band), and the lowest odds at which it pays over time after the 20% tax. Every price carries a <b>safety margin</b>: it uses the <b>safe chance</b>, the lower of the model's chance and the low end of how often picks like it came true in testing (one-sided 90% for double chance, goal lines, both teams score and yellow cards; 95% for home, draw, away, handicaps, draw no bet and corners, which needed the wider margin to stay safe on new seasons). The price without the margin is shown in brackets. If the bookmaker offers less, it fails your rules. Press <b>Show all picks</b> to see every pick, including those on your avoid list. <b>Serie A and Ligue 1</b> (added 14 Oct 2026) show only the markets that passed testing in those leagues: home, draw, away, with double chance and draw no bet, and yellow cards. Their goals, both-teams-score and corners forecasts failed, so they are not shown. Their safety margins and track records come from their own leagues; draw no bet there has no reliable margin. This is not a recommendation to bet.</p>") +
       "</div>" +
       '<div id="pr-fix-note"></div><div id="pr-list" style="display:grid;gap:14px"></div>';
     bindSeg("pr-league", v => { pr.league = v; draw(); });
@@ -1125,7 +1155,7 @@ table.picks td:first-child { font-weight: 700; }
     }
     function draw() {
       $("#pr-fix-note").innerHTML = pr.fix ? '<div class="banner"><b>Not live.</b> The fix lines show what the proposed change in Tests and decisions would do to these forecasts. The published forecasts stay as they are unless you approve it.</div>' : "";
-      const leagues = pr.league === "both" ? [0, 1] : [Number(pr.league)];
+      const leagues = pr.league === "both" ? [0, 1] : pr.league === "trial" ? [] : [Number(pr.league)];
       let out = "";
       leagues.forEach(lg => {
         let rs = gw.filter(r => r.lg === lg);
@@ -1143,7 +1173,32 @@ table.picks td:first-child { font-weight: 700; }
           out += '<div class="cards">' + rs.map(card).join("") + "</div>";
         }
       });
+      if ((pr.league === "both" || pr.league === "trial") && D.trial && D.trial.rows.length) out += trialSection();
       $("#pr-list").innerHTML = out || '<p class="caption">No matches in this snapshot.</p>';
+    }
+    function trialCard(r) {
+      const p = r.p.map(v => v / 1000), when = juba(r.kickoff), home = esc(r.h), away = esc(r.a);
+      return '<article class="pcard"><div class="row1"><span class="when">' + when.time + "</span><span>" + esc(r.lg) + '</span><span class="right"><span class="lockpill' + (r.locked ? " on" : "") + '">' + (r.locked ? "Locked" : "Provisional") + "</span></span></div>" +
+        '<div class="teams">' + home + '<span class="v">v</span>' + away + "</div>" +
+        stackbar(p[0], p[1], p[2]) +
+        '<div class="three"><span>' + home + " win<b>" + pct(p[0]) + "</b></span><span>Draw<b>" + pct(p[1]) + "</b></span><span>" + away + " win<b>" + pct(p[2]) + "</b></span></div><dl>" +
+        line("Yellow cards", r.yellows != null ? "about " + r.yellows.toFixed(1) + "; 5 or more: <b>" + pct(r.y45) + "</b>" : "<span class='ci'>not available</span>") +
+        line("Goals, corners", "<span class='ci'>not shown: they failed testing in this league</span>") +
+        "</dl>" +
+        '<div class="picks-box" data-mid="' + esc(r.id) + '"><div class="lbl" style="font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700">Picks</div>' + picksTable(r.id, false) + "</div>" +
+        '<div style="display:flex;gap:14px;flex-wrap:wrap"><button type="button" class="open allpicks" data-mid="' + esc(r.id) + '">Show all picks</button></div></article>';
+    }
+    function trialSection() {
+      let out = "";
+      ["Serie A", "Ligue 1"].forEach(name => {
+        const rs = D.trial.rows.filter(r => r.lg === name);
+        if (!rs.length) return;
+        out += '<div class="gw-head"><h3>' + name + "</h3><span>" + esc(rs[0].round || "") + ", " + rs.length + " matches, " + rs.filter(r => r.locked).length + " locked. Home, draw, away and yellow cards only.</span></div>";
+        const days = [];
+        rs.forEach(r => { const k = juba(r.kickoff); if (!days.length || days[days.length - 1].key !== k.key) days.push({ key: k.key, day: k.day, rows: [] }); days[days.length - 1].rows.push(r); });
+        days.forEach(dd => { out += '<div class="gw-day">' + dd.day + '</div><div class="cards">' + dd.rows.map(trialCard).join("") + "</div>"; });
+      });
+      return out;
     }
     draw();
   };
@@ -1304,7 +1359,7 @@ table.picks td:first-child { font-weight: 700; }
     const P = D.pairs || { matches: {} };
     const groups = Object.keys(P.matches).map(mid => {
       const m = P.matches[mid];
-      return '<optgroup label="' + esc(m.h + " v " + m.a + " (" + juba(m.kickoff).day + ")") + '">' + m.picks.map((pk, i) => '<option value="' + esc(mid + "|" + i) + '">' + esc(pk.label) + " (model " + pct(pk.p) + ")</option>").join("") + "</optgroup>";
+      return '<optgroup label="' + esc(m.h + " v " + m.a + " (" + juba(m.kickoff).day + ")") + '">' + m.picks.map((pk, i) => '<option value="' + esc(mid + "|" + i) + '">' + esc(pk.label) + " (model " + pct(pk.p) + (hasSafety(pk) && isFinite(safeP(pk)) ? ", safe " + pct(safeP(pk)) : "") + ")</option>").join("") + "</optgroup>";
     }).join("");
     return '<div class="leg-in"><h4>Pick ' + n + (n === 2 ? ' <span class="ci">(optional)</span>' : "") + "</h4>" +
       '<div class="ctl"><label for="ck-src' + n + '">Pick</label><select id="ck-src' + n + '"><option value="">' + (n === 2 ? "No second pick" : "Choose a model pick, or type your own below") + '</option><option value="own">My own pick (type the chance)</option>' + groups + "</select></div>" +
@@ -1318,7 +1373,8 @@ table.picks td:first-child { font-weight: 700; }
         const v = e.target.value;
         if (v && v !== "own") {
           const [mid, i] = v.split("|"); const pk = D.pairs.matches[mid].picks[Number(i)];
-          $("#ck-p" + n).value = (pk.p * 100).toFixed(1); $("#ck-mkt" + n).value = pickMarket(pk);
+          const sp = hasSafety(pk) ? safeP(pk) : pk.p;
+          $("#ck-p" + n).value = ((isFinite(sp) ? sp : pk.p) * 100).toFixed(1); $("#ck-mkt" + n).value = pickMarket(pk);
           const o = D.pairs.matches[mid].odds || {};
           if (o[pk.k] && !$("#ck-odds" + n).value) $("#ck-odds" + n).placeholder = "market fair " + (1 / o[pk.k]).toFixed(2);
         }

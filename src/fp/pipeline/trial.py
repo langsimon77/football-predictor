@@ -40,6 +40,7 @@ from fp.models.priors import PromotedPrior
 from fp.models.promotion import fit_promotion_model
 from fp.pipeline import counts_live, daily
 from fp.pipeline import data as data_pipeline
+from fp.publish import export as publish
 from fp.validate import freshness
 from fp.validate.leakage import known_as_of
 
@@ -49,6 +50,13 @@ TRIAL_DIR = ledger.LEDGER_DIR / "trial"
 LEDGER = TRIAL_DIR / "predictions.parquet"
 RESULTS = TRIAL_DIR / "results.parquet"
 REPORT = TRIAL_DIR / "latest.md"
+# Locked and provisional forecasts of the markets shown in the Model Lab (Lang asked on
+# 14 Oct 2026 to add these leagues to the predictions; only tested markets are shown).
+UPCOMING = TRIAL_DIR / "upcoming.parquet"
+UPCOMING_COLUMNS = ["match_id", "league", "round", "kickoff_utc", "home_id", "away_id",
+                    "locked", "lock_utc", "p_home", "p_draw", "p_away", "exp_yellows",
+                    "p_yellows_over_3_5", "p_yellows_over_4_5", "p_yellows_over_5_5",
+                    "as_of_utc", "model_version"]
 STORE = posterior_store.STORE / "trial"
 SHAPE_STORE = shape.STORE.with_name("shape_v1_trial.json")
 SHAPE_BACKTEST = ROOT / "data" / "backtests" / "trial" / "dc_bayes_v1_walkforward_2021_2025.parquet"
@@ -72,6 +80,7 @@ class TrialContext:
     ledger_path: Path = LEDGER
     results_path: Path = RESULTS
     report_path: Path | None = REPORT
+    upcoming_path: Path | None = UPCOMING
     store: Path = STORE
     shape_store: Path = SHAPE_STORE
 
@@ -132,7 +141,37 @@ def run_once(now: pd.Timestamp, ctx: TrialContext, dry_run: bool = False) -> pd.
                                     ctx.score_only) if not dry_run else pd.DataFrame())
     if ctx.report_path is not None and not dry_run:
         write_report(existing, results, now, models, sh, ctx.report_path)
+    if ctx.upcoming_path is not None and not dry_run:
+        export_upcoming(ctx, now, existing, models, counts, sh, report.stale, ctx.upcoming_path)
     return new
+
+
+def export_upcoming(ctx: TrialContext, now: pd.Timestamp, locked: pd.DataFrame,
+                    models: dict[str, daily.LeagueModels], counts: dict, sh: shape.Shape,
+                    stale: bool, path: Path) -> pd.DataFrame:
+    """The dashboard's window of matches (next 8 days plus each league's next round):
+    locked forecasts as locked, the rest provisional from today's fits."""
+    fx = ctx.fixtures
+    shown = publish.window(fx, now)
+    soon = fx[fx["match_id"].isin(shown) & fx["time_confirmed"]]
+    primary = (locked[locked["model_name"] == daily.BAYES_MODEL]
+               .sort_values("lock_utc").drop_duplicates("match_id", keep="last")
+               if len(locked) else pd.DataFrame(columns=["match_id"]))
+    done = primary[primary["match_id"].isin(soon["match_id"])].assign(locked=True)
+    prov_fx = soon[~soon["match_id"].isin(done["match_id"])].assign(late_lock=False)
+    prov = pd.DataFrame()
+    if len(prov_fx):
+        feats = rolling.features_for_fixtures(prov_fx, ctx.matches, now)
+        rows = trim(daily.build_rows(prov_fx, models, now, stale, counts, feats, {}, None, sh))
+        prov = rows[rows["model_name"] == daily.BAYES_MODEL].assign(locked=False)
+        prov["lock_utc"] = pd.Series(pd.NaT, index=prov.index, dtype="datetime64[ns, UTC]")
+    out = pd.concat([done, prov], ignore_index=True)
+    rounds = fx.set_index("match_id")["round"]
+    out["round"] = out["match_id"].map(rounds)
+    out = out.reindex(columns=UPCOMING_COLUMNS).sort_values("kickoff_utc").reset_index(drop=True)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    out.to_parquet(path, index=False)
+    return out
 
 
 def write_report(locked: pd.DataFrame, results: pd.DataFrame, now: pd.Timestamp,
