@@ -226,3 +226,15 @@
   threat_out: false
   source: 'Issue #8'
   used_at_utc: 2026-10-11T06:28Z
+- question: LaLiga_2627_deportivo_la_coruna_levante:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #9'
+  used_at_utc: 2026-10-15T05:14Z
+- question: LaLiga_2627_deportivo_la_coruna_levante:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #9'
+  used_at_utc: 2026-10-15T05:14Z
