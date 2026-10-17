@@ -346,3 +346,99 @@
   threat_out: false
   source: 'Issue #10'
   used_at_utc: 2026-10-16T05:01Z
+- question: EPL_2627_bournemouth_sunderland:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #11'
+  used_at_utc: 2026-10-17T05:00Z
+- question: EPL_2627_bournemouth_sunderland:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #11'
+  used_at_utc: 2026-10-17T05:00Z
+- question: EPL_2627_brighton_crystal_palace:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #11'
+  used_at_utc: 2026-10-17T05:00Z
+- question: EPL_2627_brighton_crystal_palace:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #11'
+  used_at_utc: 2026-10-17T05:00Z
+- question: EPL_2627_leeds_man_united:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #11'
+  used_at_utc: 2026-10-17T05:00Z
+- question: EPL_2627_leeds_man_united:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #11'
+  used_at_utc: 2026-10-17T05:00Z
+- question: EPL_2627_nottm_forest_arsenal:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #11'
+  used_at_utc: 2026-10-17T05:00Z
+- question: EPL_2627_nottm_forest_arsenal:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #11'
+  used_at_utc: 2026-10-17T05:00Z
+- question: LaLiga_2627_celta_vigo_alaves:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #11'
+  used_at_utc: 2026-10-17T05:00Z
+- question: LaLiga_2627_celta_vigo_alaves:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #11'
+  used_at_utc: 2026-10-17T05:00Z
+- question: LaLiga_2627_malaga_real_sociedad:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #11'
+  used_at_utc: 2026-10-17T05:00Z
+- question: LaLiga_2627_malaga_real_sociedad:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #11'
+  used_at_utc: 2026-10-17T05:00Z
+- question: LaLiga_2627_osasuna_racing_santander:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #11'
+  used_at_utc: 2026-10-17T05:00Z
+- question: LaLiga_2627_osasuna_racing_santander:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #11'
+  used_at_utc: 2026-10-17T05:00Z
+- question: LaLiga_2627_real_madrid_sevilla:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #11'
+  used_at_utc: 2026-10-17T05:00Z
+- question: LaLiga_2627_real_madrid_sevilla:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #11'
+  used_at_utc: 2026-10-17T05:00Z
