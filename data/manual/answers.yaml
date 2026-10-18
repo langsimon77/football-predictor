@@ -442,3 +442,27 @@
   threat_out: false
   source: 'Issue #11'
   used_at_utc: 2026-10-17T05:00Z
+- question: EPL_2627_tottenham_coventry:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #12'
+  used_at_utc: 2026-10-18T05:10Z
+- question: EPL_2627_tottenham_coventry:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #12'
+  used_at_utc: 2026-10-18T05:10Z
+- question: LaLiga_2627_getafe_rayo_vallecano:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #12'
+  used_at_utc: 2026-10-18T05:10Z
+- question: LaLiga_2627_getafe_rayo_vallecano:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #12'
+  used_at_utc: 2026-10-18T05:10Z
