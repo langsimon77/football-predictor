@@ -466,3 +466,15 @@
   threat_out: false
   source: 'Issue #12'
   used_at_utc: 2026-10-18T05:10Z
+- question: LaLiga_2627_levante_athletic_bilbao:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #13'
+  used_at_utc: 2026-10-20T05:19Z
+- question: LaLiga_2627_levante_athletic_bilbao:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #13'
+  used_at_utc: 2026-10-20T05:19Z
