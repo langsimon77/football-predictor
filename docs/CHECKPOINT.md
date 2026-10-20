@@ -9,6 +9,8 @@
 - Safety margins for Champions League picks (`data/audit/ucl_safety_2026_10.json`): 90% for result, draw no bet and goal lines; double chance has none (flagged).
 - Daily step `src/fp/pipeline/ucl.py` (after the trial step; cannot block the live run; Issue on failure): this season's fixtures and results from football-data.org (`CL`, names in `data/manual/fdorg_ucl_aliases.csv`); locks home, draw, away and goal lines into `ledger/ucl/`; writes `ledger/ucl/upcoming.parquet`. Ledger guard covers `ledger/ucl/`. Tests: `tests/test_ucl_pipeline.py`.
 - Model Lab: Champions League cards in Predictions; its picks in Pairs, the slip checker and the value finder (checked in the browser with sample fixtures; published once the first daily run writes the export).
+- First Champions League run (manual daily run 39449276758, 20 Oct 15:44 UTC, all steps green): 18 matchday 3 matches locked. Wednesday's 9 locked 25 to 27 hours before kickoff; Tuesday's 9 only 1 to 3 hours before (flagged `late_lock`; the step did not exist earlier). Four locks carry `europe_only_rating` (Sabah, Slavia Prague, Slovan Bratislava, Shakhtar Donetsk). Fit: 18,087 results, 602 clubs, converged.
+- Model Lab rebuilt with the export (18 Champions League cards checked in the browser); republishing waits for Lang (the publish was blocked because the page embeds the private betting summary).
 
 ### Open questions for Lang
 1. Serie A and Ligue 1 live review after 300 scored matches (about early January 2027).
@@ -17,7 +19,7 @@
 ### Next actions
 | Action | Owner |
 |---|---|
-| First Champions League daily run on GitHub: check the locks, flags and export; then rebuild and republish the Model Lab. | Claude |
+| Republish the Model Lab with the Champions League (waits for Lang's choice on the private betting summary). | Claude, after Lang |
 | Champions League live check: compare locked forecasts with results as they come in (no market benchmark exists). | Claude |
 | Serie A and Ligue 1 publishing review after 300 scored matches. | Claude, then Lang |
 | Rayo v Athletic (10 Oct): result still missing in every source. | Claude |
