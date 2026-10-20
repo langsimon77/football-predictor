@@ -119,6 +119,18 @@ jobs:
             uv run python -m fp.pipeline.trial
           fi
 
+      - name: Champions League (goals markets); never blocks the live run
+        id: ucl
+        continue-on-error: true
+        env:
+          FOOTBALL_DATA_ORG_TOKEN: ${{ secrets.FOOTBALL_DATA_ORG_TOKEN }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            uv run python -m fp.pipeline.ucl --dry-run
+          else
+            uv run python -m fp.pipeline.ucl
+          fi
+
       - name: Ledger is append-only against the last commit
         env:
           BASE_SHA: HEAD
@@ -180,6 +192,15 @@ jobs:
           gh issue create \
             --title "Trial leagues step failed: $(date -u +%F)" \
             --body "Serie A and Ligue 1 run in the background only; the live run was not affected. Log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+      - name: Open an issue if the Champions League step failed
+        if: steps.ucl.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "Champions League step failed: $(date -u +%F)" \
+            --body "The Champions League runs on its own; the live run was not affected. Log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
       - name: Open an issue if the run failed
         if: failure()

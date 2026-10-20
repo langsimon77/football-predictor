@@ -1,6 +1,29 @@
 # Checkpoint
 
-## Latest: 9 Oct 2026, Phase 7 signed off; Phase 8 (live season) under way; goals fix, earlier schedule and provisional background models approved and switched on
+## Latest: 20 Oct 2026, Champions League in the daily run and the Model Lab
+
+### Done 15 to 20 Oct 2026
+- Earlier work (reference Dixon-Coles, safety margins, Serie A and Ligue 1 in the Model Lab, UEFA reader) committed and merged (Lang: "Commit and merge all").
+- Value finder on the Pairs page (Model Lab version 14, 20 Oct): Lang types Gal's odds; cutoff, value verdict and value pairs; no stake amounts.
+- Champions League model `club_dc_v1` (branch `ucl-model`): one ID per club across 19 domestic leagues and the UEFA files (`data/manual/uefa_club_aliases.csv`); club Dixon-Coles with league levels (`fp.models.club_dc`); walk-forward test on 753 matches passed all four pre-registered checks (`reports/ucl_backtest_2026_10.md`).
+- Safety margins for Champions League picks (`data/audit/ucl_safety_2026_10.json`): 90% for result, draw no bet and goal lines; double chance has none (flagged).
+- Daily step `src/fp/pipeline/ucl.py` (after the trial step; cannot block the live run; Issue on failure): this season's fixtures and results from football-data.org (`CL`, names in `data/manual/fdorg_ucl_aliases.csv`); locks home, draw, away and goal lines into `ledger/ucl/`; writes `ledger/ucl/upcoming.parquet`. Ledger guard covers `ledger/ucl/`. Tests: `tests/test_ucl_pipeline.py`.
+- Model Lab: Champions League cards in Predictions; its picks in Pairs, the slip checker and the value finder (checked in the browser with sample fixtures; published once the first daily run writes the export).
+
+### Open questions for Lang
+1. Serie A and Ligue 1 live review after 300 scored matches (about early January 2027).
+2. Please answer the daily question Issue: unanswered questions cap confidence at Medium.
+
+### Next actions
+| Action | Owner |
+|---|---|
+| First Champions League daily run on GitHub: check the locks, flags and export; then rebuild and republish the Model Lab. | Claude |
+| Champions League live check: compare locked forecasts with results as they come in (no market benchmark exists). | Claude |
+| Serie A and Ligue 1 publishing review after 300 scored matches. | Claude, then Lang |
+| Rayo v Athletic (10 Oct): result still missing in every source. | Claude |
+| Settle Lang's logged bets when asked. | Claude, on request |
+
+## Earlier: 9 Oct 2026, Phase 7 signed off; Phase 8 (live season) under way; goals fix, earlier schedule and provisional background models approved and switched on
 
 ### Done this session
 - First real locks on Thu 8 Oct (Málaga v Espanyol, Arsenal v Leeds) and Fri 9 Oct (9 more); every lock 24 to 48 hours before kickoff.
