@@ -290,7 +290,8 @@ def trial_picks(r, home: str, away: str) -> list[dict]:
     return out
 
 
-def trial_block(path: Path, short: dict[str, str], pairs: dict) -> dict | None:
+def trial_block(path: Path, short: dict[str, str], pairs: dict,
+                odds: dict[str, dict] | None = None) -> dict | None:
     """Serie A and Ligue 1 (added to the predictions at Lang's request, 14 Oct 2026):
     cards for the Predictions page, and their picks added to the slip checker."""
     if not path.exists():
@@ -302,7 +303,8 @@ def trial_block(path: Path, short: dict[str, str], pairs: dict) -> dict | None:
         kick = f"{pd.Timestamp(r.kickoff_utc):%Y-%m-%dT%H:%MZ}"
         lg = TRIAL_LEAGUE_NAMES.get(r.league, r.league)
         pairs["matches"][r.match_id] = {"h": home, "a": away, "lg": lg, "kickoff": kick,
-                                        "locked": bool(r.locked), "odds": {}, "joint": {},
+                                        "locked": bool(r.locked),
+                                        "odds": (odds or {}).get(r.match_id, {}), "joint": {},
                                         "picks": trial_picks(r, home, away), "g": "trial"}
         rows.append({"id": r.match_id, "lg": lg, "h": home, "a": away, "kickoff": kick,
                      "round": r.round, "locked": bool(r.locked),
@@ -455,7 +457,8 @@ def main(argv: list[str] | None = None) -> int:
         "bets": (json.loads(args.bets_json.read_text(encoding="utf-8"))
                  if args.bets_json is not None else None),
         "up": upcoming_block(args.pages_dir, names, short, proposal),
-        "trial": trial_block(args.trial_upcoming, short, pairs),
+        "trial": trial_block(args.trial_upcoming, short, pairs,
+                             pairs_lab.bookmaker(odds_files[-1] if odds_files else None)),
         "sim": simulator_block(matches, fixtures, names, now),
         "ev": evidence_block(),
     }

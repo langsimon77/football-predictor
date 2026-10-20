@@ -275,7 +275,8 @@ def bookmaker(raw: Path | None) -> dict[str, dict]:
     if raw is None or not raw.exists():
         return {}
     d = pd.read_csv(raw, encoding="utf-8-sig")
-    d = d[d["Div"].isin(["E0", "SP1"])]
+    leagues = {"E0": "EPL", "SP1": "LaLiga", "I1": "SerieA", "F1": "Ligue1"}
+    d = d[d["Div"].isin(list(leagues))]
     out: dict[str, dict] = {}
     for _, r in d.iterrows():
         try:
@@ -283,7 +284,7 @@ def bookmaker(raw: Path | None) -> dict[str, dict]:
             a = to_team_id(str(r["AwayTeam"]), "football_data_co_uk")
         except Exception:
             continue
-        lg = "EPL" if r["Div"] == "E0" else "LaLiga"
+        lg = leagues[r["Div"]]
         x12 = metrics.demargin_power(np.array([[r["AvgH"], r["AvgD"], r["AvgA"]]], dtype=float))[0]
         ou = metrics.demargin_power(np.array([[r.get("Avg>2.5"), r.get("Avg<2.5")]],
                                              dtype=float))[0]
