@@ -58,11 +58,17 @@ def read_matches(path: Path) -> pd.DataFrame:
             "ht_home_goals": _goals(m.get("score"), "halfTime", "home"),
             "ht_away_goals": _goals(m.get("score"), "halfTime", "away"),
             "last_updated": m.get("lastUpdated"),
+            "stage": m.get("stage"),
+            "matchday": m.get("matchday"),
+            # After extra time, fullTime includes it; regularTime holds the 90 minutes.
+            "regular_home_goals": _goals(m.get("score"), "regularTime", "home"),
+            "regular_away_goals": _goals(m.get("score"), "regularTime", "away"),
         }
         for m in data["matches"]
     ]
     columns = ["fdorg_id", "competition", "kickoff_utc", "status", "home_name", "away_name",
-               "home_goals", "away_goals", "ht_home_goals", "ht_away_goals", "last_updated"]
+               "home_goals", "away_goals", "ht_home_goals", "ht_away_goals", "last_updated",
+               "stage", "matchday", "regular_home_goals", "regular_away_goals"]
     return pd.DataFrame(rows, columns=columns)
 
 

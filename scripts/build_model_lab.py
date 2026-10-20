@@ -24,6 +24,7 @@ from fp import ROOT
 from fp.ensemble import stacking
 from fp.evaluate import metrics
 from fp.features import ml_features
+from fp.ingest import europe
 from fp.ingest.matches import PROCESSED
 from fp.models import shape
 from fp.models.priors import PromotedPrior
@@ -261,12 +262,11 @@ TRIAL_UPCOMING = ROOT / "ledger" / "trial" / "upcoming.parquet"
 TRIAL_LEAGUE_NAMES = {"SerieA": "Serie A", "Ligue1": "Ligue 1"}
 
 
-def trial_picks(r, home: str, away: str) -> list[dict]:
-    """Serie A and Ligue 1 picks for the markets that passed their backtest only:
-    home, draw, away; double chance and draw no bet (both from those three numbers);
-    yellow cards. Labels and keys follow scripts/pairs_lab.py."""
+def result_picks(r, home: str, away: str) -> list[dict]:
+    """Home, draw, away; double chance and draw no bet (both from those three numbers).
+    Labels and keys follow scripts/pairs_lab.py."""
     ph, pd_, pa = float(r.p_home), float(r.p_draw), float(r.p_away)
-    out = [{"k": "H", "fam": "result", "label": f"{home} win", "p": ph},
+    return [{"k": "H", "fam": "result", "label": f"{home} win", "p": ph},
            {"k": "D", "fam": "result", "label": "Draw", "p": pd_},
            {"k": "A", "fam": "result", "label": f"{away} win", "p": pa},
            {"k": "1X", "fam": "dc", "label": f"{home} or draw", "p": ph + pd_},
@@ -276,6 +276,12 @@ def trial_picks(r, home: str, away: str) -> list[dict]:
             "refund": pd_, "nopair": True},
            {"k": "DNB-A", "fam": "dnb", "label": f"Draw no bet: {away}", "p": pa,
             "refund": pd_, "nopair": True}]
+
+
+def trial_picks(r, home: str, away: str) -> list[dict]:
+    """Serie A and Ligue 1 picks for the markets that passed their backtest only:
+    home, draw, away (with double chance and draw no bet) and yellow cards."""
+    out = result_picks(r, home, away)
     for line in pairs_lab.YELLOW_LINES:
         over = getattr(r, f"p_yellows_over_{str(line).replace('.', '_')}")
         if pd.isna(over):
@@ -312,16 +318,91 @@ def trial_block(path: Path, short: dict[str, str], pairs: dict,
                      "yellows": None if pd.isna(r.exp_yellows) else round(float(r.exp_yellows), 2),
                      "y45": None if pd.isna(r.p_yellows_over_4_5)
                      else round(float(r.p_yellows_over_4_5), 4)})
-    # The Pairs page lists matches by Juba day: add these matches to their days.
+    add_days(pairs, up)
+    return {"rows": rows, "as_of": as_of_text(up)}
+
+
+def add_days(pairs: dict, up: pd.DataFrame) -> None:
+    """The Pairs page lists matches by Juba day: add these matches to their days."""
     days = {d["key"]: d for d in pairs["days"]}
     for r in up.itertuples():
         day = pd.Timestamp(r.kickoff_utc).tz_convert(pairs_lab.JUBA)
         days.setdefault(f"{day:%Y-%m-%d}", {"key": f"{day:%Y-%m-%d}", "label": f"{day:%a %d %b}",
                                             "ids": []})["ids"].append(r.match_id)
     pairs["days"] = [days[k] for k in sorted(days)]
+
+
+def as_of_text(up: pd.DataFrame) -> str | None:
     as_of = up["as_of_utc"].max() if len(up) else None
-    return {"rows": rows, "as_of": f"{pd.Timestamp(as_of):%Y-%m-%d %H:%M} UTC" if as_of is not None
-            and pd.notna(as_of) else None}
+    return (f"{pd.Timestamp(as_of):%Y-%m-%d %H:%M} UTC" if as_of is not None and pd.notna(as_of)
+            else None)
+
+
+UCL_UPCOMING = ROOT / "ledger" / "ucl" / "upcoming.parquet"
+UCL_SAFETY = ROOT / "data" / "audit" / "ucl_safety_2026_10.json"
+UCL_STAGES = {"LEAGUE_STAGE": "League phase", "PLAYOFFS": "Knockout play-offs",
+              "LAST_16": "Round of 16", "QUARTER_FINALS": "Quarter-finals",
+              "SEMI_FINALS": "Semi-finals", "FINAL": "Final"}
+
+
+def ucl_names(short: dict[str, str]) -> dict[str, str]:
+    """Display names: the project's short names for English, Spanish, Italian and
+    French clubs; data/manual/fdorg_ucl_aliases.csv for the rest."""
+    a = pd.read_csv(europe.FDORG_ALIASES_CSV)
+    out = {c: short.get(c, c) for c in a["club_id"]}
+    out.update({c: n for c, n in zip(a["club_id"], a["short_name"], strict=True) if pd.notna(n)})
+    return out
+
+
+def ucl_round(text: object) -> str:
+    stage, _, day = str(text or "").partition(" ")
+    name = UCL_STAGES.get(stage, stage.replace("_", " ").capitalize())
+    return f"{name}, matchday {day}" if day and day != "nan" else name
+
+
+def ucl_picks(r, home: str, away: str) -> list[dict]:
+    """Champions League picks for the markets that passed their test
+    (reports/ucl_backtest_2026_10.md): home, draw, away (with double chance and draw
+    no bet) and goal lines over or under 1.5, 2.5 and 3.5."""
+    out = result_picks(r, home, away)
+    for line in pairs_lab.GOAL_LINES:
+        over = float(getattr(r, f"p_over_{str(line).replace('.', '_')}"))
+        out.append({"k": f"G>{line}", "fam": "goals",
+                    "label": f"{pairs_lab._n(line)} or more goals", "p": over})
+        out.append({"k": f"G<{line}", "fam": "goals",
+                    "label": f"{int(line)} goal{'s' if int(line) != 1 else ''} or fewer",
+                    "p": 1 - over})
+    for p in out:
+        p["p"] = round(p["p"], 5)
+        p["g"] = "ucl"
+    return out
+
+
+def ucl_block(path: Path, short: dict[str, str], pairs: dict) -> dict | None:
+    """Champions League (Lang asked to add it, 14 and 20 Oct 2026): cards for the
+    Predictions page, and its picks added to Pairs and the slip checker. No same-match
+    pairs (the export carries no score grid) and no bookmaker prices (the free odds
+    file has no Champions League)."""
+    if not path.exists():
+        return None
+    up = pd.read_parquet(path).sort_values("kickoff_utc")
+    names = ucl_names(short)
+    rows = []
+    for r in up.itertuples():
+        home, away = names.get(r.home_id, r.home_id), names.get(r.away_id, r.away_id)
+        kick = f"{pd.Timestamp(r.kickoff_utc):%Y-%m-%dT%H:%MZ}"
+        lg = "Champions League"
+        pairs["matches"][r.match_id] = {"h": home, "a": away, "lg": lg, "kickoff": kick,
+                                        "locked": bool(r.locked), "odds": {}, "joint": {},
+                                        "picks": ucl_picks(r, home, away), "g": "ucl"}
+        only = [names.get(c, c) for c in str(r.europe_only or "").split(",") if c]
+        rows.append({"id": r.match_id, "lg": lg, "h": home, "a": away, "kickoff": kick,
+                     "round": ucl_round(r.round), "locked": bool(r.locked),
+                     "p": milli([r.p_home, r.p_draw, r.p_away]),
+                     "goals": round(float(r.exp_goals_home) + float(r.exp_goals_away), 2),
+                     "o25": round(float(r.p_over_2_5), 4), "eo": only})
+    add_days(pairs, up)
+    return {"rows": rows, "as_of": as_of_text(up)}
 
 
 def simulator_block(matches: pd.DataFrame, fixtures: pd.DataFrame, names: dict[str, int],
@@ -418,6 +499,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--allow-stale", action="store_true")
     ap.add_argument("--trial-upcoming", type=Path, default=TRIAL_UPCOMING,
                     help="Serie A and Ligue 1 forecasts (written by fp.pipeline.trial)")
+    ap.add_argument("--ucl-upcoming", type=Path, default=UCL_UPCOMING,
+                    help="Champions League forecasts (written by fp.pipeline.ucl)")
     ap.add_argument("--bets-json", type=Path, default=None,
                     help="optional private betting-record summary, kept outside this repository")
     args = ap.parse_args(argv)
@@ -447,6 +530,11 @@ def main(argv: list[str] | None = None) -> int:
         if "trial" in safety_data:
             pairs["safety_trial"] = safety_data["trial"]["safety_table"]
             pairs["record_trial"] = safety_data["trial"]["record"]
+    # Champions League margins and record (data/audit/preregistration_ucl_2026_10.md).
+    if UCL_SAFETY.exists():
+        ucl_safety = json.loads(UCL_SAFETY.read_text(encoding="utf-8"))
+        pairs["safety_ucl"] = ucl_safety["safety_table"]
+        pairs["record_ucl"] = ucl_safety["record"]
     pairs["odds_file"] = odds_files[-1].parent.name if odds_files else None
     data = {
         "built": f"{pd.Timestamp.now(tz='UTC'):%Y-%m-%d %H:%M} UTC",
@@ -459,6 +547,7 @@ def main(argv: list[str] | None = None) -> int:
         "up": upcoming_block(args.pages_dir, names, short, proposal),
         "trial": trial_block(args.trial_upcoming, short, pairs,
                              pairs_lab.bookmaker(odds_files[-1] if odds_files else None)),
+        "ucl": ucl_block(args.ucl_upcoming, short, pairs),
         "sim": simulator_block(matches, fixtures, names, now),
         "ev": evidence_block(),
     }

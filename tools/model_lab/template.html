@@ -1004,10 +1004,15 @@ table.picks td:first-child { font-weight: 700; }
     return dnb ? safe * (1 - pk.refund) : safe;
   }
   function safetyTable(pk) {
-    // Serie A and Ligue 1 picks (pk.g "trial") use their own leagues' margins and record.
+    // Serie A and Ligue 1 picks (pk.g "trial") and Champions League picks (pk.g "ucl")
+    // use their own margins and record.
     const P = D.pairs || {};
-    const T = pk.g === "trial" ? P.safety_trial : P.safety;
+    const T = P["safety" + groupSuffix(pk)];
     return T ? T[pk.fam] : null;
+  }
+  function groupSuffix(pk) { return pk.g === "trial" ? "_trial" : pk.g === "ucl" ? "_ucl" : ""; }
+  function noMarginText(pk) {
+    return pk.g === "ucl" ? " (no reliable safety margin in the Champions League)" : pk.g === "trial" ? " (no reliable safety margin in this league)" : "";
   }
   function hasSafety(pk) { return !!safetyTable(pk); }
   function minOdds(pk) {
@@ -1024,7 +1029,7 @@ table.picks td:first-child { font-weight: 700; }
   }
   function recordFor(pk) {
     const P = D.pairs || {};
-    const R = (pk.g === "trial" ? P.record_trial : P.record) ? (pk.g === "trial" ? P.record_trial : P.record)[pk.fam] : null;
+    const R = P["record" + groupSuffix(pk)] ? P["record" + groupSuffix(pk)][pk.fam] : null;
     if (!R) return null;
     const q = pk.fam === "dnb" ? pk.p / Math.max(1 - pk.refund, 1e-9) : pk.p;
     const b = Math.min(Math.floor(q * 20), 19) / 20;
@@ -1035,7 +1040,7 @@ table.picks td:first-child { font-weight: 700; }
     const pref = PREF0[pickMarket(pk)] || "reason";
     const need = minOdds(pk);
     if (pref === "avoid" || pref === "never") return { ok: false, text: "No: " + pickMarket(pk).toLowerCase() + " is on your avoid list" };
-    const margin = hasSafety(pk) ? " with the safety margin (" + plainOdds(pk).toFixed(2) + " without)" : (pk.g === "trial" ? " (no reliable safety margin in this league)" : "");
+    const margin = hasSafety(pk) ? " with the safety margin (" + plainOdds(pk).toFixed(2) + " without)" : noMarginText(pk);
     if (!isFinite(need)) return { ok: false, text: "No: too little track record for a safe chance" };
     if (need > 1.70 + 1e-9) return { ok: false, text: "No: it would need odds of " + need.toFixed(2) + margin + ", above your 1.70 cap" };
     return { ok: true, text: "Only at odds of " + need.toFixed(2) + " or more" + margin + (pref === "reason" ? " (and only with a reason)" : "") };
@@ -1099,11 +1104,11 @@ table.picks td:first-child { font-weight: 700; }
       kpi("Biggest favourite", fav ? esc(D.clubs[fav.side]) + " <small>" + pct(fav.p) + "</small>" : "none", fav ? "Against " + D.clubs[fav.side === fav.r.h ? fav.r.a : fav.r.h] + "." : "") +
       "</div>" +
       '<div class="panel"><div class="controls">' +
-      '<div class="ctl"><span class="lbl">League</span>' + segHTML("pr-league", [{ v: "both", label: "All" }, { v: "0", label: "Premier League" }, { v: "1", label: "La Liga" }].concat(D.trial && D.trial.rows.length ? [{ v: "trial", label: "Serie A and Ligue 1" }] : []), pr.league) + "</div>" +
+      '<div class="ctl"><span class="lbl">League</span>' + segHTML("pr-league", [{ v: "both", label: "All" }, { v: "0", label: "Premier League" }, { v: "1", label: "La Liga" }].concat(D.trial && D.trial.rows.length ? [{ v: "trial", label: "Serie A and Ligue 1" }] : []).concat(D.ucl && D.ucl.rows.length ? [{ v: "ucl", label: "Champions League" }] : []), pr.league) + "</div>" +
       '<div class="ctl"><span class="lbl">Order</span>' + segHTML("pr-sort", [{ v: "time", label: "Kickoff" }, { v: "conf", label: "Clearest favourite" }, { v: "close", label: "Closest call" }], pr.sort) + "</div>" +
       (hasFix ? '<label class="toggle"><input type="checkbox" id="pr-fix"' + (pr.fix ? " checked" : "") + "> Also show the proposed fix (not live)</label>" : "") +
       "</div>" +
-      explain("<p>Each card shows the chances of a home win, a draw and an away win (blue, grey, red), the single most likely score, and the expected goals, corners and yellow cards. The likely score is only the best single guess: even the top score happens in only about one match in eight. <b>3 or more goals</b> is the over 2.5 line; <b>10 or more corners</b> is over 9.5; <b>5 or more yellow cards</b> is over 4.5. Under each card, <b>Picks</b> lists the most likely picks that could pass your rules: the chance the model gives, how often forecasts like it <b>came true in testing</b> (2023/24 to 2025/26, same kind of pick, chance within the same 5-point band), and the lowest odds at which it pays over time after the 20% tax. Every price carries a <b>safety margin</b>: it uses the <b>safe chance</b>, the lower of the model's chance and the low end of how often picks like it came true in testing (one-sided 90% for double chance, goal lines, both teams score and yellow cards; 95% for home, draw, away, handicaps, draw no bet and corners, which needed the wider margin to stay safe on new seasons). The price without the margin is shown in brackets. If the bookmaker offers less, it fails your rules. Press <b>Show all picks</b> to see every pick, including those on your avoid list. <b>Serie A and Ligue 1</b> (added 14 Oct 2026) show only the markets that passed testing in those leagues: home, draw, away, with double chance and draw no bet, and yellow cards. Their goals, both-teams-score and corners forecasts failed, so they are not shown. Their safety margins and track records come from their own leagues; draw no bet there has no reliable margin. This is not a recommendation to bet.</p>") +
+      explain("<p>Each card shows the chances of a home win, a draw and an away win (blue, grey, red), the single most likely score, and the expected goals, corners and yellow cards. The likely score is only the best single guess: even the top score happens in only about one match in eight. <b>3 or more goals</b> is the over 2.5 line; <b>10 or more corners</b> is over 9.5; <b>5 or more yellow cards</b> is over 4.5. Under each card, <b>Picks</b> lists the most likely picks that could pass your rules: the chance the model gives, how often forecasts like it <b>came true in testing</b> (2023/24 to 2025/26, same kind of pick, chance within the same 5-point band), and the lowest odds at which it pays over time after the 20% tax. Every price carries a <b>safety margin</b>: it uses the <b>safe chance</b>, the lower of the model's chance and the low end of how often picks like it came true in testing (one-sided 90% for double chance, goal lines, both teams score and yellow cards; 95% for home, draw, away, handicaps, draw no bet and corners, which needed the wider margin to stay safe on new seasons). The price without the margin is shown in brackets. If the bookmaker offers less, it fails your rules. Press <b>Show all picks</b> to see every pick, including those on your avoid list. <b>Serie A and Ligue 1</b> (added 14 Oct 2026) show only the markets that passed testing in those leagues: home, draw, away, with double chance and draw no bet, and yellow cards. Their goals, both-teams-score and corners forecasts failed, so they are not shown. Their safety margins and track records come from their own leagues; draw no bet there has no reliable margin. The <b>Champions League</b> (added 20 Oct 2026) shows home, draw, away, with double chance and draw no bet, and goal lines: the markets its own test covered. Its model rates every club across Europe from domestic and European results. Its margins and track records come from Champions League matches of 2021/22 to 2025/26; double chance there has no reliable margin. Clubs from leagues without free domestic data are rated from European matches only, and their cards say so. There are no free Champions League odds, so no bookmaker check. This is not a recommendation to bet.</p>") +
       "</div>" +
       '<div id="pr-fix-note"></div><div id="pr-list" style="display:grid;gap:14px"></div>';
     bindSeg("pr-league", v => { pr.league = v; draw(); });
@@ -1155,7 +1160,7 @@ table.picks td:first-child { font-weight: 700; }
     }
     function draw() {
       $("#pr-fix-note").innerHTML = pr.fix ? '<div class="banner"><b>Not live.</b> The fix lines show what the proposed change in Tests and decisions would do to these forecasts. The published forecasts stay as they are unless you approve it.</div>' : "";
-      const leagues = pr.league === "both" ? [0, 1] : pr.league === "trial" ? [] : [Number(pr.league)];
+      const leagues = pr.league === "both" ? [0, 1] : pr.league === "trial" || pr.league === "ucl" ? [] : [Number(pr.league)];
       let out = "";
       leagues.forEach(lg => {
         let rs = gw.filter(r => r.lg === lg);
@@ -1174,6 +1179,7 @@ table.picks td:first-child { font-weight: 700; }
         }
       });
       if ((pr.league === "both" || pr.league === "trial") && D.trial && D.trial.rows.length) out += trialSection();
+      if ((pr.league === "both" || pr.league === "ucl") && D.ucl && D.ucl.rows.length) out += uclSection();
       $("#pr-list").innerHTML = out || '<p class="caption">No matches in this snapshot.</p>';
     }
     function trialCard(r) {
@@ -1187,6 +1193,27 @@ table.picks td:first-child { font-weight: 700; }
         "</dl>" +
         '<div class="picks-box" data-mid="' + esc(r.id) + '"><div class="lbl" style="font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700">Picks</div>' + picksTable(r.id, false) + "</div>" +
         '<div style="display:flex;gap:14px;flex-wrap:wrap"><button type="button" class="open allpicks" data-mid="' + esc(r.id) + '">Show all picks</button></div></article>';
+    }
+    function uclCard(r) {
+      const p = r.p.map(v => v / 1000), when = juba(r.kickoff), home = esc(r.h), away = esc(r.a);
+      return '<article class="pcard"><div class="row1"><span class="when">' + when.time + "</span><span>" + esc(r.round) + '</span><span class="right"><span class="lockpill' + (r.locked ? " on" : "") + '">' + (r.locked ? "Locked" : "Provisional") + "</span></span></div>" +
+        '<div class="teams">' + home + '<span class="v">v</span>' + away + "</div>" +
+        stackbar(p[0], p[1], p[2]) +
+        '<div class="three"><span>' + home + " win<b>" + pct(p[0]) + "</b></span><span>Draw<b>" + pct(p[1]) + "</b></span><span>" + away + " win<b>" + pct(p[2]) + "</b></span></div><dl>" +
+        line("Goals", "about " + r.goals.toFixed(1) + "; 3 or more: <b>" + pct(r.o25) + "</b>") +
+        line("Corners, cards", "<span class='ci'>not shown: no Champions League data to test them</span>") +
+        "</dl>" +
+        (r.eo.length ? '<p class="caption">Rated from European matches only (no domestic results in the free data): ' + r.eo.map(esc).join(", ") + ". Treat this forecast with more caution.</p>" : "") +
+        '<div class="picks-box" data-mid="' + esc(r.id) + '"><div class="lbl" style="font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700">Picks</div>' + picksTable(r.id, false) + "</div>" +
+        '<div style="display:flex;gap:14px;flex-wrap:wrap"><button type="button" class="open allpicks" data-mid="' + esc(r.id) + '">Show all picks</button></div></article>';
+    }
+    function uclSection() {
+      const rs = D.ucl.rows;
+      let out = '<div class="gw-head"><h3>Champions League</h3><span>' + esc(rs[0].round || "") + ", " + rs.length + " matches, " + rs.filter(r => r.locked).length + " locked. Home, draw, away and goals only.</span></div>";
+      const days = [];
+      rs.forEach(r => { const k = juba(r.kickoff); if (!days.length || days[days.length - 1].key !== k.key) days.push({ key: k.key, day: k.day, rows: [] }); days[days.length - 1].rows.push(r); });
+      days.forEach(dd => { out += '<div class="gw-day">' + dd.day + '</div><div class="cards">' + dd.rows.map(uclCard).join("") + "</div>"; });
+      return out;
     }
     function trialSection() {
       let out = "";
@@ -1207,8 +1234,8 @@ table.picks td:first-child { font-weight: 700; }
   const FAMS = [{ v: "result", label: "Result" }, { v: "dc", label: "Double chance" }, { v: "eh", label: "Handicap" }, { v: "goals", label: "Goals" }, { v: "btts", label: "Both score" }, { v: "corners", label: "Corners" }, { v: "yellows", label: "Yellow cards" }];
   const pa = { day: null, kind: "either", fams: FAMS.map(f => f.v), n: 10, lgs: "all" };
   function inLeagues(mid) {
-    // "all", "main" (Premier League and La Liga) or "trial" (Serie A and Ligue 1).
-    const g = D.pairs.matches[mid].g === "trial" ? "trial" : "main";
+    // "all", "main" (Premier League and La Liga), "trial" (Serie A and Ligue 1) or "ucl".
+    const g = D.pairs.matches[mid].g || "main";
     return pa.lgs === "all" || pa.lgs === g;
   }
   function bestPairs(ids, kind, fams, n) {
@@ -1246,13 +1273,16 @@ table.picks td:first-child { font-weight: 700; }
     if (!P || !P.days.length) { sec.innerHTML = '<div class="section-head"><h2>Most likely pairs</h2><p>No matches in this snapshot.</p></div>'; return; }
     if (!pa.day) pa.day = P.days[0].key;
     const T = P.track;
+    const lgOpts = [{ v: "all", label: "All" }, { v: "main", label: "Premier League and La Liga" }]
+      .concat(D.trial && D.trial.rows.length ? [{ v: "trial", label: "Serie A and Ligue 1" }] : [])
+      .concat(D.ucl && D.ucl.rows.length ? [{ v: "ucl", label: "Champions League" }] : []);
     sec.innerHTML =
-      '<div class="section-head"><h2>Most likely pairs</h2><p>Two outcomes at a time, ranked by the chance that <b>both</b> happen. A pair can come from one match or from two. Picks: result, double chance, handicap (+2 head start, or to win by 2 or more), goals, both teams score, corners and yellow cards, over or under. Draw no bet is left out of pairs because a draw refunds it; it is on the Predictions cards and in the slip checker. Chances use the goals fix. No pick is used twice. <b>Serie A and Ligue 1</b> bring only the markets that passed testing there (result, double chance, yellow cards); their picks pair with picks from other matches, and the track record at the bottom is for Premier League and La Liga pairs.</p></div>' +
+      '<div class="section-head"><h2>Most likely pairs</h2><p>Two outcomes at a time, ranked by the chance that <b>both</b> happen. A pair can come from one match or from two. Picks: result, double chance, handicap (+2 head start, or to win by 2 or more), goals, both teams score, corners and yellow cards, over or under. Draw no bet is left out of pairs because a draw refunds it; it is on the Predictions cards and in the slip checker. Chances use the goals fix. No pick is used twice. <b>Serie A and Ligue 1</b> bring only the markets that passed testing there (result, double chance, yellow cards); their picks pair with picks from other matches, and the track record at the bottom is for Premier League and La Liga pairs. The <b>Champions League</b> brings result, double chance and goals picks; they too pair only with picks from other matches.</p></div>' +
       '<div class="banner">A view of how likely things are, not betting advice. The bookmakers beat this model in every past test, and every bet carries their margin; joining two picks charges it twice.</div>' +
       '<div class="panel" id="vf-panel"></div>' +
       '<div class="panel"><div class="controls">' +
       '<div class="ctl"><span class="lbl">Day (Juba time)</span>' + segHTML("pa-day", P.days.map(d => ({ v: d.key, label: d.label + " (" + d.ids.length + ")" })), pa.day) + "</div>" +
-      (D.trial && D.trial.rows.length ? '<div class="ctl"><span class="lbl">Leagues</span>' + segHTML("pa-lgs", [{ v: "all", label: "All" }, { v: "main", label: "Premier League and La Liga" }, { v: "trial", label: "Serie A and Ligue 1" }], pa.lgs) + "</div>" : "") +
+      (lgOpts.length > 2 ? '<div class="ctl"><span class="lbl">Leagues</span>' + segHTML("pa-lgs", lgOpts, pa.lgs) + "</div>" : "") +
       '<div class="ctl"><span class="lbl">Pairs from</span>' + segHTML("pa-kind", [{ v: "either", label: "Either" }, { v: "same", label: "One match" }, { v: "two", label: "Two matches" }], pa.kind) + "</div>" +
       '<div class="ctl"><span class="lbl">Show</span>' + segHTML("pa-n", [{ v: "5", label: "5" }, { v: "10", label: "10" }, { v: "15", label: "15" }], String(pa.n)) + "</div>" +
       "</div>" +
@@ -1268,7 +1298,7 @@ table.picks td:first-child { font-weight: 700; }
         explain("<p>If the chances are honest, the last two columns should be close. These past forecasts are the same walk-forward forecasts used everywhere in this lab, with the goals fix replayed as it would have run. Corners and yellow-card chances in the same match are combined as if unrelated, so pairs that mix them may be a little off.</p>") + "</div>" : "");
     bindSeg("pa-day", v => { pa.day = v; draw(); });
     bindSeg("pa-kind", v => { pa.kind = v; draw(); });
-    if (D.trial && D.trial.rows.length) bindSeg("pa-lgs", v => { pa.lgs = v; draw(); });
+    if (lgOpts.length > 2) bindSeg("pa-lgs", v => { pa.lgs = v; draw(); });
     bindSeg("pa-n", v => { pa.n = Number(v); draw(); });
     bindChips("pa-fams", vals => { pa.fams = vals; draw(); });
     function leg(mid, i) {
@@ -1331,7 +1361,7 @@ table.picks td:first-child { font-weight: 700; }
       const out = $("#vf-out");
       if (!VF.length) { out.innerHTML = '<p class="caption">Add the picks you have Gal odds for. The finder checks each one and builds value pairs from those that pass.</p>'; return; }
       const ev = VF.map(vfEval);
-      const row = (e, i) => "<tr><td>" + vfLegText(e) + "</td><td class='num'>" + e.it.o.toFixed(2) + "</td><td class='num'>" + pct(e.ps) + "</td><td class='num'><b>" + (isFinite(e.cutoff) ? e.cutoff.toFixed(2) : "none") + "</b></td><td class='num'>" + (isFinite(e.ev) ? signed(e.ev * 100, 1) : "n/a") + "</td><td><span class='status " + e.cls + "'>" + esc(e.status) + "</span>" + (e.value && e.pref === "reason" ? " <span class='ci'>(only with a reason)</span>" : "") + (e.value && e.it.o > 1.70 + 1e-9 ? " <span class='ci'>(above your 1.70 rule)</span>" : "") + (e.pk.g === "trial" && !hasSafety(e.pk) ? " <span class='ci'>(no reliable safety margin)</span>" : "") + "</td><td><button type='button' class='open' data-vfdel='" + i + "'>remove</button></td></tr>";
+      const row = (e, i) => "<tr><td>" + vfLegText(e) + "</td><td class='num'>" + e.it.o.toFixed(2) + "</td><td class='num'>" + pct(e.ps) + "</td><td class='num'><b>" + (isFinite(e.cutoff) ? e.cutoff.toFixed(2) : "none") + "</b></td><td class='num'>" + (isFinite(e.ev) ? signed(e.ev * 100, 1) : "n/a") + "</td><td><span class='status " + e.cls + "'>" + esc(e.status) + "</span>" + (e.value && e.pref === "reason" ? " <span class='ci'>(only with a reason)</span>" : "") + (e.value && e.it.o > 1.70 + 1e-9 ? " <span class='ci'>(above your 1.70 rule)</span>" : "") + (e.pk.g && !hasSafety(e.pk) ? " <span class='ci'>(no reliable safety margin)</span>" : "") + (e.value && e.mp == null ? " <span class='ci'>(no bookmaker price to check against)</span>" : "") + "</td><td><button type='button' class='open' data-vfdel='" + i + "'>remove</button></td></tr>";
       let html = "<div class='table-wrap'><table><thead><tr><th>Your pick</th><th class='num'>Gal odds</th><th class='num'>Safe chance</th><th class='num'>Cutoff: never below</th><th class='num'>Per 100 staked</th><th>Verdict</th><th></th></tr></thead><tbody>" + ev.map(row).join("") + "</tbody></table></div>";
       const vals = ev.filter(e => e.value).sort((a, b) => b.ev - a.ev);
       html += "<h4 style='margin:14px 0 6px'>Value singles</h4>" + (vals.length ? "<ul class='verdicts'>" + vals.map(e => "<li>" + vfLegText(e) + " at " + e.it.o.toFixed(2) + ": " + signed(e.ev * 100, 1) + " per 100 staked if the safe chance is right</li>").join("") + "</ul>" : "<p class='caption'>None of your picks is value at these odds. That is the usual answer: bookmakers rarely pay above the fair price.</p>");

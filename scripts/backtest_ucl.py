@@ -142,6 +142,7 @@ def run(matches: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
                 "home_goals": int(r.home_goals), "away_goals": int(r.away_goals),
                 "club_dc_home": m["p_home"], "club_dc_draw": m["p_draw"],
                 "club_dc_away": m["p_away"], "club_dc_over_2_5": m["p_over_2_5"],
+                "club_dc_over_1_5": m["p_over_1_5"], "club_dc_over_3_5": m["p_over_3_5"],
                 "club_dc_europe_home": me["p_home"], "club_dc_europe_draw": me["p_draw"],
                 "club_dc_europe_away": me["p_away"], "club_dc_europe_over_2_5": me["p_over_2_5"],
                 "elo_home": e[0], "elo_draw": e[1], "elo_away": e[2],

@@ -71,6 +71,45 @@ def uefa_id(country: str, name: str) -> str:
     return _aliases()[(country, unicodedata.normalize("NFC", name.strip()))]
 
 
+FDORG_ALIASES_CSV = ROOT / "data" / "manual" / "fdorg_ucl_aliases.csv"
+
+
+@cache
+def _fdorg_aliases() -> dict[str, str]:
+    a = pd.read_csv(FDORG_ALIASES_CSV)
+    return {unicodedata.normalize("NFC", n): i for n, i in zip(a["fdorg_name"], a["club_id"],
+                                                                strict=True)}
+
+
+def fdorg_id(name: str) -> str:
+    """The club ID of a football-data.org Champions League name; KeyError if unknown."""
+    return _fdorg_aliases()[unicodedata.normalize("NFC", name.strip())]
+
+
+def current_ucl(frame: pd.DataFrame, season: int = fd.CURRENT_SEASON) -> pd.DataFrame:
+    """This season's Champions League from football-data.org (read_matches rows), in this
+    module's columns. Finished matches carry their 90-minute score (regularTime when the
+    match went to extra time); the final is at a neutral ground."""
+    day = frame["kickoff_utc"].dt.tz_convert("UTC")
+    reg = frame["regular_home_goals"].notna()
+    hg = frame["home_goals"].where(~reg, frame["regular_home_goals"])
+    ag = frame["away_goals"].where(~reg, frame["regular_away_goals"])
+    done = frame["status"] == "FINISHED"
+    out = pd.DataFrame({
+        "competition": "UCL", "kind": "europe", "season": season,
+        "date": day.dt.date, "kickoff_utc": day,
+        "result_available_utc": day + pd.Timedelta(hours=3),
+        "home_id": [fdorg_id(n) for n in frame["home_name"]],
+        "away_id": [fdorg_id(n) for n in frame["away_name"]],
+        "home_goals": hg.where(done).astype("Float64"),
+        "away_goals": ag.where(done).astype("Float64"),
+        "neutral": frame["stage"].astype(str).eq("FINAL").to_numpy(),
+        "round": [f"{st} {md}" if pd.notna(md) else str(st)
+                  for st, md in zip(frame["stage"], frame["matchday"], strict=True)],
+    })
+    return _finish(out)
+
+
 def season_of(day: pd.Timestamp) -> int:
     return day.year if day.month >= 7 else day.year - 1
 

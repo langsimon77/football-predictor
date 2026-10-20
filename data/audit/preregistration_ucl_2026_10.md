@@ -23,3 +23,7 @@ Written before any Champions League forecast was made. Lang approved Champions L
 - U1, U2 and U4 pass: home, draw, away and double chance are proposed for the background run (locked and scored daily, not published), then for the Model Lab on Lang's decision.
 - U3 also passes: goal lines join them. If U3 fails, goal lines stay out. This split is fixed now, before the results.
 - Any failure of U1, U2 or U4 means no proposal; a fix would be a new proposal with its own test.
+
+## Addendum, 20 Oct 2026: safety margins for Champions League picks
+
+Written after the checks above passed and before this part was run. The picks shown for the Champions League are the families the checks cover: home, draw, away; double chance and draw no bet (both from those three numbers); goal lines (over or under 1.5, 2.5 and 3.5). Each family gets the project's safety rule (`data/audit/preregistration_safety_all_2026_10.md`) on this test's own forecasts: margins built on 2021/22 and 2022/23, checked on 2023/24 to 2025/26 (groups of at least 30 picks), one-sided 90%, then 95%, else no margin and flagged. The track record shown is 2023/24 to 2025/26.

@@ -770,3 +770,21 @@ From 14 Oct 2026 the Model Lab shows Serie A and Ligue 1 next to the EPL and La 
 
 On the Pairs page you can now type Gal's odds for any pick. The finder shows each pick's **cutoff**: the lowest odds at which it breaks even after the 20% tax, using its safe chance. Below the cutoff, never. A pick is **value** when Gal pays at least the cutoff. When the model's chance is 10 or more points above the bookmakers' own chance, the "value" is more likely the model's mistake than Gal's, so the finder leaves that pick out and lists it separately. Value pairs join two value picks from two matches. Expect "no value" most days: bookmakers rarely pay above the fair price, and that answer is the finder doing its job.
 
+
+## Chapter 12: The Champions League
+
+### 12.1 Teams that never meet
+
+In a league, every team plays every other team twice, so their ratings sit on one scale. In the Champions League, Bayern Munich may play Sporting CP once in five years. How can a model compare them? Each club also plays about 34 league matches a year at home. So the model rates each **league** first, from the European matches between clubs of different countries, and then each **club** as a difference from its league. A strong Bundesliga club is rated against Bundesliga clubs, and the Bundesliga is rated against other leagues. This is like tying separate survey grids together through a few shared benchmarks.
+
+### 12.2 Home is not the same in Europe
+
+Home advantage in a European night is a little different from a Saturday league match, so the model learns two values, one for each. The final is at a neutral ground, so no one gets it there.
+
+### 12.3 The test
+
+As always, I wrote the rules first (`data/audit/preregistration_ucl_2026_10.md`), then replayed every Champions League match of the last five seasons (753 matches), each forecast made 24 to 48 hours before kickoff from results known then. All four checks passed. The model beats the Champions League base rates clearly, beats Elo, and its over 2.5 goals forecast beats the base rate. Using domestic results helps: a version built on European matches alone did worse. There is one thing missing: no free source has Champions League odds, so I cannot compare the model with the bookmakers here. In the leagues, the bookmakers win, and there is no reason to think Europe is different [A].
+
+### 12.4 What you see
+
+The Champions League now appears in Predictions and Pairs, for the markets the test covered: home, draw, away (so double chance and draw no bet too) and goal lines. Corners and cards are not shown: no free source has Champions League corners or cards to test them. Each pick has its own safety margin from Champions League history. Double chance has no reliable margin there (its safe chances failed the check), so it is flagged. A few clubs (Shakhtar, Slavia, Sabah and Slovan) come from leagues with no free domestic results. They are rated from European matches only, and their cards say so. Treat those forecasts with more caution.

@@ -1,8 +1,9 @@
 """CI guard: the ledgers may only grow. No locked row may change or disappear.
 
-Compares each ledger (the live one and, since 13 Oct 2026, the trial one in
-ledger/trial/) in the working tree with its version at a base commit (BASE_SHA env
-var, default HEAD~1). Passes for a ledger that does not exist yet.
+Compares each ledger (the live one; since 13 Oct 2026 the trial one in ledger/trial/;
+since 20 Oct 2026 the Champions League one in ledger/ucl/) in the working tree with
+its version at a base commit (BASE_SHA env var, default HEAD~1). Passes for a ledger
+that does not exist yet.
 """
 
 from __future__ import annotations
@@ -16,7 +17,8 @@ import pandas as pd
 
 from fp import ROOT, ledger
 
-LEDGER_PATHS = ("ledger/predictions.parquet", "ledger/trial/predictions.parquet")
+LEDGER_PATHS = ("ledger/predictions.parquet", "ledger/trial/predictions.parquet",
+                "ledger/ucl/predictions.parquet")
 
 
 def at_commit(sha: str, path: str) -> pd.DataFrame | None:
