@@ -81,8 +81,7 @@ def probe() -> int:
             continue
         names = sorted(set(frame["home_name"]) | set(frame["away_name"]))
         print(f"football-data.org {code}: {len(frame)} matches, {len(names)} teams")
-        if code != "CL":
-            print("  team names:", "; ".join(names))
+        print("  team names:", "; ".join(names))  # CL too: the Champions League model maps them
     return 0
 
 

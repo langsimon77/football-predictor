@@ -149,7 +149,17 @@ def is_neutral(round_name: str | None, season: int, competition: str) -> bool:
     return season == 2019 and any(k in r for k in ("quarter", "semi"))
 
 
+# Which files openfootball has, by competition: first and last season start year
+# (repository listing checked 20 Oct 2026). Asking for a file that does not exist made
+# the downloader wait on GitHub for hours, so only these are fetched.
+AVAILABLE = {"cl": (2011, 2025), "el": (2020, 2024), "conf": (2021, 2024),
+             "clq": (2024, 2025), "elq": (2024, 2025), "confq": (2024, 2025)}
+
+
 def download(season: int, competition: str, current_season: int) -> Path | None:
+    first, last = AVAILABLE.get(competition, (0, 9999))
+    if not first <= season <= last:
+        return None
     folder = f"{season}-{(season + 1) % 100:02d}"
     try:
         return fetch(f"{BASE_URL}/{folder}/{competition}.txt", SOURCE,
