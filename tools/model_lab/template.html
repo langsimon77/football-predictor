@@ -1249,6 +1249,7 @@ table.picks td:first-child { font-weight: 700; }
     sec.innerHTML =
       '<div class="section-head"><h2>Most likely pairs</h2><p>Two outcomes at a time, ranked by the chance that <b>both</b> happen. A pair can come from one match or from two. Picks: result, double chance, handicap (+2 head start, or to win by 2 or more), goals, both teams score, corners and yellow cards, over or under. Draw no bet is left out of pairs because a draw refunds it; it is on the Predictions cards and in the slip checker. Chances use the goals fix. No pick is used twice. <b>Serie A and Ligue 1</b> bring only the markets that passed testing there (result, double chance, yellow cards); their picks pair with picks from other matches, and the track record at the bottom is for Premier League and La Liga pairs.</p></div>' +
       '<div class="banner">A view of how likely things are, not betting advice. The bookmakers beat this model in every past test, and every bet carries their margin; joining two picks charges it twice.</div>' +
+      '<div class="panel" id="vf-panel"></div>' +
       '<div class="panel"><div class="controls">' +
       '<div class="ctl"><span class="lbl">Day (Juba time)</span>' + segHTML("pa-day", P.days.map(d => ({ v: d.key, label: d.label + " (" + d.ids.length + ")" })), pa.day) + "</div>" +
       (D.trial && D.trial.rows.length ? '<div class="ctl"><span class="lbl">Leagues</span>' + segHTML("pa-lgs", [{ v: "all", label: "All" }, { v: "main", label: "Premier League and La Liga" }, { v: "trial", label: "Serie A and Ligue 1" }], pa.lgs) + "</div>" : "") +
@@ -1285,6 +1286,102 @@ table.picks td:first-child { font-weight: 700; }
           '<div class="legs">' + leg(c.a[0], c.a[1]) + leg(c.b[0], c.b[1]) + "</div></article>";
       }).join("") + "</div>" : '<p class="caption">No pairs with these settings.</p>';
     }
+    // ---------------------------------------------------------- value finder
+    // Lang's odds plus the safe chance (asked 20 Oct 2026). A pick is value only if Gal's
+    // odds reach its cutoff (the lowest odds that break even after the 20% tax at the safe
+    // chance), it is not on the avoid list, and the model is not 10 or more points above the
+    // bookmakers' own chance. Pairs: two value picks from two matches. No stake amounts.
+    const VF_KEY = "fp-value-finder";
+    let VF = [];
+    try { VF = JSON.parse(localStorage.getItem(VF_KEY) || "[]"); } catch (e) { VF = []; }
+    VF = VF.filter(it => P.matches[it.mid] && P.matches[it.mid].picks.some(pk => pk.k === it.k));
+    const vfSave = () => { try { localStorage.setItem(VF_KEY, JSON.stringify(VF)); } catch (e) { /* private window */ } };
+    function marketP(m, pk) {
+      const o = m.odds || {};
+      if (o[pk.k] != null) return o[pk.k];
+      if (o.H == null || o.D == null || o.A == null) return null;
+      return { "1X": o.H + o.D, "X2": o.D + o.A, "12": o.H + o.A, "DNB-H": o.H, "DNB-A": o.A }[pk.k] ?? null;
+    }
+    function vfEval(it) {
+      const m = P.matches[it.mid], pk = m.picks.find(x => x.k === it.k);
+      const ps = safeP(pk), cutoff = minOdds(pk), refund = pk.fam === "dnb" ? pk.refund : 0;
+      const ev = isFinite(ps) ? ps * (1 + 0.8 * (it.o - 1)) + refund - 1 : NaN;
+      const mp = marketP(m, pk), gap = mp != null ? pk.p - mp : null;
+      const pref = PREF0[pickMarket(pk)] || "reason";
+      let status, cls;
+      if (pref === "avoid" || pref === "never") { status = "On your avoid list"; cls = "bad"; }
+      else if (gap != null && gap >= 0.10) { status = "Left out: the model is " + Math.round(gap * 100) + " points above the bookmakers"; cls = "flag"; }
+      else if (!isFinite(cutoff) || it.o < cutoff - 1e-9) { status = isFinite(cutoff) ? "Below cutoff: needs " + cutoff.toFixed(2) : "No safe chance"; cls = "bad"; }
+      else { status = "Value"; cls = "good"; }
+      return { it, m, pk, ps, cutoff, ev, mp, gap, pref, status, cls, value: status === "Value" };
+    }
+    function vfOptions() {
+      const m = P.matches[$("#vf-match").value];
+      $("#vf-pick").innerHTML = m.picks.map(pk => '<option value="' + esc(pk.k) + '">' + esc(pk.label) + " (model " + pct(pk.p) + ")</option>").join("");
+      vfHint();
+    }
+    function vfHint() {
+      const m = P.matches[$("#vf-match").value], pk = m.picks.find(x => x.k === $("#vf-pick").value);
+      if (!pk) { $("#vf-hint").textContent = ""; return; }
+      const c = minOdds(pk), mp = marketP(m, pk);
+      $("#vf-hint").innerHTML = "Cutoff for this pick: <b>" + (isFinite(c) ? c.toFixed(2) : "none") + "</b>. Never take it below that. Safe chance " + pct(safeP(pk)) + (mp != null ? "; bookmakers " + pct(mp) : "") + ".";
+    }
+    function vfLegText(e) { return "<b>" + esc(e.pk.label) + "</b> <span class='ci'>" + esc(e.m.h + " v " + e.m.a) + ", " + esc(e.m.lg || "") + ", " + juba(e.m.kickoff).day + " " + juba(e.m.kickoff).time + "</span>"; }
+    function vfRender() {
+      const out = $("#vf-out");
+      if (!VF.length) { out.innerHTML = '<p class="caption">Add the picks you have Gal odds for. The finder checks each one and builds value pairs from those that pass.</p>'; return; }
+      const ev = VF.map(vfEval);
+      const row = (e, i) => "<tr><td>" + vfLegText(e) + "</td><td class='num'>" + e.it.o.toFixed(2) + "</td><td class='num'>" + pct(e.ps) + "</td><td class='num'><b>" + (isFinite(e.cutoff) ? e.cutoff.toFixed(2) : "none") + "</b></td><td class='num'>" + (isFinite(e.ev) ? signed(e.ev * 100, 1) : "n/a") + "</td><td><span class='status " + e.cls + "'>" + esc(e.status) + "</span>" + (e.value && e.pref === "reason" ? " <span class='ci'>(only with a reason)</span>" : "") + (e.value && e.it.o > 1.70 + 1e-9 ? " <span class='ci'>(above your 1.70 rule)</span>" : "") + (e.pk.g === "trial" && !hasSafety(e.pk) ? " <span class='ci'>(no reliable safety margin)</span>" : "") + "</td><td><button type='button' class='open' data-vfdel='" + i + "'>remove</button></td></tr>";
+      let html = "<div class='table-wrap'><table><thead><tr><th>Your pick</th><th class='num'>Gal odds</th><th class='num'>Safe chance</th><th class='num'>Cutoff: never below</th><th class='num'>Per 100 staked</th><th>Verdict</th><th></th></tr></thead><tbody>" + ev.map(row).join("") + "</tbody></table></div>";
+      const vals = ev.filter(e => e.value).sort((a, b) => b.ev - a.ev);
+      html += "<h4 style='margin:14px 0 6px'>Value singles</h4>" + (vals.length ? "<ul class='verdicts'>" + vals.map(e => "<li>" + vfLegText(e) + " at " + e.it.o.toFixed(2) + ": " + signed(e.ev * 100, 1) + " per 100 staked if the safe chance is right</li>").join("") + "</ul>" : "<p class='caption'>None of your picks is value at these odds. That is the usual answer: bookmakers rarely pay above the fair price.</p>");
+      const cands = [];
+      for (let x = 0; x < vals.length; x++) for (let y = x + 1; y < vals.length; y++) {
+        const a = vals[x], b = vals[y];
+        if (a.it.mid === b.it.mid || a.pk.nopair || b.pk.nopair) continue;
+        const q = a.ps * b.ps, O = a.it.o * b.it.o, e = q * (1 + 0.8 * (O - 1)) - 1;
+        if (e > 0) cands.push({ a, b, q, O, e, cut: 1 + (1 / q - 1) / 0.8 });
+      }
+      cands.sort((u, v) => v.e - u.e);
+      const used = new Set(), pairs = [];
+      cands.forEach(c => { const ka = c.a.it.mid + c.a.it.k, kb = c.b.it.mid + c.b.it.k; if (!used.has(ka) && !used.has(kb) && pairs.length < 5) { used.add(ka); used.add(kb); pairs.push(c); } });
+      html += "<h4 style='margin:14px 0 6px'>Value pairs <span class='ci'>(two value picks from two matches, no pick used twice)</span></h4>" + (pairs.length ?
+        "<div class='table-wrap'><table><thead><tr><th>Pair</th><th class='num'>Total odds</th><th class='num'>Both come true (safe)</th><th class='num'>Cutoff for total odds</th><th class='num'>Per 100 staked</th><th>Notes</th></tr></thead><tbody>" +
+        pairs.map(c => "<tr><td>" + vfLegText(c.a) + "<br>" + vfLegText(c.b) + "</td><td class='num'>" + c.O.toFixed(2) + "</td><td class='num'>" + pct(c.q, 1) + "</td><td class='num'><b>" + c.cut.toFixed(2) + "</b></td><td class='num'>" + signed(c.e * 100, 1) + "</td><td>" + [c.O > 1.70 + 1e-9 ? "above your 1.70 rule" : "", (c.a.pref === "reason" || c.b.pref === "reason") ? "a pick needs a reason" : ""].filter(Boolean).join("; ") + "</td></tr>").join("") + "</tbody></table></div>" :
+        "<p class='caption'>No value pairs: a pair needs two value picks from two different matches.</p>");
+      const off = ev.filter(e => e.cls === "flag");
+      if (off.length) html += "<h4 style='margin:14px 0 6px'>Model and market disagree <span class='ci'>(left out)</span></h4><ul class='verdicts'>" + off.map(e => "<li>" + vfLegText(e) + ": model " + pct(e.pk.p) + ", bookmakers " + pct(e.mp) + ". In past seasons the market was right more often in matches like this.</li>").join("") + "</ul>";
+      html += "<p class='caption' style='margin-top:10px'>Per 100 staked: the average return if the safe chance is right, after the 20% tax; not a promise. No stake amounts are suggested: the model has not shown an edge over the bookmakers, so sizing stakes on its numbers would only magnify its errors. <button type='button' class='open' id='vf-clear'>Clear the list</button></p>";
+      out.innerHTML = html;
+    }
+    function valueFinder() {
+      const ids = Object.keys(P.matches).filter(mid => new Date(P.matches[mid].kickoff) > new Date(Date.now() - 3 * 3600e3))
+        .sort((x, y) => P.matches[x].kickoff.localeCompare(P.matches[y].kickoff));
+      if (!ids.length) { $("#vf-panel").innerHTML = "<h3>Value finder</h3><p class='caption'>No upcoming matches in this snapshot.</p>"; return; }
+      $("#vf-panel").innerHTML = "<h3>Value finder <span class='sub'>type Gal's odds; only picks at or above their cutoff count</span></h3>" +
+        "<div class='controls'><div class='ctl'><label for='vf-match'>Match</label><select id='vf-match'>" + ids.map(mid => { const m = P.matches[mid], w = juba(m.kickoff); return "<option value='" + esc(mid) + "'>" + esc(w.day + " " + w.time + ", " + m.h + " v " + m.a + " (" + (m.lg || "") + ")") + "</option>"; }).join("") + "</select></div>" +
+        "<div class='ctl'><label for='vf-pick'>Pick</label><select id='vf-pick'></select></div>" +
+        "<div class='ctl'><label for='vf-odds'>Gal odds</label><input type='number' id='vf-odds' min='1.01' step='0.01' placeholder='e.g. 1.45'></div>" +
+        "<div class='ctl'><span class='lbl'>&nbsp;</span><button type='button' class='btn' id='vf-add'>Add</button></div></div>" +
+        "<p class='caption' id='vf-hint'></p>" +
+        explain("<p>The <b>cutoff</b> is the lowest odds at which a pick breaks even after Gal's 20% tax, using its <b>safe chance</b> (the model's chance cut down by the safety margin). Below the cutoff a pick loses money over time even if the model is right; never take it there. A pick is <b>value</b> when Gal's odds are at or above its cutoff, it is not on your avoid list, and the model is not 10 or more points above the bookmakers' own chance (when the bookmakers' price is known: home, draw, away, double chance and 3 or more goals). <b>Value pairs</b> join two value picks from two different matches; the tax is charged once on the pair's total winnings. Your 1.70 rule shows as a note, not a block.</p>") +
+        "<div id='vf-out'></div>";
+      $("#vf-match").addEventListener("change", vfOptions);
+      $("#vf-pick").addEventListener("change", vfHint);
+      $("#vf-add").addEventListener("click", () => {
+        const o = Number($("#vf-odds").value), mid = $("#vf-match").value, k = $("#vf-pick").value;
+        if (!(o > 1)) { $("#vf-hint").innerHTML = "<span class='status bad'>Enter Gal's odds first (above 1.00).</span>"; return; }
+        VF = VF.filter(it => !(it.mid === mid && it.k === k)).concat([{ mid, k, o }]);
+        vfSave(); $("#vf-odds").value = ""; vfRender();
+      });
+      $("#vf-out").addEventListener("click", e => {
+        const del = e.target.closest("[data-vfdel]");
+        if (del) { VF.splice(Number(del.dataset.vfdel), 1); vfSave(); vfRender(); return; }
+        if (e.target.id === "vf-clear") { VF = []; vfSave(); vfRender(); }
+      });
+      vfOptions(); vfRender();
+    }
+    valueFinder();
     draw();
   };
 

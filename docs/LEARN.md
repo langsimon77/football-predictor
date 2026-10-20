@@ -766,3 +766,7 @@ The same idea now covers every pick on the Model Lab. I checked each kind of pic
 
 From 14 Oct 2026 the Model Lab shows Serie A and Ligue 1 next to the EPL and La Liga, but only for what passed testing in those leagues: home, draw, away (so double chance and draw no bet too) and yellow cards. Their goals and corners forecasts failed, so the cards say "not shown" rather than show numbers we cannot stand behind. Each pick's track record and safety margin come from Serie A and Ligue 1's own history, not from England and Spain. The live check after 300 scored matches still runs.
 
+### 11.6 The value finder
+
+On the Pairs page you can now type Gal's odds for any pick. The finder shows each pick's **cutoff**: the lowest odds at which it breaks even after the 20% tax, using its safe chance. Below the cutoff, never. A pick is **value** when Gal pays at least the cutoff. When the model's chance is 10 or more points above the bookmakers' own chance, the "value" is more likely the model's mistake than Gal's, so the finder leaves that pick out and lists it separately. Value pairs join two value picks from two matches. Expect "no value" most days: bookmakers rarely pay above the fair price, and that answer is the finder doing its job.
+
