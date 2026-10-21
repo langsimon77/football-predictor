@@ -1,6 +1,6 @@
 # Latest predictions
 
-Updated Tue 20 Oct 2026, 17:32 Juba time. Primary model: `dc_bayes_v1` (Bayesian Dixon-Coles with shots on target). Probabilities are locked and never edited. The range after the home-win chance is the model's 80% interval. Tier: how far to trust the home, draw, away forecast, then over 2.5 goals (High, Medium, Low; see `docs/LEARN.md` chapter 4).
+Updated Wed 21 Oct 2026, 07:20 Juba time. Primary model: `dc_bayes_v1` (Bayesian Dixon-Coles with shots on target). Probabilities are locked and never edited. The range after the home-win chance is the model's 80% interval. Tier: how far to trust the home, draw, away forecast, then over 2.5 goals (High, Medium, Low; see `docs/LEARN.md` chapter 4).
 
 ## Locked, not yet played
 
@@ -24,4 +24,4 @@ Lower RPS is better; 0 is perfect.
 | `stack_v1` | 39 | 0.164 | 59% |
 | `xgboost_v1` | 39 | 0.162 | 59% |
 
-Results so far: football_data_org 20, football_data_co_uk 19. 20 still wait for football-data.co.uk, so their corners and cards are scored only if Lang entered them.
+Results so far: football_data_co_uk 39.
