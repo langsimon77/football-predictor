@@ -21,7 +21,7 @@ from datetime import date, datetime, timedelta, timezone
 
 import paths
 
-PAGES = {"UEL": "2026–27 UEFA Europa League league phase", "UECL": "2026–27 UEFA Conference League league phase"}
+PAGES = {"UEL": "2026\u201327 UEFA Europa League league phase", "UECL": "2026\u201327 UEFA Conference League league phase"}
 UA = {"User-Agent": "football-predictor/1.0 (+https://github.com/langsimon77/football-predictor)"}
 MONTHS = {m: i for i, m in enumerate("Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(), 1)}
 # Wikipedia flag codes that differ from the pipeline's country codes.
@@ -29,7 +29,7 @@ WIKI_CC = {"SLO": "SVN", "NIR": "NIR", "IRL": "IRL"}
 NAME = re.compile(r"^\|name_([A-Z0-9]+)\s*=\s*\{\{fbaicon\|([A-Z]{3})\}\}\s*\[\[(?:[^\]|]*\|)?([^\]]+)\]\]", re.M)
 MATCH = re.compile(r"^\|match_([A-Z0-9]+)_([A-Z0-9]+)\s*=\s*(.*?)\s*$", re.M)
 MATCHDAY = re.compile(r"<!--\s*Matchday\s+(\d+)\s*-->")
-SCORE = re.compile(r"^(\d+)\s*[–\-]\s*(\d+)$")
+SCORE = re.compile(r"^(\d+)\s*[\u2013\-]\s*(\d+)$")
 DAY = re.compile(r"\{\{small\|(\d{1,2}) ([A-Z][a-z]{2})\}\}")
 
 
