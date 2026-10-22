@@ -9,7 +9,7 @@ Forecasts for the two competitions the main pipeline does not cover, for the Mod
 |---|---|---|
 | Download the four free sources | `fetch_sources.py` | `data/raw/euro_sources/` (outside Git) |
 | Merge them into one results table | `build.py` | `data/interim/euro/raw.pkl` |
-| Resolve club names across sources | `prepare.py` (`names.py`, `data.py`) | `data/interim/euro/df.pkl` |
+| Resolve club names, cross-check this season's fixtures | `prepare.py` (`names.py`, `data.py`, `fixtures.py`) | `data/interim/euro/df.pkl`, `fixtures.json`; `data/euro/fixtures_check.json` |
 | Forecast the coming fixtures | `predict.py` (`elo.py`, `dc.py`, `link.py`) | `data/euro/pred.json` |
 | Export for the Model Lab, with the lock rule | `export.py` | `data/euro/euro_gameweek.json`, `data/euro/history_seed.json` |
 
@@ -20,8 +20,14 @@ run), `evalbt.py` (log loss by setting and blend weight), `evalx.py` (thin-data 
 ## Sources (all free)
 
 openfootball/europe, openfootball/football.json, openfootball/champions-league (CC0) and
-xgabora/Club-Football-Match-Data (MIT). 2026/27 European fixtures and results: `euro2627.py`
-(typed in from public reports on 22 Oct 2026; task 5.2 replaces it).
+xgabora/Club-Football-Match-Data (MIT). 2026/27 European fixtures and results come from two
+sources, cross-checked by `fixtures.py` (run in `prepare.py`): Wikipedia's league-phase results
+grids (MediaWiki API) and `euro2627.py` (typed in from public reports on 22 Oct 2026; it also
+has kick-off times and the qualifying rounds). A fixture or result in both, agreeing, is
+verified; anything else is flagged unverified on the Model Lab cards, and a result the sources
+disagree on is left out of training. `data/euro/fixtures_check.json` reports the counts. No
+free structured source has these two competitions otherwise: football-data.org's free tier
+does not cover them and openfootball stops at 2025/26 (Champions League only).
 
 ## Settings
 

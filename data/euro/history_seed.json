@@ -55,7 +55,7 @@
 "mkt": "goals",
 "k": "G>2.5",
 "label": "Over 2.5 goals",
-"p": 0.6406,
+"p": 0.6405,
 "result": null
 },
 {
@@ -83,21 +83,21 @@
 "mkt": "result",
 "k": "H",
 "label": "Ferencv\u00e1ros win",
-"p": 0.6128,
+"p": 0.6129,
 "result": null
 },
 {
 "mkt": "goals",
 "k": "G>2.5",
 "label": "Over 2.5 goals",
-"p": 0.5642,
+"p": 0.5643,
 "result": null
 },
 {
 "mkt": "btts",
 "k": "BTTS",
 "label": "Both score: yes",
-"p": 0.538,
+"p": 0.5379,
 "result": null
 }
 ],
@@ -223,7 +223,7 @@
 "mkt": "result",
 "k": "A",
 "label": "Bayer Leverkusen win",
-"p": 0.709,
+"p": 0.7091,
 "result": null
 },
 {
@@ -258,7 +258,7 @@
 "mkt": "result",
 "k": "H",
 "label": "Union SG win",
-"p": 0.7118,
+"p": 0.7119,
 "result": null
 },
 {
@@ -293,7 +293,7 @@
 "mkt": "result",
 "k": "A",
 "label": "Marseille win",
-"p": 0.4748,
+"p": 0.4747,
 "result": null
 },
 {
@@ -398,7 +398,7 @@
 "mkt": "result",
 "k": "H",
 "label": "Crvena Zvezda win",
-"p": 0.4172,
+"p": 0.4173,
 "result": null
 },
 {
@@ -433,7 +433,7 @@
 "mkt": "result",
 "k": "A",
 "label": "Brighton win",
-"p": 0.7277,
+"p": 0.7278,
 "result": null
 },
 {
@@ -468,14 +468,14 @@
 "mkt": "result",
 "k": "A",
 "label": "Brann win",
-"p": 0.6379,
+"p": 0.6381,
 "result": null
 },
 {
 "mkt": "goals",
 "k": "G>2.5",
 "label": "Over 2.5 goals",
-"p": 0.5445,
+"p": 0.5446,
 "result": null
 },
 {
@@ -503,7 +503,7 @@
 "mkt": "result",
 "k": "H",
 "label": "Getafe win",
-"p": 0.6294,
+"p": 0.6295,
 "result": null
 },
 {
@@ -853,7 +853,7 @@
 "mkt": "result",
 "k": "A",
 "label": "Salzburg win",
-"p": 0.4951,
+"p": 0.4952,
 "result": null
 },
 {
@@ -923,7 +923,7 @@
 "mkt": "result",
 "k": "A",
 "label": "Benfica win",
-"p": 0.5332,
+"p": 0.5333,
 "result": null
 },
 {
@@ -1168,7 +1168,7 @@
 "mkt": "result",
 "k": "H",
 "label": "Borac Banja Luka win",
-"p": 0.5253,
+"p": 0.5254,
 "result": null
 },
 {

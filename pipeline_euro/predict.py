@@ -36,7 +36,9 @@ out={"uel":[],"uecl":[]}; pairs={}; hist=[]
 NAMES={"Ararat-Armenia":"Ararat-Armenia","Union Saint-Gilloise":"Union SG","Hapoel Beer Sheva":"Hapoel Be'er Sheva","Viktoria Plzen":"Viktoria Plzeň","Lillestrom":"Lillestrøm","Lech Poznan":"Lech Poznań",
        "Ferencvaros":"Ferencváros","Besiktas":"Beşiktaş","Mjallby":"Mjällby","Nordsjaelland":"Nordsjælland","Kauno Zalgiris":"Kauno Žalgiris","Inter Club d'Escaldes":"Inter Escaldes","Universitatea Craiova":"U Craiova",
        "Crvena Zvezda":"Crvena Zvezda","FC Copenhagen":"Copenhagen","Iberia 1999":"Iberia 1999","Jagiellonia":"Jagiellonia"}
-for f in euro2627.FIX:
+# Fixtures cross-checked against Wikipedia (fixtures.py, written by prepare.py).
+FIX = json.load(open(str(paths.WORK / "fixtures.json")))
+for f in FIX:
     hk=R(f["home"],f["hcc"]); ak=R(f["away"],f["acc"])
     h=NAMES.get(f["home"],f["home"]); a=NAMES.get(f["away"],f["away"])
     pe,pdc,pb,Mx,lh,la=forecast(hk,ak)
@@ -50,7 +52,7 @@ for f in euro2627.FIX:
     # expected goals consistent with reshaped grid
     xg=(float((Mx*I).sum()),float((Mx*J).sum()))
     out[comp].append(dict(id=mid,lg=lgname,h=h,a=a,kickoff=f["kickoff"],round=f["round"],locked=True,p=[int(round(v*1000)) for v in pb],
-        xg=[round(xg[0],2),round(xg[1],2)],goals=round(xg[0]+xg[1],2),o25=round(ev["G>2.5"],4),btts=round(ev["BTTS"],4),score=f"{k[0]}-{k[1]}",score_p=round(float(Mx[k]),4),
+        xg=[round(xg[0],2),round(xg[1],2)],goals=round(xg[0]+xg[1],2),o25=round(ev["G>2.5"],4),btts=round(ev["BTTS"],4),score=f"{k[0]}-{k[1]}",score_p=round(float(Mx[k]),4),verified=bool(f.get("verified")),time_confirmed=bool(f.get("time_confirmed",True)),sources=f.get("sources",[]),
         methods=dict(elo=[round(float(v),3) for v in pe],dc=[round(float(v),3) for v in pdc]),eo=eo))
     picks=[]
     for kk in ["H","D","A","1X","X2","12","EH+2H","EH+2A","EH-1H","EH-1A","G>1.5","G<1.5","G>2.5","G<2.5","G>3.5","G<3.5","BTTS","NoBTTS"]:
