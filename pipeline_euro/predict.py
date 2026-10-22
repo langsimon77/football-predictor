@@ -1,6 +1,6 @@
 import sys, json, math, warnings, paths; warnings.filterwarnings("ignore")
 import pandas as pd, numpy as np, collections
-import elo, link, dc, names, euro2627
+import elo, link, dc, names
 cfg=json.load(open(str(paths.HERE / "final_cfg.json")))
 df=pd.read_pickle(str(paths.WORK / "df.pkl")); y=np.where(df.hg>df.ag,0,np.where(df.hg==df.ag,1,2))
 ep=json.load(open(str(paths.HERE / "elo_params.json")))
@@ -29,10 +29,11 @@ def forecast(hk,ak):
     pd_,o25,btts,Mx,_=dc.probs(lh,la,rho=rho)
     pb=w*pe+(1-w)*pd_
     # reshape the score grid so its home/draw/away totals match the blend
-    i=np.arange(Mx.shape[0]); I,J=np.meshgrid(i,i,indexing="ij")
-    Mx=Mx.copy(); Mx[I>J]*=pb[0]/pd_[0]; Mx[I==J]*=pb[1]/pd_[1]; Mx[I<J]*=pb[2]/pd_[2]; Mx/=Mx.sum()
+    Mx=dc.reshape(Mx, pb)
     return pe,pd_,pb,Mx,lh,la
 out={"uel":[],"uecl":[]}; pairs={}; hist=[]
+import datetime as _dt
+RUN_AT=_dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%MZ")  # when these forecasts were made
 NAMES={"Ararat-Armenia":"Ararat-Armenia","Union Saint-Gilloise":"Union SG","Hapoel Beer Sheva":"Hapoel Be'er Sheva","Viktoria Plzen":"Viktoria Plzeň","Lillestrom":"Lillestrøm","Lech Poznan":"Lech Poznań",
        "Ferencvaros":"Ferencváros","Besiktas":"Beşiktaş","Mjallby":"Mjällby","Nordsjaelland":"Nordsjælland","Kauno Zalgiris":"Kauno Žalgiris","Inter Club d'Escaldes":"Inter Escaldes","Universitatea Craiova":"U Craiova",
        "Crvena Zvezda":"Crvena Zvezda","FC Copenhagen":"Copenhagen","Iberia 1999":"Iberia 1999","Jagiellonia":"Jagiellonia"}
@@ -46,9 +47,8 @@ for f in FIX:
     ev={k:float(Mx[np.vectorize(fn)(I,J)].sum()) for k,fn in EV.items()}
     k=np.unravel_index(Mx.argmax(),Mx.shape)
     comp=f["comp"].lower(); lgname="Europa League" if comp=="uel" else "Conference League"
-    mid=("UEL" if comp=="uel" else "UECL")+"_2627_"+names.norm(f["home"]).replace(" ","_")+"_"+names.norm(f["away"]).replace(" ","_")+"_2026-10-22"
+    mid=("UEL" if comp=="uel" else "UECL")+"_2627_"+names.norm(f["home"]).replace(" ","_")+"_"+names.norm(f["away"]).replace(" ","_")+"_"+f["kickoff"][:10]
     eo=[nm for nm,kk in ((h,hk),(a,ak)) if rc[kk]<15]
-    xs=(lh*1.0,la*1.0)
     # expected goals consistent with reshaped grid
     xg=(float((Mx*I).sum()),float((Mx*J).sum()))
     out[comp].append(dict(id=mid,lg=lgname,h=h,a=a,kickoff=f["kickoff"],round=f["round"],locked=True,p=[int(round(v*1000)) for v in pb],
@@ -60,20 +60,24 @@ for f in FIX:
     picks.append(dict(k="DNB-H",fam="dnb",label="Draw no bet: "+h,p=round(ev["H"],5),refund=round(ev["D"],6),nopair=True,g=comp))
     picks.append(dict(k="DNB-A",fam="dnb",label="Draw no bet: "+a,p=round(ev["A"],5),refund=round(ev["D"],6),nopair=True,g=comp))
     joint={}
+    # Same rules as the main leagues' pairs (scripts/pairs_lab.py, same_match_joint): no draw no
+    # bet, no two picks of one family, and no pair where one pick implies the other or where
+    # both cannot happen together.
     for x in range(len(picks)):
         for z in range(x+1,len(picks)):
-            if picks[x].get("nopair") or picks[z].get("nopair"): continue
-            fx=EV[picks[x]["k"]]; fz=EV[picks[z]["k"]]
+            p1,p2=picks[x],picks[z]
+            if p1.get("nopair") or p2.get("nopair") or p1["fam"]==p2["fam"]: continue
+            fx=EV[p1["k"]]; fz=EV[p2["k"]]
             jp=float(Mx[np.vectorize(lambda u,v: fx(u,v) and fz(u,v))(I,J)].sum())
-            if 0.0005<jp<min(picks[x]["p"],picks[z]["p"])-0.0005 or True:
-                if jp>0.0005: joint[f"{x},{z}"]=round(jp,5)
+            if jp<1e-6 or jp>=min(p1["p"],p2["p"])-1e-5: continue  # picks are rounded to 5 decimals
+            joint[f"{x},{z}"]=round(jp,5)
     pairs[mid]=dict(picks=picks,joint=joint,h=h,a=a,lg=lgname,kickoff=f["kickoff"],locked=True,odds={},g=comp)
     # history calls: result, goals 2.5, both score
     res_k=max(["H","D","A"],key=lambda q:ev[q])
     calls=[dict(mkt="result",k=res_k,label=label(res_k,h,a),p=round(ev[res_k],4),result=None)]
     gk="G>2.5" if ev["G>2.5"]>=ev["G<2.5"] else "G<2.5"; calls.append(dict(mkt="goals",k=gk,label="Over 2.5 goals" if gk=="G>2.5" else "Under 2.5 goals",p=round(ev[gk],4),result=None))
     bk="BTTS" if ev["BTTS"]>=ev["NoBTTS"] else "NoBTTS"; calls.append(dict(mkt="btts",k=bk,label="Both score: yes" if bk=="BTTS" else "Both score: no",p=round(ev[bk],4),result=None))
-    hist.append(dict(match_id=mid,lg=lgname,h=h,a=a,kickoff=f["kickoff"],round=f["round"],locked_at="2026-10-22T12:00Z",model_version="eur-1",calls=calls,score=None,settled_utc=None))
+    hist.append(dict(match_id=mid,lg=lgname,h=h,a=a,kickoff=f["kickoff"],round=f["round"],locked_at=RUN_AT,model_version="eur-1",calls=calls,score=None,settled_utc=None))
 json.dump(dict(out=out,pairs=pairs,hist=hist),open(str(paths.OUT / "pred.json"),"w"),indent=0)
 for comp in out:
     for r in out[comp]: print(f"{r['h']:22s} {r['a']:22s} {r['p']} xg={r['xg']} o25={r['o25']:.2f} {r['score']} elo={r['methods']['elo']} dc={r['methods']['dc']} eo={r['eo']}")
