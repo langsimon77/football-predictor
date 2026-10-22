@@ -15,8 +15,7 @@ rec={}; P3=[]; Y3=[]
 for n,(ix,row) in enumerate(b.iterrows()):
     if not keep[n]: continue
     pe=Pel[n]; pdc=np.array([row.pH,row.pD,row.pA]); pb=w*pe+(1-w)*pdc
-    _,_,_,M,_=dc.probs(row.lh,row.la,rho=-0.05); M=M.copy()
-    M[I>J]*=pb[0]/pdc[0]; M[I==J]*=pb[1]/pdc[1]; M[I<J]*=pb[2]/pdc[2]; M/=M.sum()
+    _,_,_,M,_=dc.probs(row.lh,row.la,rho=-0.05); M=dc.reshape(M, pb)
     hg,ag=int(df.hg[ix]),int(df.ag[ix])
     P3.append(pb); Y3.append(y[ix])
     for k,mk in masks.items():

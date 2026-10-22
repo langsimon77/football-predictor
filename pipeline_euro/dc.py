@@ -46,3 +46,12 @@ def probs(lh,la,rho=-0.05,maxg=10):
     tot=np.add.outer(i,i); o25=M[tot>=3].sum(); btts=M[1:,1:].sum()
     k=np.unravel_index(M.argmax(),M.shape)
     return np.array([pH,pD,pA]), o25, btts, M, k
+
+
+def reshape(M, target):
+    """Rescale a score grid so its home, draw and away totals equal target (a blend of models),
+    keeping each region's shape; the grid still sums to 1."""
+    i = np.arange(M.shape[0]); I, J = np.meshgrid(i, i, indexing="ij")
+    M = M.copy(); cur = (M[I > J].sum(), np.trace(M), M[I < J].sum())
+    M[I > J] *= target[0] / cur[0]; M[I == J] *= target[1] / cur[1]; M[I < J] *= target[2] / cur[2]
+    return M / M.sum()
