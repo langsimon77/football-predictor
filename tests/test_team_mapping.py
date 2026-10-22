@@ -6,6 +6,8 @@ They skip, not fail, when files are absent. CI downloads everything before testi
 
 from __future__ import annotations
 
+import warnings
+
 import pandas as pd
 import pytest
 
@@ -135,8 +137,8 @@ def test_current_season_results_agree_across_sources(division):
 
     One source may publish a round a day or two before the other (13 Oct 2026:
     football-data.co.uk had the 10 to 12 Oct round, openfootball not yet). A match
-    only one source has is allowed if it is recent; an older one means a club name
-    maps wrongly.
+    only one source has is allowed after the slower source's last result; one inside
+    the dates both cover means a club name maps wrongly. A long lag only warns.
     """
     year = fd.CURRENT_SEASON
     of = load_openfootball(division, year).dropna(subset=["home_goals"])
@@ -160,9 +162,16 @@ def test_current_season_results_agree_across_sources(division):
     assert (both["date_fd"] == both["date_of"]).all(), both[both["date_fd"] != both["date_of"]]
     assert (both["score_fd"] == both["score_of"]).all(), both[both["score_fd"] != both["score_of"]]
     one_sided = merged[merged["_merge"] != "both"]
-    newest = pd.Timestamp(max(fdc["date"].max(), of["date"].max()))
+    # Judge only the dates both sources cover: a match past the slower source's last result
+    # can't be compared (22 Oct 2026: openfootball was 3 to 4 weeks behind in every league).
+    fd_last, of_last = pd.Timestamp(fdc["date"].max()), pd.Timestamp(of["date"].max())
+    covered = min(fd_last, of_last)
+    lag = abs(fd_last - of_last)
+    if lag > pd.Timedelta(days=LAG_DAYS):
+        slow = "openfootball" if of_last < fd_last else "football-data.co.uk"
+        warnings.warn(f"{division}: {slow} is {lag.days} days behind", stacklevel=1)
     played = pd.to_datetime(one_sided["date_fd"].fillna(one_sided["date_of"]))
-    assert (played >= newest - pd.Timedelta(days=LAG_DAYS)).all(), one_sided
+    assert (played > covered).all(), one_sided[played <= covered]
 
 
 @pytest.mark.parametrize("code", ["PL", "PD", "SA", "FL1"])

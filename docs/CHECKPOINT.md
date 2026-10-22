@@ -13,7 +13,8 @@
 - The page data is built here: `scripts/build_model_lab.py --pages-dir DIR --data-json OUT` (with
   the private betting summary); the private build splits it into `data/gameweek.json`,
   `data/core.json` and `data/history-seed.json`, published as artifact files.
-- Branch `lab-audit` (local, not pushed): `data/markets/markets.json` (one definition of codes,
+- Merged into main on 22 Oct (Lang's yes; first Europe run on GitHub the same day, 36 matches,
+  1 started kept locked): `data/markets/markets.json` (one definition of codes,
   labels and settle rules; `scripts/gen_markets.py`), `pipeline_euro/` (Europa and Conference
   League: free sources, Wikipedia cross-check of this season's fixtures, lock rule, `make euro`,
   `.github/workflows/euro.yml` at 06:00 UTC) and the pre-registered Europe checks
@@ -23,12 +24,15 @@
   or three when each is 1.20 or lower; one pick per match; stake from Lang's weekly budget rule.
 
 ### Open questions for Lang
-1. Push and merge `lab-audit` (starts the daily Europe forecasts)?
-2. The 21 Oct odds check accepts only slips above 1.70 total odds, which rule 1 does not allow:
+1. The 21 Oct odds check accepts only slips above 1.70 total odds, which rule 1 does not allow:
    which rule stays?
-3. The nightly history settle task (not on this Mac) must write with update, not set, and read
-   `data/history-seed.json`.
-4. Replicate the new-club Elo start on the next 300 European matches?
+2. The nightly history settle task (a Claude routine, checked 22 Oct) writes with update, so
+   `corrections` survive. It never creates History documents: 25 forecast matches (28 Oct to
+   4 Nov) are missing, and nothing adds new ones. Change its prompt to add them?
+3. Replicate the new-club Elo start on the next 300 European matches?
+4. openfootball is 3 to 4 weeks behind in every league (22 Oct). The cross-check test now judges
+   only the dates both sources cover and warns about the lag (the daily results come from
+   football-data.co.uk, so forecasts are not affected).
 
 ## Earlier: 20 Oct 2026, Champions League in the daily run and the Model Lab
 
