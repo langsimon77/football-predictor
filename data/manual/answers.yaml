@@ -478,3 +478,15 @@
   threat_out: false
   source: 'Issue #13'
   used_at_utc: 2026-10-20T05:19Z
+- question: EPL_2627_ipswich_nottm_forest:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #15'
+  used_at_utc: 2026-10-22T05:23Z
+- question: EPL_2627_ipswich_nottm_forest:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #15'
+  used_at_utc: 2026-10-22T05:23Z
