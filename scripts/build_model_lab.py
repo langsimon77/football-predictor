@@ -472,7 +472,7 @@ EURO_TASKS = [
     ("5.4", "5.4 totals calibration (best of two, over 2.5)", "Calibrating over and under 2.5"),
     ("5.5", "5.5 home, draw, away calibration (best of two)", "Calibrating home, draw, away"),
     ("5.6", "5.6 stacked blend", "A stacked blend that knows how much data each team has"),
-    ("5.7", "5.7 new-team Elo start (thin-data matches)", "Elo start for new clubs from league strength"),
+    ("5.7", "5.7 new-team Elo start (thin-data matches)", "Elo start for new clubs from league level"),
 ]
 
 
