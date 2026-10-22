@@ -405,6 +405,26 @@ def ucl_block(path: Path, short: dict[str, str], pairs: dict) -> dict | None:
     return {"rows": rows, "as_of": as_of_text(up)}
 
 
+EURO_GAMEWEEK = ROOT / "data" / "euro" / "euro_gameweek.json"
+
+
+def euro_blocks(path: Path, pairs: dict) -> dict:
+    """Europa League and Conference League (pipeline_euro/export.py): cards, their picks for
+    Pairs and the slip pages, and their own safety margins and track record."""
+    if not path.exists():
+        return {}
+    e = json.loads(path.read_text(encoding="utf-8"))
+    pairs["matches"].update(e["pairs_matches"])
+    pairs["safety_eur"], pairs["record_eur"] = e["safety_eur"], e["record_eur"]
+    days = {d["key"]: d for d in pairs["days"]}
+    for mid, m in sorted(e["pairs_matches"].items(), key=lambda kv: kv[1]["kickoff"]):
+        day = pd.Timestamp(m["kickoff"]).tz_convert(pairs_lab.JUBA)
+        days.setdefault(f"{day:%Y-%m-%d}", {"key": f"{day:%Y-%m-%d}", "label": f"{day:%a %d %b}",
+                                            "ids": []})["ids"].append(mid)
+    pairs["days"] = [days[k] for k in sorted(days)]
+    return {"uel": e["uel"], "uecl": e["uecl"]}
+
+
 def simulator_block(matches: pd.DataFrame, fixtures: pd.DataFrame, names: dict[str, int],
                     now: pd.Timestamp) -> dict:
     second = pd.read_parquet(PROCESSED / "second_tier.parquet")
@@ -494,7 +514,10 @@ def check_fresh(pages_meta: dict) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("out", type=Path)
+    ap.add_argument("out", type=Path, nargs="?", default=None,
+                    help="write the page here (the template with the data inside)")
+    ap.add_argument("--data-json", type=Path, default=None,
+                    help="write the data alone here (the Model Lab page build keeps them apart)")
     ap.add_argument("--pages-dir", type=Path, required=True)
     ap.add_argument("--allow-stale", action="store_true")
     ap.add_argument("--trial-upcoming", type=Path, default=TRIAL_UPCOMING,
@@ -548,14 +571,20 @@ def main(argv: list[str] | None = None) -> int:
         "trial": trial_block(args.trial_upcoming, short, pairs,
                              pairs_lab.bookmaker(odds_files[-1] if odds_files else None)),
         "ucl": ucl_block(args.ucl_upcoming, short, pairs),
+        **euro_blocks(EURO_GAMEWEEK, pairs),
         "sim": simulator_block(matches, fixtures, names, now),
         "ev": evidence_block(),
     }
     blob = json.dumps(data, separators=(",", ":"), allow_nan=False)
-    page = TEMPLATE.read_text(encoding="utf-8").replace("/*__DATA__*/null", blob)
-    args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(page, encoding="utf-8")
-    print(f"wrote {args.out} ({len(page) / 1e6:.2f} MB, data {len(blob) / 1e6:.2f} MB)")
+    if args.data_json:
+        args.data_json.parent.mkdir(parents=True, exist_ok=True)
+        args.data_json.write_text(blob, encoding="utf-8")
+        print(f"wrote {args.data_json} ({len(blob) / 1e6:.2f} MB)")
+    if args.out:
+        page = TEMPLATE.read_text(encoding="utf-8").replace("/*__DATA__*/null", blob)
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        args.out.write_text(page, encoding="utf-8")
+        print(f"wrote {args.out} ({len(page) / 1e6:.2f} MB, data {len(blob) / 1e6:.2f} MB)")
     return 0
 
 

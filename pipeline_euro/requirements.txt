@@ -1,0 +1,6 @@
+# The Europe pipeline runs inside the project environment (uv sync --frozen); these are the
+# versions it was checked with, for running it on its own.
+pandas==3.0.6
+numpy==2.5.3
+scipy==1.18.1
+scikit-learn==1.9.1

@@ -1,0 +1,48 @@
+name: Europe forecasts
+
+on:
+  schedule:
+    # 06:00 UTC = 08:00 Juba: Europa and Conference League forecasts for the Model Lab.
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write  # commit data/euro
+
+concurrency:
+  group: daily  # shares the daily run's queue, so the two never push at once
+  cancel-in-progress: false
+
+jobs:
+  euro:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install locked dependencies
+        run: uv sync --frozen
+
+      - name: Forecast (fetch sources, build, predict, export with the lock rule)
+        run: make euro
+
+      - name: No banned dash characters
+        run: uv run python scripts/check_dashes.py
+
+      - name: Commit the Europe files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/euro
+          if git diff --cached --quiet; then
+            echo "Nothing new."
+          else
+            git commit -m "Euro run $(date -u +%F): Europa and Conference League forecasts"
+            git pull --rebase
+            git push
+          fi
