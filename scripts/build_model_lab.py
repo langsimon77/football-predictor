@@ -467,6 +467,29 @@ def simulator_block(matches: pd.DataFrame, fixtures: pd.DataFrame, names: dict[s
     return out
 
 
+EURO_TASKS = [
+    ("5.3", "5.3 settings and fitted rho", "Goals model settings and a fitted rho"),
+    ("5.4", "5.4 totals calibration (best of two, over 2.5)", "Calibrating over and under 2.5"),
+    ("5.5", "5.5 home, draw, away calibration (best of two)", "Calibrating home, draw, away"),
+    ("5.6", "5.6 stacked blend", "A stacked blend that knows how much data each team has"),
+    ("5.7", "5.7 new-team Elo start (thin-data matches)", "Elo start for new clubs from league strength"),
+]
+
+
+def euro_checks() -> dict | None:
+    """The Europe pipeline's October checks and its bookmaker benchmark (Tests and decisions)."""
+    ex = ROOT / "data" / "euro" / "experiments_2026_10.json"
+    bm = ROOT / "data" / "euro" / "benchmark_2026_10.json"
+    if not ex.exists():
+        return None
+    e = json.loads(ex.read_text(encoding="utf-8"))
+    tests = [{"task": t, "name": name, "detail": e.get(t, {}).get("detail", ""),
+              "diff": e["tests"].get(key), "pass": bool(e["holm"].get(key, {}).get("pass"))}
+             for t, key, name in EURO_TASKS]
+    return {"reference": e["summary"]["reference"], "tests": tests,
+            "benchmark": json.loads(bm.read_text(encoding="utf-8")) if bm.exists() else None}
+
+
 def evidence_block() -> dict:
     cv = pd.read_parquet(BACKTESTS / "challengers_walkforward_2021_2025_cv.parquet")
     stack = json.loads((ROOT / "data" / "stacking" / "stack_1x2.json").read_text())
@@ -498,7 +521,8 @@ def evidence_block() -> dict:
     return {"cv": [{"model": r.model, "params": json.dumps(json.loads(r.params)),
                     "log_loss": round(float(r.log_loss), 5)} for r in cv.itertuples()],
             "stack": stack, "stack_by_season": per_season, "tiers": tiers,
-            "steadiness": paths, "audit": audit.panel() if audit.OUT_JSON.exists() else None}
+            "steadiness": paths, "audit": audit.panel() if audit.OUT_JSON.exists() else None,
+            "euro": euro_checks()}
 
 
 def check_fresh(pages_meta: dict) -> None:

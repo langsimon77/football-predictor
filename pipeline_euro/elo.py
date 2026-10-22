@@ -1,12 +1,15 @@
 import numpy as np, pandas as pd, math, collections
-def run_elo(df, K0=20.0, HD=60.0, HE=45.0, newK=3.0, gap_reg=0.25, seed=None, stop_date=None, snapshot_dates=()):
+def run_elo(df, K0=20.0, HD=60.0, HE=45.0, newK=3.0, gap_reg=0.25, seed=None, stop_date=None, snapshot_dates=(), init_fn=None):
     """Goal-difference Elo. Returns pre-match diff (home - away + hfa) for every row, and rating snapshots."""
     R={}; N=collections.Counter(); last={}
     ccsum=collections.defaultdict(list)
     pre=np.zeros(len(df)); snaps={}
     sd=sorted(snapshot_dates); si=0
-    def init(team, cc, elo_hint):
+    def init(team, cc, elo_hint, date=None):
         if elo_hint is not None and not (isinstance(elo_hint,float) and math.isnan(elo_hint)): return float(elo_hint)
+        if init_fn is not None:
+            v = init_fn(team, cc, R, N, date)
+            if v is not None: return float(v)
         # country mean of established teams minus 75, else 1350
         vals=[R[t] for t in R if t.startswith(cc+":") and N[t]>=10]
         return (np.mean(vals)-75.0) if len(vals)>=3 else 1350.0
@@ -15,7 +18,7 @@ def run_elo(df, K0=20.0, HD=60.0, HE=45.0, newK=3.0, gap_reg=0.25, seed=None, st
             snaps[sd[si]]=dict(R); si+=1
         h,a=r.H,r.A
         for tm,cc,hint in ((h,r.hcc,getattr(r,"helo",None)),(a,r.acc,getattr(r,"aelo",None))):
-            if tm not in R: R[tm]=init(tm,cc,hint)
+            if tm not in R: R[tm]=init(tm,cc,hint,r.date)
             elif tm in last and (r.t-last[tm]).days>100:
                 vals=[R[t] for t in R if t.startswith(cc+":") and N[t]>=10]
                 if len(vals)>=3: R[tm]=R[tm]*(1-gap_reg)+np.mean(vals)*gap_reg

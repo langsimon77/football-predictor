@@ -1,0 +1,117 @@
+{
+ "n": 13038,
+ "from": "2023-07-04",
+ "to": "2026-09-03",
+ "model": 0.9926,
+ "bookmakers": 0.9705,
+ "diff": {
+  "mean": 0.0221,
+  "lo": 0.0193,
+  "hi": 0.0252,
+  "n": 13038
+ },
+ "margin": 0.0599,
+ "by_country": {
+  "AUT": {
+   "n": 245,
+   "model": 1.0293,
+   "bookmakers": 1.0096
+  },
+  "BEL": {
+   "n": 971,
+   "model": 1.007,
+   "bookmakers": 0.9964
+  },
+  "DEN": {
+   "n": 249,
+   "model": 1.0253,
+   "bookmakers": 0.9992
+  },
+  "ENG": {
+   "n": 1160,
+   "model": 0.9907,
+   "bookmakers": 0.9663
+  },
+  "ESP": {
+   "n": 1171,
+   "model": 0.98,
+   "bookmakers": 0.9541
+  },
+  "FIN": {
+   "n": 244,
+   "model": 1.0011,
+   "bookmakers": 0.9913
+  },
+  "FRA": {
+   "n": 934,
+   "model": 1.0094,
+   "bookmakers": 0.9838
+  },
+  "GER": {
+   "n": 927,
+   "model": 0.9919,
+   "bookmakers": 0.9618
+  },
+  "GRE": {
+   "n": 405,
+   "model": 0.9826,
+   "bookmakers": 0.9406
+  },
+  "IRL": {
+   "n": 239,
+   "model": 1.0288,
+   "bookmakers": 1.0226
+  },
+  "ITA": {
+   "n": 1160,
+   "model": 0.9862,
+   "bookmakers": 0.9643
+  },
+  "NED": {
+   "n": 951,
+   "model": 0.9596,
+   "bookmakers": 0.9431
+  },
+  "NOR": {
+   "n": 323,
+   "model": 1.0103,
+   "bookmakers": 0.9973
+  },
+  "POL": {
+   "n": 395,
+   "model": 1.0576,
+   "bookmakers": 1.0529
+  },
+  "POR": {
+   "n": 951,
+   "model": 0.9341,
+   "bookmakers": 0.919
+  },
+  "ROU": {
+   "n": 402,
+   "model": 1.0687,
+   "bookmakers": 1.0346
+  },
+  "SCO": {
+   "n": 673,
+   "model": 0.9677,
+   "bookmakers": 0.9527
+  },
+  "SUI": {
+   "n": 270,
+   "model": 1.0416,
+   "bookmakers": 1.0227
+  },
+  "SWE": {
+   "n": 341,
+   "model": 1.0061,
+   "bookmakers": 0.9912
+  },
+  "TUR": {
+   "n": 1027,
+   "model": 0.989,
+   "bookmakers": 0.9497
+  }
+ },
+ "note": "Domestic top divisions; no free odds exist for the Europa or Conference League."
+}

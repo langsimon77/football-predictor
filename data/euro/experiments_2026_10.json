@@ -1,0 +1,433 @@
+{
+ "summary": {
+  "reference": {
+   "all": 0.9393,
+   "tune": 0.948,
+   "hold": 0.9082,
+   "n": 1199,
+   "n_tune": 938,
+   "n_hold": 261
+  }
+ },
+ "5.3": {
+  "grid": [
+   {
+    "half": 180.0,
+    "alpha": 0.0001,
+    "rho": "fixed",
+    "tune": 0.9555,
+    "hold": 0.9123,
+    "all": 0.9461
+   },
+   {
+    "half": 180.0,
+    "alpha": 0.0001,
+    "rho": "fitted",
+    "tune": 0.954,
+    "hold": 0.9092,
+    "all": 0.9442
+   },
+   {
+    "half": 180.0,
+    "alpha": 0.0003,
+    "rho": "fixed",
+    "tune": 0.9525,
+    "hold": 0.9116,
+    "all": 0.9436
+   },
+   {
+    "half": 180.0,
+    "alpha": 0.0003,
+    "rho": "fitted",
+    "tune": 0.9511,
+    "hold": 0.9086,
+    "all": 0.9418
+   },
+   {
+    "half": 180.0,
+    "alpha": 0.001,
+    "rho": "fixed",
+    "tune": 0.9505,
+    "hold": 0.9132,
+    "all": 0.9424
+   },
+   {
+    "half": 180.0,
+    "alpha": 0.001,
+    "rho": "fitted",
+    "tune": 0.9492,
+    "hold": 0.9103,
+    "all": 0.9407
+   },
+   {
+    "half": 270.0,
+    "alpha": 0.0001,
+    "rho": "fixed",
+    "tune": 0.9516,
+    "hold": 0.9097,
+    "all": 0.9425
+   },
+   {
+    "half": 270.0,
+    "alpha": 0.0001,
+    "rho": "fitted",
+    "tune": 0.9502,
+    "hold": 0.9067,
+    "all": 0.9407
+   },
+   {
+    "half": 270.0,
+    "alpha": 0.0003,
+    "rho": "fixed",
+    "tune": 0.9493,
+    "hold": 0.909,
+    "all": 0.9405
+   },
+   {
+    "half": 270.0,
+    "alpha": 0.0003,
+    "rho": "fitted",
+    "tune": 0.948,
+    "hold": 0.9061,
+    "all": 0.9388
+   },
+   {
+    "half": 270.0,
+    "alpha": 0.001,
+    "rho": "fixed",
+    "tune": 0.9484,
+    "hold": 0.9106,
+    "all": 0.9402
+   },
+   {
+    "half": 270.0,
+    "alpha": 0.001,
+    "rho": "fitted",
+    "tune": 0.9471,
+    "hold": 0.9078,
+    "all": 0.9386
+   },
+   {
+    "half": 365.0,
+    "alpha": 0.0001,
+    "rho": "fixed",
+    "tune": 0.95,
+    "hold": 0.909,
+    "all": 0.941
+   },
+   {
+    "half": 365.0,
+    "alpha": 0.0001,
+    "rho": "fitted",
+    "tune": 0.9485,
+    "hold": 0.9061,
+    "all": 0.9393
+   },
+   {
+    "half": 365.0,
+    "alpha": 0.0003,
+    "rho": "fixed",
+    "tune": 0.948,
+    "hold": 0.9082,
+    "all": 0.9393
+   },
+   {
+    "half": 365.0,
+    "alpha": 0.0003,
+    "rho": "fitted",
+    "tune": 0.9467,
+    "hold": 0.9054,
+    "all": 0.9377
+   },
+   {
+    "half": 365.0,
+    "alpha": 0.001,
+    "rho": "fixed",
+    "tune": 0.9475,
+    "hold": 0.9098,
+    "all": 0.9393
+   },
+   {
+    "half": 365.0,
+    "alpha": 0.001,
+    "rho": "fitted",
+    "tune": 0.9463,
+    "hold": 0.907,
+    "all": 0.9377
+   },
+   {
+    "half": 540.0,
+    "alpha": 0.0001,
+    "rho": "fixed",
+    "tune": 0.9488,
+    "hold": 0.909,
+    "all": 0.9401
+   },
+   {
+    "half": 540.0,
+    "alpha": 0.0001,
+    "rho": "fitted",
+    "tune": 0.9474,
+    "hold": 0.9061,
+    "all": 0.9384
+   },
+   {
+    "half": 540.0,
+    "alpha": 0.0003,
+    "rho": "fixed",
+    "tune": 0.9471,
+    "hold": 0.908,
+    "all": 0.9386
+   },
+   {
+    "half": 540.0,
+    "alpha": 0.0003,
+    "rho": "fitted",
+    "tune": 0.9458,
+    "hold": 0.9052,
+    "all": 0.9369
+   },
+   {
+    "half": 540.0,
+    "alpha": 0.001,
+    "rho": "fixed",
+    "tune": 0.947,
+    "hold": 0.9094,
+    "all": 0.9388
+   },
+   {
+    "half": 540.0,
+    "alpha": 0.001,
+    "rho": "fitted",
+    "tune": 0.9458,
+    "hold": 0.9066,
+    "all": 0.9372
+   },
+   {
+    "half": 730.0,
+    "alpha": 0.0001,
+    "rho": "fixed",
+    "tune": 0.9484,
+    "hold": 0.9093,
+    "all": 0.9398
+   },
+   {
+    "half": 730.0,
+    "alpha": 0.0001,
+    "rho": "fitted",
+    "tune": 0.9469,
+    "hold": 0.9063,
+    "all": 0.9381
+   },
+   {
+    "half": 730.0,
+    "alpha": 0.0003,
+    "rho": "fixed",
+    "tune": 0.9468,
+    "hold": 0.9082,
+    "all": 0.9384
+   },
+   {
+    "half": 730.0,
+    "alpha": 0.0003,
+    "rho": "fitted",
+    "tune": 0.9454,
+    "hold": 0.9054,
+    "all": 0.9367
+   },
+   {
+    "half": 730.0,
+    "alpha": 0.001,
+    "rho": "fixed",
+    "tune": 0.9468,
+    "hold": 0.9093,
+    "all": 0.9387
+   },
+   {
+    "half": 730.0,
+    "alpha": 0.001,
+    "rho": "fitted",
+    "tune": 0.9456,
+    "hold": 0.9065,
+    "all": 0.9371
+   }
+  ],
+  "chosen": {
+   "half": 730.0,
+   "alpha": 0.0003,
+   "rho": "fitted",
+   "tune": 0.9454,
+   "hold": 0.9054,
+   "all": 0.9367
+  },
+  "hold_diff": {
+   "mean": -0.0028,
+   "lo": -0.0087,
+   "hi": 0.0029,
+   "n": 261
+  },
+  "rho_fitted_range": [
+   -0.05,
+   0.061
+  ],
+  "detail": "best on the tuning matches: half-life 730 days, penalty 0.0003, rho fitted (fitted rho -0.05 to 0.061)"
+ },
+ "5.4": {
+  "mean_pred_tune": 0.571,
+  "actual_tune": 0.585,
+  "mean_pred_hold": 0.613,
+  "actual_hold": 0.655,
+  "reference_hold": 0.6345,
+  "shift": {
+   "UCL": 0.0182,
+   "UECL": -0.0242,
+   "UEL": 0.0053
+  },
+  "shift_hold": 0.6325,
+  "shift_hold_diff": {
+   "mean": -0.002,
+   "lo": -0.0049,
+   "hi": 0.0008,
+   "n": 261
+  },
+  "shift_1x2_hold_diff": {
+   "mean": -0.0004,
+   "lo": -0.0011,
+   "hi": 0.0002,
+   "n": 261
+  },
+  "isotonic_hold": 0.642,
+  "isotonic_hold_diff": {
+   "mean": 0.0074,
+   "lo": -0.0084,
+   "hi": 0.0281,
+   "n": 261
+  },
+  "other_lines_hold": {
+   "o15": {
+    "pred": 0.823,
+    "actual": 0.843
+   },
+   "o35": {
+    "pred": 0.399,
+    "actual": 0.425
+   },
+   "btts": {
+    "pred": 0.572,
+    "actual": 0.575
+   }
+  },
+  "detail": "over 2.5: predicted 61.3%, happened 65.5% on the test matches; goals shift by competition -0.0020, isotonic +0.0074"
+ },
+ "5.5": {
+  "temperature": 0.852,
+  "temperature_hold_diff": {
+   "mean": -0.0034,
+   "lo": -0.0127,
+   "hi": 0.0072,
+   "n": 261
+  },
+  "dirichlet_hold_diff": {
+   "mean": 0.0002,
+   "lo": -0.0176,
+   "hi": 0.0195,
+   "n": 261
+  },
+  "detail": "temperature 0.852: -0.0034; Dirichlet +0.0002"
+ },
+ "5.6": {
+  "hold_diff": {
+   "mean": 0.0088,
+   "lo": -0.0104,
+   "hi": 0.0301,
+   "n": 261
+  },
+  "walk_forward_all": 0.9437,
+  "walk_forward_all_diff": {
+   "mean": 0.0044,
+   "lo": -0.0024,
+   "hi": 0.0114,
+   "n": 1199
+  },
+  "beats_0_9393": false,
+  "detail": "walked forward over all 1199: 0.9437 against 0.9393"
+ },
+ "5.7": {
+  "has_hook": true,
+  "thin_n_hold": 63,
+  "thin_hold_ref": 0.8068,
+  "thin_hold_new": 0.804,
+  "thin_hold_diff": {
+   "mean": -0.0027,
+   "lo": -0.0055,
+   "hi": -0.0002,
+   "n": 63
+  },
+  "all_hold_diff": {
+   "mean": -0.0007,
+   "lo": -0.0015,
+   "hi": -0.0,
+   "n": 261
+  },
+  "detail": "63 test matches with a thin-data team: 0.8068 to 0.8040"
+ },
+ "holm": {
+  "5.7 new-team Elo start (thin-data matches)": {
+   "p": 0.0229,
+   "holm_threshold": 0.01,
+   "pass": false
+  },
+  "5.4 totals calibration (best of two, over 2.5)": {
+   "p": 0.0845,
+   "holm_threshold": 0.0125,
+   "pass": false
+  },
+  "5.3 settings and fitted rho": {
+   "p": 0.172,
+   "holm_threshold": 0.0167,
+   "pass": false
+  },
+  "5.5 home, draw, away calibration (best of two)": {
+   "p": 0.2515,
+   "holm_threshold": 0.025,
+   "pass": false
+  },
+  "5.6 stacked blend": {
+   "p": 0.8028,
+   "holm_threshold": 0.05,
+   "pass": false
+  }
+ },
+ "tests": {
+  "5.3 settings and fitted rho": {
+   "mean": -0.0028,
+   "lo": -0.0087,
+   "hi": 0.0029,
+   "n": 261
+  },
+  "5.4 totals calibration (best of two, over 2.5)": {
+   "mean": -0.002,
+   "lo": -0.0049,
+   "hi": 0.0008,
+   "n": 261
+  },
+  "5.5 home, draw, away calibration (best of two)": {
+   "mean": -0.0034,
+   "lo": -0.0127,
+   "hi": 0.0072,
+   "n": 261
+  },
+  "5.6 stacked blend": {
+   "mean": 0.0088,
+   "lo": -0.0104,
+   "hi": 0.0301,
+   "n": 261
+  },
+  "5.7 new-team Elo start (thin-data matches)": {
+   "mean": -0.0027,
+   "lo": -0.0055,
+   "hi": -0.0002,
+   "n": 63
+  }
+ }
+}
