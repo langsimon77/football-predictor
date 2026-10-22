@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "about": "One definition of every pick the project forecasts, labels and settles. scripts/gen_markets.py writes src/fp/markets_gen.py and the Model Lab's JavaScript from this file; do not edit those by hand. A settle rule is [stat, op, value]: the pick wins when stat op value holds, is void when the void rule holds, and stays unsettled when a stat it needs is missing.",
+  "stats": {
+    "diff": "home goals minus away goals, after 90 minutes",
+    "total": "home goals plus away goals, after 90 minutes",
+    "both": "1 when both teams scored, else 0",
+    "corners": "home corners plus away corners",
+    "yellows": "home yellow cards plus away yellow cards (a count of yellow cards, not booking points)"
+  },
+  "ops": [">", ">=", "<", "<=", "==", "!="],
+  "markets": [
+    {"code": "H", "family": "result", "market": "Home win", "label": "{home} win", "book": ["1X2", "1"], "win": ["diff", ">", 0]},
+    {"code": "D", "family": "result", "market": "Draw (full time)", "label": "Draw", "book": ["1X2", "X"], "win": ["diff", "==", 0]},
+    {"code": "A", "family": "result", "market": "Away win", "label": "{away} win", "book": ["1X2", "2"], "win": ["diff", "<", 0]},
+    {"code": "1X", "family": "dc", "market": "Double chance", "label": "{home} or draw", "book": ["Double chance", "1X"], "win": ["diff", ">=", 0]},
+    {"code": "X2", "family": "dc", "market": "Double chance", "label": "Draw or {away}", "book": ["Double chance", "X2"], "win": ["diff", "<=", 0]},
+    {"code": "12", "family": "dc", "market": "Double chance", "label": "{home} or {away}", "book": ["Double chance", "12"], "win": ["diff", "!=", 0]},
+    {"code": "EH+2H", "family": "eh", "market": "European handicap", "label": "{home} +2 handicap", "book": ["European handicap", "home +2"], "win": ["diff", ">", -2]},
+    {"code": "EH+2A", "family": "eh", "market": "European handicap", "label": "{away} +2 handicap", "book": ["European handicap", "away +2"], "win": ["diff", "<", 2]},
+    {"code": "EH-1H", "family": "eh", "market": "European handicap", "label": "{home} to win by 2 or more", "book": ["European handicap", "home −1"], "win": ["diff", ">=", 2]},
+    {"code": "EH-1A", "family": "eh", "market": "European handicap", "label": "{away} to win by 2 or more", "book": ["European handicap", "away −1"], "win": ["diff", "<=", -2]},
+    {"code": "DNB-H", "family": "dnb", "market": "Draw no bet", "label": "Draw no bet: {home}", "book": ["Draw no bet", "1"], "win": ["diff", ">", 0], "void": ["diff", "==", 0]},
+    {"code": "DNB-A", "family": "dnb", "market": "Draw no bet", "label": "Draw no bet: {away}", "book": ["Draw no bet", "2"], "win": ["diff", "<", 0], "void": ["diff", "==", 0]},
+    {"code": "G>{line}", "family": "goals", "market": {"1.5": "Over 1.5 goals", "*": "Over 2.5 goals or more"}, "label": "{above} or more goals", "call": "Over {line} goals", "book": ["Under/Over {line} goals", "over"], "win": ["total", ">", "{line}"],
+     "lines": [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5], "published": [1.5, 2.5, 3.5]},
+    {"code": "G<{line}", "family": "goals", "market": "Under goals", "label": "{below} goal{s} or fewer", "call": "Under {line} goals", "book": ["Under/Over {line} goals", "under"], "win": ["total", "<", "{line}"],
+     "lines": [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5], "published": [1.5, 2.5, 3.5]},
+    {"code": "BTTS", "family": "btts", "market": "Both teams score", "label": "Both teams score", "call": "Both score: yes", "book": ["Both teams to score", "yes"], "win": ["both", "==", 1]},
+    {"code": "NoBTTS", "family": "btts", "market": "Both teams score", "label": "Not both teams score", "call": "Both score: no", "book": ["Both teams to score", "no"], "win": ["both", "==", 0]},
+    {"code": "C>{line}", "family": "corners", "market": "Corners", "label": "{above} or more corners", "call": "Over {line} corners", "book": ["Under/Over {line} corners", "over"], "win": ["corners", ">", "{line}"],
+     "lines": [7.5, 8.5, 9.5, 10.5, 11.5, 12.5], "published": [8.5, 9.5, 10.5, 11.5]},
+    {"code": "C<{line}", "family": "corners", "market": "Corners", "label": "{below} corners or fewer", "call": "Under {line} corners", "book": ["Under/Over {line} corners", "under"], "win": ["corners", "<", "{line}"],
+     "lines": [7.5, 8.5, 9.5, 10.5, 11.5, 12.5], "published": [8.5, 9.5, 10.5, 11.5]},
+    {"code": "Y>{line}", "family": "yellows", "market": "Yellow cards (not booking points)", "label": "{above} or more yellow cards", "call": "Over {line} yellow cards", "book": ["Under/Over {line} yellow cards (not booking points)", "over"], "win": ["yellows", ">", "{line}"],
+     "lines": [2.5, 3.5, 4.5, 5.5, 6.5], "published": [3.5, 4.5, 5.5]},
+    {"code": "Y<{line}", "family": "yellows", "market": "Yellow cards (not booking points)", "label": "{below} yellow cards or fewer", "call": "Under {line} yellow cards", "book": ["Under/Over {line} yellow cards (not booking points)", "under"], "win": ["yellows", "<", "{line}"],
+     "lines": [2.5, 3.5, 4.5, 5.5, 6.5], "published": [3.5, 4.5, 5.5]}
+  ]
+}
