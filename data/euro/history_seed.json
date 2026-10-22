@@ -41,7 +41,7 @@
 "a": "AZ Alkmaar",
 "kickoff": "2026-10-22T16:45Z",
 "round": "League phase, matchday 3",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -76,7 +76,7 @@
 "a": "Torreense",
 "kickoff": "2026-10-22T16:45Z",
 "round": "League phase, matchday 3",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -111,7 +111,7 @@
 "a": "NEC Nijmegen",
 "kickoff": "2026-10-22T16:45Z",
 "round": "League phase, matchday 3",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -146,7 +146,7 @@
 "a": "Rennes",
 "kickoff": "2026-10-22T16:45Z",
 "round": "League phase, matchday 3",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -181,7 +181,7 @@
 "a": "Sunderland",
 "kickoff": "2026-10-22T16:45Z",
 "round": "League phase, matchday 3",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -216,7 +216,7 @@
 "a": "Bayer Leverkusen",
 "kickoff": "2026-10-22T16:45Z",
 "round": "League phase, matchday 3",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -251,7 +251,7 @@
 "a": "Hapoel Be'er Sheva",
 "kickoff": "2026-10-22T16:45Z",
 "round": "League phase, matchday 3",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -286,7 +286,7 @@
 "a": "Marseille",
 "kickoff": "2026-10-22T16:45Z",
 "round": "League phase, matchday 3",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -321,7 +321,7 @@
 "a": "Mj\u00e4llby",
 "kickoff": "2026-10-22T16:45Z",
 "round": "League phase, matchday 2",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -356,7 +356,7 @@
 "a": "CSKA Sofia",
 "kickoff": "2026-10-22T16:45Z",
 "round": "League phase, matchday 2",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -391,7 +391,7 @@
 "a": "Copenhagen",
 "kickoff": "2026-10-22T16:45Z",
 "round": "League phase, matchday 2",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -426,7 +426,7 @@
 "a": "Brighton",
 "kickoff": "2026-10-22T16:45Z",
 "round": "League phase, matchday 2",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -461,7 +461,7 @@
 "a": "Brann",
 "kickoff": "2026-10-22T16:45Z",
 "round": "League phase, matchday 2",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -496,7 +496,7 @@
 "a": "Lugano",
 "kickoff": "2026-10-22T16:45Z",
 "round": "League phase, matchday 2",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -531,7 +531,7 @@
 "a": "U Craiova",
 "kickoff": "2026-10-22T16:45Z",
 "round": "League phase, matchday 2",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -566,7 +566,7 @@
 "a": "Riga",
 "kickoff": "2026-10-22T16:45Z",
 "round": "League phase, matchday 2",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -601,7 +601,7 @@
 "a": "Hearts",
 "kickoff": "2026-10-22T16:45Z",
 "round": "League phase, matchday 2",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -636,7 +636,7 @@
 "a": "AC Milan",
 "kickoff": "2026-10-22T19:00Z",
 "round": "League phase, matchday 3",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -671,7 +671,7 @@
 "a": "Crystal Palace",
 "kickoff": "2026-10-22T19:00Z",
 "round": "League phase, matchday 3",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -706,7 +706,7 @@
 "a": "Celta Vigo",
 "kickoff": "2026-10-22T19:00Z",
 "round": "League phase, matchday 3",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -741,7 +741,7 @@
 "a": "Levski Sofia",
 "kickoff": "2026-10-22T19:00Z",
 "round": "League phase, matchday 3",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -776,7 +776,7 @@
 "a": "Anderlecht",
 "kickoff": "2026-10-22T19:00Z",
 "round": "League phase, matchday 3",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -811,7 +811,7 @@
 "a": "Real Sociedad",
 "kickoff": "2026-10-22T19:00Z",
 "round": "League phase, matchday 3",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -846,7 +846,7 @@
 "a": "Salzburg",
 "kickoff": "2026-10-22T19:00Z",
 "round": "League phase, matchday 3",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -881,7 +881,7 @@
 "a": "Sparta Praha",
 "kickoff": "2026-10-22T19:00Z",
 "round": "League phase, matchday 3",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -916,7 +916,7 @@
 "a": "Benfica",
 "kickoff": "2026-10-22T19:00Z",
 "round": "League phase, matchday 3",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -951,7 +951,7 @@
 "a": "Lyon",
 "kickoff": "2026-10-22T19:00Z",
 "round": "League phase, matchday 3",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -986,7 +986,7 @@
 "a": "Atalanta",
 "kickoff": "2026-10-22T19:00Z",
 "round": "League phase, matchday 2",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -1021,7 +1021,7 @@
 "a": "Egnatia",
 "kickoff": "2026-10-22T19:00Z",
 "round": "League phase, matchday 2",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -1056,7 +1056,7 @@
 "a": "Freiburg",
 "kickoff": "2026-10-22T19:00Z",
 "round": "League phase, matchday 2",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -1091,7 +1091,7 @@
 "a": "Sint-Truiden",
 "kickoff": "2026-10-22T19:00Z",
 "round": "League phase, matchday 2",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -1126,7 +1126,7 @@
 "a": "Hajduk Split",
 "kickoff": "2026-10-22T19:00Z",
 "round": "League phase, matchday 2",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -1161,7 +1161,7 @@
 "a": "KuPS",
 "kickoff": "2026-10-22T19:00Z",
 "round": "League phase, matchday 2",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -1196,7 +1196,7 @@
 "a": "Twente",
 "kickoff": "2026-10-22T19:00Z",
 "round": "League phase, matchday 2",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -1231,7 +1231,7 @@
 "a": "Gent",
 "kickoff": "2026-10-22T19:00Z",
 "round": "League phase, matchday 2",
-"locked_at": "2026-10-22T15:39Z",
+"locked_at": "2026-10-22T16:05Z",
 "model_version": "eur-1",
 "calls": [
 {
