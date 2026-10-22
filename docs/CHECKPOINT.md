@@ -1,10 +1,36 @@
 # Checkpoint
 
-## Latest: 22 Oct 2026, ready slip in the slip finder (Model Lab version 22)
+## Latest: 22 Oct 2026, Model Lab audit (version 23) and the Europe pipeline in the repository
 
-- Lang's rules for the slip finder (22 Oct 2026, answered one question at a time): total fair odds 1.20 to 1.70 (Lang kept the 1.70 cap from the betting record); two picks, or three when every pick has fair odds of 1.20 or lower; one pick per match; any league; every market the model covers; fair odds = 1 / the model's chance; stake = Lang's share of what is left of this week's budget (Monday to Sunday, Juba time; stakes of real bets in the Bet log; winnings kept aside).
-- Built as the default "Ready slip" view of the Slip finder tab: best slip by safe chance in three bands (1.20 to 1.35, 1.35 to 1.50, 1.50 to 1.70), laid out like a bookmaker slip, with the lowest bookmaker odds that would pay after the 20% tax, an optional odds check per pick (rules 1 and 6), and "Record this slip in the Bet log". Left out: draw no bet, picks above 99%, picks without a safety margin, picks 10 or more points above the bookmakers. Budget and share are saved in the artifact database `settings/budget` (owner only).
-- The live Model Lab was ahead of this repository: another session added History, slip screenshots, the 21 Oct slip finder (kept as the second view, "odds check") and Europa and Conference League data, none of it committed. `tools/model_lab/template.html` now holds the merged page (uncommitted; it names the bookmaker in many places, so clean that before any commit). The Europa and Conference League blocks were copied from the live page; their builder code is not on this Mac.
+- Model Lab version 23 published after a full audit (Lang's audit prompt, 22 Oct 2026): escaping,
+  one rule and tax source, History corrections that never overwrite the settle task, yellow cards
+  apart from booking points, strict team matching, per-competition forecast times, History past
+  1,000 documents, keyed redraws, duplicate checks, Juba time from the time-zone database, WCAG AA
+  contrast, data in files (first view 1.3 s on throttled 3G, was 5.1 s), a fast slip search in a
+  worker, charts that fall back to tables. The page source is a private local repository
+  (outside this public repository, no remote); its report is AUDIT_REPORT.md there. The public
+  `tools/model_lab/template.html` is the old page and is no longer used for the Model Lab.
+- The page data is built here: `scripts/build_model_lab.py --pages-dir DIR --data-json OUT` (with
+  the private betting summary); the private build splits it into `data/gameweek.json`,
+  `data/core.json` and `data/history-seed.json`, published as artifact files.
+- Branch `lab-audit` (local, not pushed): `data/markets/markets.json` (one definition of codes,
+  labels and settle rules; `scripts/gen_markets.py`), `pipeline_euro/` (Europa and Conference
+  League: free sources, Wikipedia cross-check of this season's fixtures, lock rule, `make euro`,
+  `.github/workflows/euro.yml` at 06:00 UTC) and the pre-registered Europe checks
+  (`reports/euro_experiments_2026_10.md`): none passed; the bookmakers beat the goals model on
+  13,038 domestic matches.
+- Ready slip in the Slip finder (22 Oct, Lang's rules): total fair odds 1.20 to 1.70; two picks,
+  or three when each is 1.20 or lower; one pick per match; stake from Lang's weekly budget rule.
+
+### Open questions for Lang
+1. Push and merge `lab-audit` (starts the daily Europe forecasts)?
+2. The 21 Oct odds check accepts only slips above 1.70 total odds, which rule 1 does not allow:
+   which rule stays?
+3. The nightly history settle task (not on this Mac) must write with update, not set, and read
+   `data/history-seed.json`.
+4. Replicate the new-club Elo start on the next 300 European matches?
+
+## Earlier: 20 Oct 2026, Champions League in the daily run and the Model Lab
 
 ### Done 15 to 20 Oct 2026
 - Earlier work (reference Dixon-Coles, safety margins, Serie A and Ligue 1 in the Model Lab, UEFA reader) committed and merged (Lang: "Commit and merge all").
