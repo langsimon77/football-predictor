@@ -1,6 +1,10 @@
 # Checkpoint
 
-## Latest: 20 Oct 2026, Champions League in the daily run and the Model Lab
+## Latest: 22 Oct 2026, ready slip in the slip finder (Model Lab version 22)
+
+- Lang's rules for the slip finder (22 Oct 2026, answered one question at a time): total fair odds 1.20 to 1.70 (Lang kept the 1.70 cap from the betting record); two picks, or three when every pick has fair odds of 1.20 or lower; one pick per match; any league; every market the model covers; fair odds = 1 / the model's chance; stake = Lang's share of what is left of this week's budget (Monday to Sunday, Juba time; stakes of real bets in the Bet log; winnings kept aside).
+- Built as the default "Ready slip" view of the Slip finder tab: best slip by safe chance in three bands (1.20 to 1.35, 1.35 to 1.50, 1.50 to 1.70), laid out like a bookmaker slip, with the lowest bookmaker odds that would pay after the 20% tax, an optional odds check per pick (rules 1 and 6), and "Record this slip in the Bet log". Left out: draw no bet, picks above 99%, picks without a safety margin, picks 10 or more points above the bookmakers. Budget and share are saved in the artifact database `settings/budget` (owner only).
+- The live Model Lab was ahead of this repository: another session added History, slip screenshots, the 21 Oct slip finder (kept as the second view, "odds check") and Europa and Conference League data, none of it committed. `tools/model_lab/template.html` now holds the merged page (uncommitted; it names the bookmaker in many places, so clean that before any commit). The Europa and Conference League blocks were copied from the live page; their builder code is not on this Mac.
 
 ### Done 15 to 20 Oct 2026
 - Earlier work (reference Dixon-Coles, safety margins, Serie A and Ligue 1 in the Model Lab, UEFA reader) committed and merged (Lang: "Commit and merge all").
