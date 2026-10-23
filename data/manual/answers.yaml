@@ -490,3 +490,51 @@
   threat_out: false
   source: 'Issue #15'
   used_at_utc: 2026-10-22T05:23Z
+- question: EPL_2627_arsenal_everton:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #16'
+  used_at_utc: 2026-10-23T05:24Z
+- question: EPL_2627_arsenal_everton:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #16'
+  used_at_utc: 2026-10-23T05:24Z
+- question: EPL_2627_aston_villa_man_city:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #16'
+  used_at_utc: 2026-10-23T05:24Z
+- question: EPL_2627_aston_villa_man_city:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #16'
+  used_at_utc: 2026-10-23T05:24Z
+- question: EPL_2627_chelsea_tottenham:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #16'
+  used_at_utc: 2026-10-23T05:24Z
+- question: EPL_2627_chelsea_tottenham:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #16'
+  used_at_utc: 2026-10-23T05:24Z
+- question: EPL_2627_coventry_fulham:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #16'
+  used_at_utc: 2026-10-23T05:24Z
+- question: EPL_2627_coventry_fulham:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #16'
+  used_at_utc: 2026-10-23T05:24Z
