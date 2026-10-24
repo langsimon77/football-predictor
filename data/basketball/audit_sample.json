@@ -1,0 +1,303 @@
+{
+ "generated_utc": "2026-10-24T19:26:17+00:00",
+ "source": "English Wikipedia via the MediaWiki API (CC BY-SA 4.0)",
+ "leagues": {
+  "NBL": {
+   "2016/17": {
+    "article": "2016-17 NBL season",
+    "games": 138,
+    "dated": 135,
+    "with_time": 119,
+    "played": 114,
+    "future": 0,
+    "future_with_time": 0,
+    "last_future_with_time": null,
+    "time_note": null
+   },
+   "2017/18": {
+    "article": "2017-18 NBL season",
+    "games": 175,
+    "dated": 175,
+    "with_time": 121,
+    "played": 121,
+    "future": 0,
+    "future_with_time": 0,
+    "last_future_with_time": null,
+    "time_note": null
+   },
+   "2018/19": {
+    "article": "2018-19 NBL season",
+    "games": 0,
+    "dated": 0,
+    "with_time": 0,
+    "played": 0,
+    "future": 0,
+    "future_with_time": 0,
+    "last_future_with_time": null,
+    "time_note": null
+   },
+   "2019/20": {
+    "article": "2019-20 NBL season",
+    "games": 0,
+    "dated": 0,
+    "with_time": 0,
+    "played": 0,
+    "future": 0,
+    "future_with_time": 0,
+    "last_future_with_time": null,
+    "time_note": null
+   },
+   "2020/21": {
+    "article": "2020-21 NBL season",
+    "games": 0,
+    "dated": 0,
+    "with_time": 0,
+    "played": 0,
+    "future": 0,
+    "future_with_time": 0,
+    "last_future_with_time": null,
+    "time_note": null
+   },
+   "2021/22": {
+    "article": "2021-22 NBL season",
+    "games": 0,
+    "dated": 0,
+    "with_time": 0,
+    "played": 0,
+    "future": 0,
+    "future_with_time": 0,
+    "last_future_with_time": null,
+    "time_note": null
+   },
+   "2022/23": {
+    "article": "2022-23 NBL season",
+    "games": 140,
+    "dated": 140,
+    "with_time": 140,
+    "played": 140,
+    "future": 0,
+    "future_with_time": 0,
+    "last_future_with_time": null,
+    "time_note": null
+   },
+   "2023/24": {
+    "article": "2023-24 NBL season",
+    "games": 140,
+    "dated": 140,
+    "with_time": 140,
+    "played": 140,
+    "future": 0,
+    "future_with_time": 0,
+    "last_future_with_time": null,
+    "time_note": null
+   },
+   "2024/25": {
+    "article": "2024-25 NBL season",
+    "games": 145,
+    "dated": 145,
+    "with_time": 144,
+    "played": 145,
+    "future": 0,
+    "future_with_time": 0,
+    "last_future_with_time": null,
+    "time_note": null
+   },
+   "2025/26": {
+    "article": "2025-26 NBL season",
+    "games": 166,
+    "dated": 166,
+    "with_time": 166,
+    "played": 166,
+    "future": 0,
+    "future_with_time": 0,
+    "last_future_with_time": null,
+    "time_note": null
+   },
+   "2026/27": {
+    "article": "2026-27 NBL season",
+    "games": 165,
+    "dated": 163,
+    "with_time": 59,
+    "played": 41,
+    "future": 121,
+    "future_with_time": 18,
+    "last_future_with_time": "2026-11-08",
+    "time_note": null
+   }
+  },
+  "EuroLeague": {
+   "2016/17": {
+    "article": "2016-17 EuroLeague regular season",
+    "games": 240,
+    "dated": 240,
+    "with_time": 240,
+    "played": 240,
+    "future": 0,
+    "future_with_time": 0,
+    "last_future_with_time": null,
+    "time_note": null
+   },
+   "2017/18": {
+    "article": "2017-18 EuroLeague regular season",
+    "games": 240,
+    "dated": 240,
+    "with_time": 240,
+    "played": 240,
+    "future": 0,
+    "future_with_time": 0,
+    "last_future_with_time": null,
+    "time_note": null
+   },
+   "2018/19": {
+    "article": "2018-19 EuroLeague regular season",
+    "games": 240,
+    "dated": 240,
+    "with_time": 240,
+    "played": 240,
+    "future": 0,
+    "future_with_time": 0,
+    "last_future_with_time": null,
+    "time_note": null
+   },
+   "2019/20": {
+    "article": "2019-20 EuroLeague regular season",
+    "games": 306,
+    "dated": 306,
+    "with_time": 306,
+    "played": 252,
+    "future": 0,
+    "future_with_time": 0,
+    "last_future_with_time": null,
+    "time_note": null
+   },
+   "2020/21": {
+    "article": "2020-21 EuroLeague regular season",
+    "games": 306,
+    "dated": 306,
+    "with_time": 306,
+    "played": 306,
+    "future": 0,
+    "future_with_time": 0,
+    "last_future_with_time": null,
+    "time_note": null
+   },
+   "2021/22": {
+    "article": "2021-22 EuroLeague regular season",
+    "games": 278,
+    "dated": 278,
+    "with_time": 278,
+    "played": 278,
+    "future": 0,
+    "future_with_time": 0,
+    "last_future_with_time": null,
+    "time_note": null
+   },
+   "2022/23": {
+    "article": "2022-23 EuroLeague regular season",
+    "games": 306,
+    "dated": 306,
+    "with_time": 306,
+    "played": 306,
+    "future": 0,
+    "future_with_time": 0,
+    "last_future_with_time": null,
+    "time_note": null
+   },
+   "2023/24": {
+    "article": "2023-24 EuroLeague regular season",
+    "games": 306,
+    "dated": 306,
+    "with_time": 306,
+    "played": 306,
+    "future": 0,
+    "future_with_time": 0,
+    "last_future_with_time": null,
+    "time_note": null
+   },
+   "2024/25": {
+    "article": "2024-25 EuroLeague regular season",
+    "games": 306,
+    "dated": 306,
+    "with_time": 305,
+    "played": 306,
+    "future": 0,
+    "future_with_time": 0,
+    "last_future_with_time": null,
+    "time_note": "Times are CET or CEST,"
+   },
+   "2025/26": {
+    "article": "2025-26 EuroLeague regular season",
+    "games": 380,
+    "dated": 380,
+    "with_time": 380,
+    "played": 380,
+    "future": 0,
+    "future_with_time": 0,
+    "last_future_with_time": null,
+    "time_note": "Times are CET or CEST,"
+   },
+   "2026/27": {
+    "article": "2026-27 EuroLeague regular season",
+    "games": 80,
+    "dated": 80,
+    "with_time": 80,
+    "played": 70,
+    "future": 10,
+    "future_with_time": 10,
+    "last_future_with_time": "2026-10-28",
+    "time_note": "Times are CET or CEST,"
+   }
+  },
+  "NBA": {
+   "2016/17": {
+    "team_articles_missing": [],
+    "team_logs_with_games": 29,
+    "rows_by_kind": {
+     "other": 2700
+    },
+    "regular_games_listed": 0,
+    "regular_played": 0,
+    "played_in_both_logs": 0,
+    "both_logs_agree": 0,
+    "played_in_one_log_only": 0
+   },
+   "2025/26": {
+    "team_articles_missing": [],
+    "team_logs_with_games": 30,
+    "rows_by_kind": {
+     "preseason": 134,
+     "regular": 2467,
+     "playoffs": 170,
+     "play-in": 12,
+     "other": 13
+    },
+    "regular_games_listed": 1227,
+    "regular_played": 1227,
+    "played_in_both_logs": 1183,
+    "both_logs_agree": 1168,
+    "played_in_one_log_only": 18
+   },
+   "2026/27": {
+    "team_articles_missing": [],
+    "team_logs_with_games": 30,
+    "rows_by_kind": {
+     "preseason": 133,
+     "regular": 1470,
+     "other": 998
+    },
+    "regular_games_listed": 1009,
+    "regular_played": 28,
+    "played_in_both_logs": 28,
+    "both_logs_agree": 28,
+    "played_in_one_log_only": 0
+   }
+  }
+ },
+ "cross_checks": {
+  "EuroLeague 2025/26": {
+   "boxes_played": 380,
+   "grid_results": 380,
+   "same_home_away_scores": 378
+  }
+ }
+}
