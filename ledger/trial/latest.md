@@ -1,4 +1,4 @@
-# Leagues on trial: 2026-10-24 05:07 UTC
+# Leagues on trial: 2026-10-24 16:51 UTC
 
 Serie A and Ligue 1 in the background: locked and scored, not published (Lang, 13 Oct 2026). Markets: home, draw, away (with double chance) and yellows.
 
