@@ -538,3 +538,63 @@
   threat_out: false
   source: 'Issue #16'
   used_at_utc: 2026-10-23T05:24Z
+- question: EPL_2627_crystal_palace_newcastle:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #17'
+  used_at_utc: 2026-10-24T05:03Z
+- question: EPL_2627_crystal_palace_newcastle:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #17'
+  used_at_utc: 2026-10-24T05:03Z
+- question: EPL_2627_hull_brentford:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #17'
+  used_at_utc: 2026-10-24T05:03Z
+- question: EPL_2627_hull_brentford:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #17'
+  used_at_utc: 2026-10-24T05:03Z
+- question: EPL_2627_liverpool_brighton:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #17'
+  used_at_utc: 2026-10-24T05:03Z
+- question: EPL_2627_liverpool_brighton:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #17'
+  used_at_utc: 2026-10-24T05:03Z
+- question: EPL_2627_man_united_bournemouth:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #17'
+  used_at_utc: 2026-10-24T05:03Z
+- question: EPL_2627_man_united_bournemouth:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #17'
+  used_at_utc: 2026-10-24T05:03Z
+- question: EPL_2627_sunderland_leeds:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #17'
+  used_at_utc: 2026-10-24T05:03Z
+- question: EPL_2627_sunderland_leeds:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #17'
+  used_at_utc: 2026-10-24T05:03Z
