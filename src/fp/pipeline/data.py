@@ -22,9 +22,9 @@ import pandas as pd
 import pandera.pandas as pa
 
 from fp import leagues
+from fp.ingest import football_data_api, openfootball
 from fp.ingest import football_data_csv as fd
 from fp.ingest import matches as build
-from fp.ingest import openfootball
 from fp.validate import freshness, schemas
 
 DUCKDB_PATH = build.PROCESSED / "football.duckdb"
@@ -42,6 +42,7 @@ def download() -> None:
     openfootball.download_all()
     fd.download_all()
     fd.download_fixtures()
+    football_data_api.download_all()  # kickoff times openfootball has not published yet
 
 
 def build_trial(skip_download: bool = False) -> int:
@@ -50,6 +51,7 @@ def build_trial(skip_download: bool = False) -> int:
     if not skip_download:
         openfootball.download_all(group)
         fd.download_all(group)
+        football_data_api.download_all(group)
     TRIAL_DIR.mkdir(parents=True, exist_ok=True)
     tables = {
         "matches": (lambda: build.build_matches(group), schemas.matches_schema(group)),

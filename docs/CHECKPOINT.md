@@ -2,6 +2,7 @@
 
 ## Latest: 22 Oct 2026, Model Lab audit (version 23) and the Europe pipeline in the repository
 
+- 24 Oct 2026, La Liga kickoff gap fixed (no model change): openfootball (31 days behind) listed every La Liga match from matchday 10 on a placeholder Sunday with no time, so nothing locked after Levante v Athletic (21 Oct 18:00 UTC) and matchday 10 got no forecasts [V: run 40064677070]; the calendar now fills a blank kickoff from football-data.org when it marks the time as set (`fill_kickoffs` in `src/fp/ingest/matches.py`, column `kickoff_source`, `tests/test_kickoff_times.py`), openfootball stays first where it has a time, and missed matches stay unlocked (lock rule). This corrects open question 4: the lag did reach forecasts, through kickoff times. Open: openfootball's EPL times from 7 Nov are Saturday 15:00 placeholders (21 differ from football-data.org [V]); should football-data.org win when they differ?
 - Model Lab version 23 published after a full audit (Lang's audit prompt, 22 Oct 2026): escaping,
   one rule and tax source, History corrections that never overwrite the settle task, yellow cards
   apart from booking points, strict team matching, per-competition forecast times, History past

@@ -22,6 +22,7 @@ from pathlib import Path
 import pandas as pd
 
 from fp import ROOT, leagues
+from fp.ingest import football_data_api as fdorg
 from fp.ingest import football_data_csv as fd
 from fp.ingest import openfootball
 from fp.ingest.http import cached_copies
@@ -196,15 +197,62 @@ def build_matches(group: Group = leagues.LIVE) -> pd.DataFrame:
     return matches.sort_values(["kickoff_utc", "match_id"]).reset_index(drop=True)
 
 
+def fill_kickoffs(cal: pd.DataFrame, league: leagues.League, season: int,
+                  times: pd.DataFrame | None = None) -> pd.DataFrame:
+    """Fill the kickoff times openfootball leaves blank, from football-data.org.
+
+    openfootball lags the leagues' announcements. On 24 Oct 2026 every La Liga match
+    from matchday 10 on had a placeholder Sunday date and no time, so none could
+    lock, while football-data.org had set all ten matchday 10 times by 13 Oct.
+    A blank is filled only when football-data.org marks the time as set
+    (fdorg.TIME_SET); the date then follows that kickoff in local time. Where both
+    sources give a time, openfootball's stays and any difference is logged.
+
+    `times` (home_id, away_id, kickoff_utc) defaults to the newest cached file.
+    """
+    out = cal.copy()
+    out["kickoff_source"] = pd.Series("openfootball", index=out.index).where(
+        out["time_confirmed"])
+    if times is None:
+        copies = cached_copies(fdorg.SOURCE, f"{league.fdorg}_{season}.json")
+        if not copies:
+            return out
+        times = fdorg.set_kickoffs(copies[-1])
+    lookup = {(h, a): k for h, a, k in times[["home_id", "away_id", "kickoff_utc"]].itertuples(
+        index=False)}
+    found = pd.to_datetime(pd.Series([lookup.get((h, a)) for h, a in zip(
+        out["home_id"], out["away_id"], strict=True)], index=out.index, dtype=object), utc=True)
+
+    fill = ~out["time_confirmed"] & found.notna()
+    out.loc[fill, "kickoff_utc"] = found[fill].astype(out["kickoff_utc"].dtype)
+    out.loc[fill, "time_confirmed"] = True
+    out.loc[fill, "date"] = found[fill].dt.tz_convert(league.time_zone).dt.strftime("%Y-%m-%d")
+    out.loc[fill, "kickoff_source"] = fdorg.SOURCE
+    if fill.any():
+        log.info("%s: %d kickoff times from football-data.org (blank in openfootball)",
+                 league.code, int(fill.sum()))
+
+    differ = out["time_confirmed"] & ~fill & found.notna() & (out["kickoff_utc"] != found)
+    if differ.any():
+        both = out.loc[differ, ["match_id", "kickoff_utc"]].assign(theirs=found[differ])
+        first = both.sort_values("kickoff_utc").iloc[0]
+        log.warning("%s: %d kickoff times differ between openfootball and football-data.org; "
+                    "openfootball's kept. Earliest: %s %s UTC (openfootball) or %s UTC",
+                    league.code, int(differ.sum()), first["match_id"],
+                    f"{first['kickoff_utc']:%a %d %b %H:%M}", f"{first['theirs']:%a %d %b %H:%M}")
+    return out
+
+
 def build_fixtures(season: int = fd.CURRENT_SEASON, group: Group = leagues.LIVE) -> pd.DataFrame:
-    """The full calendar for one season from openfootball."""
+    """The full calendar for one season from openfootball, with blank kickoff times
+    filled from football-data.org (fill_kickoffs)."""
     frames = []
     for lg in group:
-        cal = _calendar(lg.division, season)
+        cal = fill_kickoffs(_calendar(lg.division, season), lg, season)
         cal["status"] = cal["home_goals"].notna().map({True: "played", False: "scheduled"})
         frames.append(cal[[
             "match_id", "league", "season", "round", "date", "kickoff_utc", "time_confirmed",
-            "home_id", "away_id", "home_goals", "away_goals", "status",
+            "kickoff_source", "home_id", "away_id", "home_goals", "away_goals", "status",
         ]])
     return pd.concat(frames, ignore_index=True).sort_values(["date", "match_id"])
 
