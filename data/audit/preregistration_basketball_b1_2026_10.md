@@ -110,6 +110,12 @@ K2 handicap and totals). No result can change these rules.
 Reported, not judged: accuracy, mean error of margin and total, results by season, the chosen
 settings, the regulation-time version, and the tuning-season scores.
 
+## Amendment 1 (24 Oct 2026, after Lang approved building, before any model was fitted)
+
+The naive total uses "the previous 60 days", but at the start of each season those days hold
+no games (the summer break). Rule added: if the previous 60 days hold fewer than 20 games, the
+naive total is the average of the league's last 100 games instead. Nothing else changes.
+
 ## 7. Deliverables and limits
 
 - Code in `basketball/` (data, Elo, points model, backtest), tests in `tests/`, report in
