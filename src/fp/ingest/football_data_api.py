@@ -4,7 +4,8 @@ Free plan facts [V: football-data.org/pricing, 23 Sep 2026]: 10 calls a minute,
 fixtures, scores and tables only, no referees or cards. Used for Champions League
 dates (rest days), as a cross-check on the openfootball calendar, since
 12 Oct 2026 for fast final scores (fp.ingest.results_feed), and since 24 Oct 2026
-for kickoff times that openfootball has not published yet (fp.ingest.matches).
+for kickoff times: where it has set a time, that time wins over openfootball's
+(fp.ingest.matches.fill_kickoffs).
 
 The token comes from FOOTBALL_DATA_ORG_TOKEN (see fp.config). Never log it.
 """

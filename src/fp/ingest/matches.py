@@ -199,14 +199,19 @@ def build_matches(group: Group = leagues.LIVE) -> pd.DataFrame:
 
 def fill_kickoffs(cal: pd.DataFrame, league: leagues.League, season: int,
                   times: pd.DataFrame | None = None) -> pd.DataFrame:
-    """Fill the kickoff times openfootball leaves blank, from football-data.org.
+    """Kickoff times from football-data.org wherever it has set one.
 
     openfootball lags the leagues' announcements. On 24 Oct 2026 every La Liga match
     from matchday 10 on had a placeholder Sunday date and no time, so none could
     lock, while football-data.org had set all ten matchday 10 times by 13 Oct.
-    A blank is filled only when football-data.org marks the time as set
-    (fdorg.TIME_SET); the date then follows that kickoff in local time. Where both
-    sources give a time, openfootball's stays and any difference is logged.
+    Its EPL file also gave the 7 Nov round default Saturday 15:00 times that
+    football-data.org had already moved to the real slots.
+
+    So, when football-data.org marks a time as set (fdorg.TIME_SET), its time and
+    date are used, both where openfootball is blank and where the two differ (Lang
+    chose this on 24 Oct 2026). Otherwise openfootball's time stays. The date
+    follows the kickoff in local time. A locked match whose kickoff changes locks
+    again only if it moved more than 7 days (fp.pipeline.daily.candidates).
 
     `times` (home_id, away_id, kickoff_utc) defaults to the newest cached file.
     """
@@ -223,29 +228,30 @@ def fill_kickoffs(cal: pd.DataFrame, league: leagues.League, season: int,
     found = pd.to_datetime(pd.Series([lookup.get((h, a)) for h, a in zip(
         out["home_id"], out["away_id"], strict=True)], index=out.index, dtype=object), utc=True)
 
-    fill = ~out["time_confirmed"] & found.notna()
-    out.loc[fill, "kickoff_utc"] = found[fill].astype(out["kickoff_utc"].dtype)
-    out.loc[fill, "time_confirmed"] = True
-    out.loc[fill, "date"] = found[fill].dt.tz_convert(league.time_zone).dt.strftime("%Y-%m-%d")
-    out.loc[fill, "kickoff_source"] = fdorg.SOURCE
-    if fill.any():
-        log.info("%s: %d kickoff times from football-data.org (blank in openfootball)",
-                 league.code, int(fill.sum()))
-
-    differ = out["time_confirmed"] & ~fill & found.notna() & (out["kickoff_utc"] != found)
-    if differ.any():
+    blank = ~out["time_confirmed"] & found.notna()
+    differ = out["time_confirmed"] & found.notna() & (out["kickoff_utc"] != found)
+    if differ.any():  # logged before the change, while openfootball's time is still here
         both = out.loc[differ, ["match_id", "kickoff_utc"]].assign(theirs=found[differ])
-        first = both.sort_values("kickoff_utc").iloc[0]
-        log.warning("%s: %d kickoff times differ between openfootball and football-data.org; "
-                    "openfootball's kept. Earliest: %s %s UTC (openfootball) or %s UTC",
-                    league.code, int(differ.sum()), first["match_id"],
-                    f"{first['kickoff_utc']:%a %d %b %H:%M}", f"{first['theirs']:%a %d %b %H:%M}")
+        first = both.sort_values("theirs").iloc[0]
+        log.info("%s: %d kickoff times from football-data.org where openfootball differs. "
+                 "Earliest: %s %s UTC (openfootball %s UTC)",
+                 league.code, int(differ.sum()), first["match_id"],
+                 f"{first['theirs']:%a %d %b %H:%M}", f"{first['kickoff_utc']:%a %d %b %H:%M}")
+    if blank.any():
+        log.info("%s: %d kickoff times from football-data.org (blank in openfootball)",
+                 league.code, int(blank.sum()))
+
+    use = blank | differ
+    out.loc[use, "kickoff_utc"] = found[use].astype(out["kickoff_utc"].dtype)
+    out.loc[use, "time_confirmed"] = True
+    out.loc[use, "date"] = found[use].dt.tz_convert(league.time_zone).dt.strftime("%Y-%m-%d")
+    out.loc[use, "kickoff_source"] = fdorg.SOURCE
     return out
 
 
 def build_fixtures(season: int = fd.CURRENT_SEASON, group: Group = leagues.LIVE) -> pd.DataFrame:
-    """The full calendar for one season from openfootball, with blank kickoff times
-    filled from football-data.org (fill_kickoffs)."""
+    """The full calendar for one season from openfootball, with kickoff times from
+    football-data.org wherever it has set one (fill_kickoffs)."""
     frames = []
     for lg in group:
         cal = fill_kickoffs(_calendar(lg.division, season), lg, season)
