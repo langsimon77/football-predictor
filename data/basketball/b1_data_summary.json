@@ -1,0 +1,376 @@
+{
+ "generated_utc": "2026-10-24T21:51:07+02:00",
+ "source": "English Wikipedia (CC BY-SA 4.0)",
+ "seasons": {
+  "EuroLeague 2016/17": {
+   "games": 240,
+   "played": 240,
+   "left_out": 1,
+   "forfeits": 0,
+   "overtime": 10,
+   "with_quarters": 240,
+   "clubs": 16,
+   "checks": {
+    "agrees": 239,
+    "grid says 83-84": 1
+   }
+  },
+  "EuroLeague 2017/18": {
+   "games": 240,
+   "played": 240,
+   "left_out": 0,
+   "forfeits": 0,
+   "overtime": 12,
+   "with_quarters": 240,
+   "clubs": 16,
+   "checks": {
+    "agrees": 240
+   }
+  },
+  "EuroLeague 2018/19": {
+   "games": 240,
+   "played": 240,
+   "left_out": 0,
+   "forfeits": 0,
+   "overtime": 7,
+   "with_quarters": 239,
+   "clubs": 16,
+   "checks": {
+    "agrees": 240
+   }
+  },
+  "EuroLeague 2019/20": {
+   "games": 306,
+   "played": 252,
+   "left_out": 0,
+   "forfeits": 0,
+   "overtime": 17,
+   "with_quarters": 252,
+   "clubs": 18,
+   "checks": {
+    "agrees": 252
+   }
+  },
+  "EuroLeague 2020/21": {
+   "games": 306,
+   "played": 306,
+   "left_out": 1,
+   "forfeits": 0,
+   "overtime": 19,
+   "with_quarters": 305,
+   "clubs": 18,
+   "checks": {
+    "agrees": 305,
+    "grid says 87-71": 1
+   }
+  },
+  "EuroLeague 2021/22": {
+   "games": 278,
+   "played": 278,
+   "left_out": 0,
+   "forfeits": 0,
+   "overtime": 13,
+   "with_quarters": 278,
+   "clubs": 18,
+   "checks": {
+    "agrees": 278
+   }
+  },
+  "EuroLeague 2022/23": {
+   "games": 306,
+   "played": 306,
+   "left_out": 0,
+   "forfeits": 0,
+   "overtime": 16,
+   "with_quarters": 306,
+   "clubs": 18,
+   "checks": {
+    "agrees": 306
+   }
+  },
+  "EuroLeague 2023/24": {
+   "games": 306,
+   "played": 306,
+   "left_out": 0,
+   "forfeits": 0,
+   "overtime": 15,
+   "with_quarters": 306,
+   "clubs": 18,
+   "checks": {
+    "agrees": 306
+   }
+  },
+  "EuroLeague 2024/25": {
+   "games": 306,
+   "played": 306,
+   "left_out": 2,
+   "forfeits": 0,
+   "overtime": 10,
+   "with_quarters": 306,
+   "clubs": 18,
+   "checks": {
+    "agrees": 304,
+    "grid says 115-86": 1,
+    "grid says 96-89": 1
+   }
+  },
+  "EuroLeague 2025/26": {
+   "games": 380,
+   "played": 380,
+   "left_out": 3,
+   "forfeits": 0,
+   "overtime": 15,
+   "with_quarters": 380,
+   "clubs": 20,
+   "checks": {
+    "agrees": 377,
+    "grid says 84-65": 1,
+    "grid says 85-79": 1,
+    "grid says 85-92": 1
+   }
+  },
+  "EuroLeague 2026/27": {
+   "games": 80,
+   "played": 70,
+   "left_out": 0,
+   "forfeits": 0,
+   "overtime": 3,
+   "with_quarters": 70,
+   "clubs": 20,
+   "checks": {
+    "not in grid": 70
+   }
+  },
+  "NBL 2016/17": {
+   "games": 112,
+   "played": 112,
+   "left_out": 0,
+   "forfeits": 0,
+   "overtime": 7,
+   "with_quarters": 112,
+   "clubs": 8,
+   "checks": {
+    "no second source": 112
+   }
+  },
+  "NBL 2017/18": {
+   "games": 112,
+   "played": 112,
+   "left_out": 0,
+   "forfeits": 0,
+   "overtime": 3,
+   "with_quarters": 112,
+   "clubs": 8,
+   "checks": {
+    "no second source": 112
+   }
+  },
+  "NBL 2022/23": {
+   "games": 140,
+   "played": 140,
+   "left_out": 0,
+   "forfeits": 0,
+   "overtime": 11,
+   "with_quarters": 140,
+   "clubs": 10,
+   "checks": {
+    "no second source": 140
+   }
+  },
+  "NBL 2023/24": {
+   "games": 140,
+   "played": 140,
+   "left_out": 0,
+   "forfeits": 0,
+   "overtime": 5,
+   "with_quarters": 139,
+   "clubs": 10,
+   "checks": {
+    "no second source": 140
+   }
+  },
+  "NBL 2024/25": {
+   "games": 145,
+   "played": 145,
+   "left_out": 0,
+   "forfeits": 0,
+   "overtime": 4,
+   "with_quarters": 145,
+   "clubs": 10,
+   "checks": {
+    "no second source": 145
+   }
+  },
+  "NBL 2025/26": {
+   "games": 165,
+   "played": 165,
+   "left_out": 0,
+   "forfeits": 0,
+   "overtime": 9,
+   "with_quarters": 165,
+   "clubs": 10,
+   "checks": {
+    "no second source": 165
+   }
+  },
+  "NBL 2026/27": {
+   "games": 165,
+   "played": 41,
+   "left_out": 0,
+   "forfeits": 0,
+   "overtime": 1,
+   "with_quarters": 41,
+   "clubs": 10,
+   "checks": {
+    "no second source": 41
+   }
+  }
+ },
+ "left_out_games": [
+  {
+   "game_id": "EuroLeague_201617_bamberg_baskets_panathinaikos_b_c",
+   "date": "2016-10-26",
+   "home": "Bamberg Baskets",
+   "away": "Panathinaikos B.C.",
+   "box": "82-83",
+   "reason": "grid says 83-84"
+  },
+  {
+   "game_id": "EuroLeague_202021_bc_zenit_saint_petersburg_alba_berlin",
+   "date": "2021-03-02",
+   "home": "BC Zenit Saint Petersburg",
+   "away": "Alba Berlin",
+   "box": "87-78",
+   "reason": "grid says 87-71"
+  },
+  {
+   "game_id": "EuroLeague_202425_fc_bayern_munich_basketball_alba_berlin",
+   "date": "2024-11-14",
+   "home": "FC Bayern Munich (basketball)",
+   "away": "Alba Berlin",
+   "box": "115-88",
+   "reason": "grid says 115-86"
+  },
+  {
+   "game_id": "EuroLeague_202425_real_madrid_baloncesto_olimpia_milano",
+   "date": "2025-03-25",
+   "home": "Real Madrid Baloncesto",
+   "away": "Olimpia Milano",
+   "box": "96-86",
+   "reason": "grid says 96-89"
+  },
+  {
+   "game_id": "EuroLeague_202526_bc_zalgiris_virtus_bologna",
+   "date": "2025-10-28",
+   "home": "BC Žalgiris",
+   "away": "Virtus Bologna",
+   "box": "86-65",
+   "reason": "grid says 84-65"
+  },
+  {
+   "game_id": "EuroLeague_202526_bc_zalgiris_kk_partizan",
+   "date": "2025-12-19",
+   "home": "BC Žalgiris",
+   "away": "KK Partizan",
+   "box": "109-68",
+   "reason": "grid says 85-79"
+  },
+  {
+   "game_id": "EuroLeague_202526_bc_zalgiris_paris_basketball",
+   "date": "2026-04-17",
+   "home": "BC Žalgiris",
+   "away": "Paris Basketball",
+   "box": "85-79",
+   "reason": "grid says 85-92"
+  }
+ ],
+ "nbl_median_tip_by_home_club": {
+  "Sydney Kings": "17:15",
+  "South East Melbourne Phoenix": "17:30",
+  "Melbourne United": "18:00",
+  "Brisbane Bullets": "18:30",
+  "Cairns Taipans": "18:30",
+  "Perth Wildcats": "18:30",
+  "Adelaide 36ers": "19:00",
+  "Illawarra Hawks": "19:30",
+  "New Zealand Breakers": "19:30",
+  "Tasmania JackJumpers": "19:30"
+ },
+ "clubs": {
+  "EuroLeague": [
+   "AS Monaco Basket",
+   "ASVEL Basket",
+   "Alba Berlin",
+   "Anadolu Efes S.K.",
+   "BC Khimki",
+   "BC UNICS",
+   "BC Zenit Saint Petersburg",
+   "BC Žalgiris",
+   "Baloncesto Málaga",
+   "Bamberg Baskets",
+   "Beşiktaş J.K. (men's basketball)",
+   "CB Gran Canaria",
+   "Darüşşafaka Basketbol",
+   "Dubai Basketball",
+   "FC Barcelona Bàsquet",
+   "FC Bayern Munich (basketball)",
+   "Fenerbahçe S.K. (basketball)",
+   "Galatasaray S.K. (men's basketball)",
+   "Hapoel Tel Aviv B.C.",
+   "KK Budućnost",
+   "KK Crvena zvezda",
+   "KK Partizan",
+   "Maccabi Tel Aviv B.C.",
+   "Olimpia Milano",
+   "Olympiacos B.C.",
+   "PBC CSKA Moscow",
+   "Panathinaikos B.C.",
+   "Paris Basketball",
+   "Real Madrid Baloncesto",
+   "Saski Baskonia",
+   "Valencia Basket",
+   "Virtus Bologna"
+  ],
+  "NBL": [
+   "Adelaide 36ers",
+   "Brisbane Bullets",
+   "Cairns Taipans",
+   "Illawarra Hawks",
+   "Melbourne United",
+   "New Zealand Breakers",
+   "Perth Wildcats",
+   "South East Melbourne Phoenix",
+   "Sydney Kings",
+   "Tasmania JackJumpers"
+  ]
+ },
+ "sections_left_out": {
+  "NBL 2016/17": [
+   "2016 Australian Basketball Challenge",
+   "2016 NBL All-Australian Tour of China",
+   "Grand final",
+   "Semi-finals"
+  ],
+  "NBL 2017/18": [
+   "2017 NBL All-Australian Tour of China",
+   "2017 NBL Blitz",
+   "= Final =",
+   "= Semi-final =",
+   "Brisbane Bullets pre-season",
+   "Cairns Taipans pre-season",
+   "Final",
+   "Grand Final",
+   "Illawarra Hawks pre-season",
+   "Melbourne United pre-season",
+   "New Zealand Breakers pre-season",
+   "Perth Wildcats pre-season",
+   "Semi-final",
+   "Semi-finals",
+   "Sydney Kings pre-season",
+   "[[2017 Merlion Cup (basketball)|2017 Merlion Cup]]"
+  ],
+  "NBL 2025/26": [
+   "Championship game"
+  ]
+ }
+}

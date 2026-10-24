@@ -1,0 +1,412 @@
+{
+ "EuroLeague": {
+  "games": {
+   "tuning": 1315,
+   "before_test": 1554
+  },
+  "elo": {
+   "k": 30,
+   "home": 100,
+   "carry": 0.5,
+   "mov": true,
+   "tuning_log_loss": 0.609061860250431,
+   "margin_scale_b": 0.04000312637301229,
+   "margin_sd": 11.996385240492538
+  },
+  "points": {
+   "half_life": 120,
+   "penalty": 10,
+   "tuning_margin_crps": 6.734241834595982,
+   "tuning_total_crps": 9.361417277728076,
+   "sd_home": 10.008611546434047,
+   "sd_away": 10.455491616074333,
+   "rho": 0.3116581972311612
+  },
+  "naive": {
+   "home_win_rate": 0.617490494296578,
+   "margin_mean": 3.6821292775665397,
+   "margin_sd": 12.937319791012445,
+   "total_sd": 17.20040483137912
+  },
+  "elo_grid_top5": [
+   {
+    "log_loss": 0.60906,
+    "k": 30,
+    "home": 100,
+    "carry": 0.5,
+    "mov": true
+   },
+   {
+    "log_loss": 0.60937,
+    "k": 30,
+    "home": 100,
+    "carry": 0.75,
+    "mov": true
+   },
+   {
+    "log_loss": 0.60965,
+    "k": 25,
+    "home": 100,
+    "carry": 0.75,
+    "mov": true
+   },
+   {
+    "log_loss": 0.61001,
+    "k": 25,
+    "home": 100,
+    "carry": 0.5,
+    "mov": true
+   },
+   {
+    "log_loss": 0.61008,
+    "k": 30,
+    "home": 75,
+    "carry": 0.5,
+    "mov": true
+   }
+  ],
+  "points_grid": [
+   {
+    "crps_sum": 17.0235,
+    "half_life": 30,
+    "penalty": 0.3
+   },
+   {
+    "crps_sum": 16.6317,
+    "half_life": 30,
+    "penalty": 1
+   },
+   {
+    "crps_sum": 16.3258,
+    "half_life": 30,
+    "penalty": 3
+   },
+   {
+    "crps_sum": 16.3843,
+    "half_life": 30,
+    "penalty": 10
+   },
+   {
+    "crps_sum": 16.6791,
+    "half_life": 30,
+    "penalty": 30
+   },
+   {
+    "crps_sum": 16.5966,
+    "half_life": 60,
+    "penalty": 0.3
+   },
+   {
+    "crps_sum": 16.3882,
+    "half_life": 60,
+    "penalty": 1
+   },
+   {
+    "crps_sum": 16.1841,
+    "half_life": 60,
+    "penalty": 3
+   },
+   {
+    "crps_sum": 16.2005,
+    "half_life": 60,
+    "penalty": 10
+   },
+   {
+    "crps_sum": 16.4921,
+    "half_life": 60,
+    "penalty": 30
+   },
+   {
+    "crps_sum": 16.3136,
+    "half_life": 120,
+    "penalty": 0.3
+   },
+   {
+    "crps_sum": 16.2155,
+    "half_life": 120,
+    "penalty": 1
+   },
+   {
+    "crps_sum": 16.1001,
+    "half_life": 120,
+    "penalty": 3
+   },
+   {
+    "crps_sum": 16.0957,
+    "half_life": 120,
+    "penalty": 10
+   },
+   {
+    "crps_sum": 16.3493,
+    "half_life": 120,
+    "penalty": 30
+   },
+   {
+    "crps_sum": 16.2967,
+    "half_life": 240,
+    "penalty": 0.3
+   },
+   {
+    "crps_sum": 16.2338,
+    "half_life": 240,
+    "penalty": 1
+   },
+   {
+    "crps_sum": 16.1559,
+    "half_life": 240,
+    "penalty": 3
+   },
+   {
+    "crps_sum": 16.119,
+    "half_life": 240,
+    "penalty": 10
+   },
+   {
+    "crps_sum": 16.2767,
+    "half_life": 240,
+    "penalty": 30
+   },
+   {
+    "crps_sum": 16.4079,
+    "half_life": 480,
+    "penalty": 0.3
+   },
+   {
+    "crps_sum": 16.3551,
+    "half_life": 480,
+    "penalty": 1
+   },
+   {
+    "crps_sum": 16.2886,
+    "half_life": 480,
+    "penalty": 3
+   },
+   {
+    "crps_sum": 16.231,
+    "half_life": 480,
+    "penalty": 10
+   },
+   {
+    "crps_sum": 16.2981,
+    "half_life": 480,
+    "penalty": 30
+   }
+  ],
+  "regulation": {
+   "sd_home": 9.776379782368254,
+   "sd_away": 9.989603491367056,
+   "rho": 0.27274541320978113,
+   "naive": {
+    "home_win_rate": 0.6289156626506024,
+    "margin_mean": 3.728865194211729,
+    "margin_sd": 12.844535171993154,
+    "total_sd": 16.427791381820015
+   }
+  }
+ },
+ "NBL": {
+  "games": {
+   "tuning": 252,
+   "before_test": 364
+  },
+  "elo": {
+   "k": 20,
+   "home": 50,
+   "carry": 0.75,
+   "mov": true,
+   "tuning_log_loss": 0.6565201772180175,
+   "margin_scale_b": 0.04446093153086273,
+   "margin_sd": 14.057696463361784
+  },
+  "points": {
+   "half_life": 480,
+   "penalty": 3,
+   "tuning_margin_crps": 8.002922826757894,
+   "tuning_total_crps": 9.46220627294839,
+   "sd_home": 11.576000404893007,
+   "sd_away": 10.169881603871625,
+   "rho": 0.153743276911316
+  },
+  "naive": {
+   "home_win_rate": 0.5555555555555556,
+   "margin_mean": 1.7936507936507937,
+   "margin_sd": 14.627012117896893,
+   "total_sd": 18.251134606698077
+  },
+  "elo_grid_top5": [
+   {
+    "log_loss": 0.65652,
+    "k": 20,
+    "home": 50,
+    "carry": 0.75,
+    "mov": true
+   },
+   {
+    "log_loss": 0.65672,
+    "k": 25,
+    "home": 50,
+    "carry": 0.75,
+    "mov": true
+   },
+   {
+    "log_loss": 0.65683,
+    "k": 25,
+    "home": 50,
+    "carry": 0.5,
+    "mov": true
+   },
+   {
+    "log_loss": 0.65696,
+    "k": 20,
+    "home": 50,
+    "carry": 0.5,
+    "mov": true
+   },
+   {
+    "log_loss": 0.6572,
+    "k": 20,
+    "home": 50,
+    "carry": 1.0,
+    "mov": true
+   }
+  ],
+  "points_grid": [
+   {
+    "crps_sum": 19.4342,
+    "half_life": 30,
+    "penalty": 0.3
+   },
+   {
+    "crps_sum": 18.1361,
+    "half_life": 30,
+    "penalty": 1
+   },
+   {
+    "crps_sum": 17.8224,
+    "half_life": 30,
+    "penalty": 3
+   },
+   {
+    "crps_sum": 17.9542,
+    "half_life": 30,
+    "penalty": 10
+   },
+   {
+    "crps_sum": 18.3303,
+    "half_life": 30,
+    "penalty": 30
+   },
+   {
+    "crps_sum": 18.3789,
+    "half_life": 60,
+    "penalty": 0.3
+   },
+   {
+    "crps_sum": 17.9851,
+    "half_life": 60,
+    "penalty": 1
+   },
+   {
+    "crps_sum": 17.7046,
+    "half_life": 60,
+    "penalty": 3
+   },
+   {
+    "crps_sum": 17.7682,
+    "half_life": 60,
+    "penalty": 10
+   },
+   {
+    "crps_sum": 18.1461,
+    "half_life": 60,
+    "penalty": 30
+   },
+   {
+    "crps_sum": 18.1496,
+    "half_life": 120,
+    "penalty": 0.3
+   },
+   {
+    "crps_sum": 17.8163,
+    "half_life": 120,
+    "penalty": 1
+   },
+   {
+    "crps_sum": 17.5775,
+    "half_life": 120,
+    "penalty": 3
+   },
+   {
+    "crps_sum": 17.6129,
+    "half_life": 120,
+    "penalty": 10
+   },
+   {
+    "crps_sum": 17.9844,
+    "half_life": 120,
+    "penalty": 30
+   },
+   {
+    "crps_sum": 17.9607,
+    "half_life": 240,
+    "penalty": 0.3
+   },
+   {
+    "crps_sum": 17.7099,
+    "half_life": 240,
+    "penalty": 1
+   },
+   {
+    "crps_sum": 17.5057,
+    "half_life": 240,
+    "penalty": 3
+   },
+   {
+    "crps_sum": 17.5112,
+    "half_life": 240,
+    "penalty": 10
+   },
+   {
+    "crps_sum": 17.8535,
+    "half_life": 240,
+    "penalty": 30
+   },
+   {
+    "crps_sum": 17.6526,
+    "half_life": 480,
+    "penalty": 0.3
+   },
+   {
+    "crps_sum": 17.5632,
+    "half_life": 480,
+    "penalty": 1
+   },
+   {
+    "crps_sum": 17.4651,
+    "half_life": 480,
+    "penalty": 3
+   },
+   {
+    "crps_sum": 17.4782,
+    "half_life": 480,
+    "penalty": 10
+   },
+   {
+    "crps_sum": 17.7748,
+    "half_life": 480,
+    "penalty": 30
+   }
+  ],
+  "regulation": {
+   "sd_home": 11.288973098386395,
+   "sd_away": 9.965463664324048,
+   "rho": 0.11633763369834078,
+   "naive": {
+    "home_win_rate": 0.5462184873949579,
+    "margin_mean": 1.6865079365079365,
+    "margin_sd": 14.592647926945208,
+    "total_sd": 17.56073444715964
+   }
+  }
+ }
+}
