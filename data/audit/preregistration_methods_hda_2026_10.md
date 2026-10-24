@@ -102,6 +102,39 @@ each method against the current stack and against the markets (matches with odds
 - Nothing enters the daily run, the ledger or the Model Lab. A method that passes is only
   proposed, with an entry in `docs/MODEL_CHANGELOG.md`, and waits for Lang's approval.
 
+## Amendment 1 (24 Oct 2026, after Lang approved building, before any method was scored)
+
+Details the plan left open, fixed now; no check, grid, season or threshold changes.
+
+1. **N2 and N3 are written in JAX, not PyTorch.** JAX is already installed (NumPyro uses it),
+   so no large new download is needed. Same networks. Training: Adam, learning rate 0.001,
+   batches of 256, at most 60 passes over the data, stop after 5 passes without improvement
+   on the latest 10% of training matches, keep the best pass.
+2. **Network shapes.** LSTM: one layer reads each club's matches, oldest first; the two clubs'
+   final states and the match features go through one 32-unit layer to the three outcomes.
+   Transformer: each read match is projected to the model width, plus a learned position;
+   2 layers, 2 heads, feed-forward width twice the model width; the club vector is the mean
+   over its read matches; then the same 32-unit layer.
+3. **Sequence inputs per read match:** goals, shots, shots on target and corners, each for
+   and against; home or away; rest days before it (at most 14); the opponent's Elo before it
+   (the project's Elo, `fp.models.elo`). Scaled with the training matches' means and spreads.
+   Only matches whose result was known at the forecast's lock are read.
+4. **Form features (N4, N5).** For every club, ARIMA and Prophet are refitted at the first
+   lock of every month from 2017/18 on (the challengers' refit rule). Between refits, ARIMA
+   updates its forecast with each new result at fixed parameters; Prophet forecasts from that
+   month's fit. Each match gets eight columns: the four forecasts (goals for and against,
+   shots on target for and against) for each of its two clubs. A club with fewer than 20
+   top-flight matches gets no form features (left empty: the GLM fills the median, LightGBM
+   handles gaps).
+5. **N4 and N5 each give two forecasts** (the multinomial GLM and LightGBM, each with the four
+   form features, settings chosen by the same cross-validation). The one with the lower log
+   loss on 2021/22 and 2022/23 represents the method in A1, N6 and N7; both are reported.
+6. **Stacks.** The current stack is rebuilt as in Phase 4 (Elo, fast Dixon-Coles, the
+   Bayesian model without the goals fix, and the four challengers; weights fitted on 2021/22
+   and 2022/23). N7 adds the representatives of N1 to N5. When N6 chooses on 2021/22 and
+   2022/23, both stacks use cross-fitted forecasts (weights from the other season), Phase 4's
+   rule, so no candidate is judged on a season that set its own weights.
+
 ## 6. Not in this plan
 
 - Goal lines, corners, cards, Serie A and Ligue 1, the Champions League and the Europa and

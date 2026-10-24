@@ -26,6 +26,13 @@ dashboard = [
     "plotly==7.1.0",
     "streamlit==1.64.0",
 ]
+# The new-methods test only (data/audit/preregistration_methods_hda_2026_10.md). Never
+# installed by the daily run: `uv sync --group research` on GitHub's backtest runner.
+research = [
+    "lightgbm==4.7.0",
+    "prophet==1.4.0",
+    "statsmodels==0.15.0",
+]
 dev = [
     "mypy==2.3.1",
     "pandas-stubs==3.0.5.260914",
