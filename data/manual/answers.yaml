@@ -598,3 +598,15 @@
   threat_out: false
   source: 'Issue #17'
   used_at_utc: 2026-10-24T05:03Z
+- question: LaLiga_2627_sevilla_osasuna:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #18'
+  used_at_utc: 2026-10-25T05:20Z
+- question: LaLiga_2627_sevilla_osasuna:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #18'
+  used_at_utc: 2026-10-25T05:20Z
