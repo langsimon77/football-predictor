@@ -220,14 +220,16 @@ def calibration_slope(p: np.ndarray, y: np.ndarray, steps: int = 50) -> float:
 
 
 def bootstrap_mean(diff: np.ndarray, day: np.ndarray, reps: int = 4000,
-                   seed: int = 2026) -> tuple[float, float, float]:
-    """Mean of `diff` with a 95% interval, resampling whole game days (paired bootstrap:
-    `diff` is one model's score minus another's on the same games)."""
+                   seed: int = 2026, level: float = 0.95) -> tuple[float, float, float]:
+    """Mean of `diff` with an interval (95% unless `level` says otherwise), resampling whole
+    game days (paired bootstrap: `diff` is one model's score minus another's on the same
+    games)."""
     codes, _ = pd.factorize(pd.Series(day))
     sums = np.bincount(codes, weights=diff)
     counts = np.bincount(codes).astype(float)
     rng = np.random.default_rng(seed)
     pick = rng.integers(0, len(sums), size=(reps, len(sums)))
     means = sums[pick].sum(axis=1) / counts[pick].sum(axis=1)
-    lo, hi = np.percentile(means, [2.5, 97.5])
+    tail = (1 - level) / 2 * 100
+    lo, hi = np.percentile(means, [tail, 100 - tail])
     return float(diff.mean()), float(lo), float(hi)

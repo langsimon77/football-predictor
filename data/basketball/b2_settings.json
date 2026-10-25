@@ -1,0 +1,2278 @@
+{
+ "EuroLeague": {
+  "tuning_games": 1315,
+  "challengers": {
+   "C1": {
+    "winner": {
+     "params": {
+      "penalty": 10
+     },
+     "tuning_score": 0.6113588290128227,
+     "sd": NaN,
+     "grid": [
+      {
+       "score": 0.61801,
+       "penalty": 0.01
+      },
+      {
+       "score": 0.61694,
+       "penalty": 0.1
+      },
+      {
+       "score": 0.61415,
+       "penalty": 1
+      },
+      {
+       "score": 0.61136,
+       "penalty": 10
+      }
+     ]
+    },
+    "margin": {
+     "params": {
+      "penalty": 10
+     },
+     "tuning_score": 6.781794149227959,
+     "sd": 12.07794022634134,
+     "grid": [
+      {
+       "score": 6.81612,
+       "penalty": 0.01
+      },
+      {
+       "score": 6.81359,
+       "penalty": 0.1
+      },
+      {
+       "score": 6.80331,
+       "penalty": 1
+      },
+      {
+       "score": 6.78179,
+       "penalty": 10
+      }
+     ]
+    },
+    "total": {
+     "params": {
+      "penalty": 10
+     },
+     "tuning_score": 9.407684921481167,
+     "sd": 16.642265363816737,
+     "grid": [
+      {
+       "score": 9.45516,
+       "penalty": 0.01
+      },
+      {
+       "score": 9.44862,
+       "penalty": 0.1
+      },
+      {
+       "score": 9.4314,
+       "penalty": 1
+      },
+      {
+       "score": 9.40768,
+       "penalty": 10
+      }
+     ]
+    }
+   },
+   "C2": {
+    "winner": {
+     "params": {
+      "depth": 3,
+      "leaf": 20
+     },
+     "tuning_score": 0.6148034099381471,
+     "sd": NaN,
+     "grid": [
+      {
+       "score": 0.6148,
+       "depth": 3,
+       "leaf": 20
+      },
+      {
+       "score": 0.61561,
+       "depth": 3,
+       "leaf": 50
+      },
+      {
+       "score": 0.61602,
+       "depth": 5,
+       "leaf": 20
+      },
+      {
+       "score": 0.61596,
+       "depth": 5,
+       "leaf": 50
+      },
+      {
+       "score": 0.61849,
+       "depth": 8,
+       "leaf": 20
+      },
+      {
+       "score": 0.616,
+       "depth": 8,
+       "leaf": 50
+      }
+     ]
+    },
+    "margin": {
+     "params": {
+      "depth": 3,
+      "leaf": 50
+     },
+     "tuning_score": 6.7663887135949565,
+     "sd": 12.05176843948299,
+     "grid": [
+      {
+       "score": 6.77024,
+       "depth": 3,
+       "leaf": 20
+      },
+      {
+       "score": 6.76639,
+       "depth": 3,
+       "leaf": 50
+      },
+      {
+       "score": 6.80955,
+       "depth": 5,
+       "leaf": 20
+      },
+      {
+       "score": 6.77975,
+       "depth": 5,
+       "leaf": 50
+      },
+      {
+       "score": 6.82974,
+       "depth": 8,
+       "leaf": 20
+      },
+      {
+       "score": 6.78103,
+       "depth": 8,
+       "leaf": 50
+      }
+     ]
+    },
+    "total": {
+     "params": {
+      "depth": 3,
+      "leaf": 50
+     },
+     "tuning_score": 9.42551849990855,
+     "sd": 16.678666372723303,
+     "grid": [
+      {
+       "score": 9.44804,
+       "depth": 3,
+       "leaf": 20
+      },
+      {
+       "score": 9.42552,
+       "depth": 3,
+       "leaf": 50
+      },
+      {
+       "score": 9.48324,
+       "depth": 5,
+       "leaf": 20
+      },
+      {
+       "score": 9.42692,
+       "depth": 5,
+       "leaf": 50
+      },
+      {
+       "score": 9.49787,
+       "depth": 8,
+       "leaf": 20
+      },
+      {
+       "score": 9.42721,
+       "depth": 8,
+       "leaf": 50
+      }
+     ]
+    }
+   },
+   "C3": {
+    "winner": {
+     "params": {
+      "depth": 2,
+      "lr": 0.03,
+      "rounds": 100
+     },
+     "tuning_score": 0.6158647721017768,
+     "sd": NaN,
+     "grid": [
+      {
+       "score": 0.61586,
+       "depth": 2,
+       "lr": 0.03,
+       "rounds": 100
+      },
+      {
+       "score": 0.63651,
+       "depth": 2,
+       "lr": 0.03,
+       "rounds": 300
+      },
+      {
+       "score": 0.63943,
+       "depth": 2,
+       "lr": 0.1,
+       "rounds": 100
+      },
+      {
+       "score": 0.69844,
+       "depth": 2,
+       "lr": 0.1,
+       "rounds": 300
+      },
+      {
+       "score": 0.62442,
+       "depth": 3,
+       "lr": 0.03,
+       "rounds": 100
+      },
+      {
+       "score": 0.65476,
+       "depth": 3,
+       "lr": 0.03,
+       "rounds": 300
+      },
+      {
+       "score": 0.66382,
+       "depth": 3,
+       "lr": 0.1,
+       "rounds": 100
+      },
+      {
+       "score": 0.73828,
+       "depth": 3,
+       "lr": 0.1,
+       "rounds": 300
+      }
+     ]
+    },
+    "margin": {
+     "params": {
+      "depth": 2,
+      "lr": 0.03,
+      "rounds": 100
+     },
+     "tuning_score": 6.762786118245678,
+     "sd": 12.046238840055986,
+     "grid": [
+      {
+       "score": 6.76279,
+       "depth": 2,
+       "lr": 0.03,
+       "rounds": 100
+      },
+      {
+       "score": 6.88103,
+       "depth": 2,
+       "lr": 0.03,
+       "rounds": 300
+      },
+      {
+       "score": 6.91586,
+       "depth": 2,
+       "lr": 0.1,
+       "rounds": 100
+      },
+      {
+       "score": 7.24792,
+       "depth": 2,
+       "lr": 0.1,
+       "rounds": 300
+      },
+      {
+       "score": 6.82901,
+       "depth": 3,
+       "lr": 0.03,
+       "rounds": 100
+      },
+      {
+       "score": 7.02977,
+       "depth": 3,
+       "lr": 0.03,
+       "rounds": 300
+      },
+      {
+       "score": 7.10251,
+       "depth": 3,
+       "lr": 0.1,
+       "rounds": 100
+      },
+      {
+       "score": 7.49195,
+       "depth": 3,
+       "lr": 0.1,
+       "rounds": 300
+      }
+     ]
+    },
+    "total": {
+     "params": {
+      "depth": 2,
+      "lr": 0.03,
+      "rounds": 100
+     },
+     "tuning_score": 9.477557478230443,
+     "sd": 16.752612531534357,
+     "grid": [
+      {
+       "score": 9.47756,
+       "depth": 2,
+       "lr": 0.03,
+       "rounds": 100
+      },
+      {
+       "score": 9.57308,
+       "depth": 2,
+       "lr": 0.03,
+       "rounds": 300
+      },
+      {
+       "score": 9.58861,
+       "depth": 2,
+       "lr": 0.1,
+       "rounds": 100
+      },
+      {
+       "score": 9.8469,
+       "depth": 2,
+       "lr": 0.1,
+       "rounds": 300
+      },
+      {
+       "score": 9.52456,
+       "depth": 3,
+       "lr": 0.03,
+       "rounds": 100
+      },
+      {
+       "score": 9.66425,
+       "depth": 3,
+       "lr": 0.03,
+       "rounds": 300
+      },
+      {
+       "score": 9.73276,
+       "depth": 3,
+       "lr": 0.1,
+       "rounds": 100
+      },
+      {
+       "score": 10.16538,
+       "depth": 3,
+       "lr": 0.1,
+       "rounds": 300
+      }
+     ]
+    }
+   },
+   "C4": {
+    "winner": {
+     "params": {
+      "leaves": 7,
+      "lr": 0.03,
+      "rounds": 100,
+      "l2": 1
+     },
+     "tuning_score": 0.6258622131891532,
+     "sd": NaN,
+     "grid": [
+      {
+       "score": 0.62661,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 0.62586,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 0.66285,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 0.66041,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 1
+      },
+      {
+       "score": 0.67152,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 0.66821,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 0.79065,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 0.76072,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 1
+      },
+      {
+       "score": 0.64574,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 0.64098,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 0.71388,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 0.6993,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 1
+      },
+      {
+       "score": 0.7318,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 0.7057,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 0.95116,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 0.86844,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 1
+      }
+     ]
+    },
+    "margin": {
+     "params": {
+      "leaves": 7,
+      "lr": 0.03,
+      "rounds": 100,
+      "l2": 0
+     },
+     "tuning_score": 6.857528353253907,
+     "sd": 12.212051750675553,
+     "grid": [
+      {
+       "score": 6.85753,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 6.86157,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 7.05983,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 7.06014,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 1
+      },
+      {
+       "score": 7.08517,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 7.11313,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 7.4597,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 7.46177,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 1
+      },
+      {
+       "score": 6.94795,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 6.94534,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 7.25249,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 7.2148,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 1
+      },
+      {
+       "score": 7.33436,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 7.3281,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 7.73466,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 7.68613,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 1
+      }
+     ]
+    },
+    "total": {
+     "params": {
+      "leaves": 7,
+      "lr": 0.03,
+      "rounds": 100,
+      "l2": 1
+     },
+     "tuning_score": 9.504623966875702,
+     "sd": 16.782826321568642,
+     "grid": [
+      {
+       "score": 9.5217,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 9.50462,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 9.748,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 9.7234,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 1
+      },
+      {
+       "score": 9.76233,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 9.77303,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 10.24516,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 10.21445,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 1
+      },
+      {
+       "score": 9.62283,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 9.58878,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 9.99282,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 9.90409,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 1
+      },
+      {
+       "score": 10.04593,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 10.05991,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 10.48897,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 10.50654,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 1
+      }
+     ]
+    }
+   },
+   "C5": {
+    "winner": {
+     "params": {
+      "hidden": 16,
+      "penalty": 0.001
+     },
+     "tuning_score": 0.6767560690936928,
+     "sd": NaN,
+     "grid": [
+      {
+       "score": 0.67676,
+       "hidden": 16,
+       "penalty": 0.001
+      },
+      {
+       "score": 0.67712,
+       "hidden": 16,
+       "penalty": 0.01
+      },
+      {
+       "score": 0.68461,
+       "hidden": 32,
+       "penalty": 0.001
+      },
+      {
+       "score": 0.6846,
+       "hidden": 32,
+       "penalty": 0.01
+      }
+     ]
+    },
+    "margin": {
+     "params": {
+      "hidden": 16,
+      "penalty": 0.01
+     },
+     "tuning_score": 7.327747987052063,
+     "sd": 13.05680793660608,
+     "grid": [
+      {
+       "score": 7.33085,
+       "hidden": 16,
+       "penalty": 0.001
+      },
+      {
+       "score": 7.32775,
+       "hidden": 16,
+       "penalty": 0.01
+      },
+      {
+       "score": 7.36332,
+       "hidden": 32,
+       "penalty": 0.001
+      },
+      {
+       "score": 7.3671,
+       "hidden": 32,
+       "penalty": 0.01
+      }
+     ]
+    },
+    "total": {
+     "params": {
+      "hidden": 32,
+      "penalty": 0.01
+     },
+     "tuning_score": 10.233184370486722,
+     "sd": 18.134267637997148,
+     "grid": [
+      {
+       "score": 10.46392,
+       "hidden": 16,
+       "penalty": 0.001
+      },
+      {
+       "score": 10.44704,
+       "hidden": 16,
+       "penalty": 0.01
+      },
+      {
+       "score": 10.23544,
+       "hidden": 32,
+       "penalty": 0.001
+      },
+      {
+       "score": 10.23318,
+       "hidden": 32,
+       "penalty": 0.01
+      }
+     ]
+    }
+   },
+   "C6": {
+    "winner": {
+     "params": {
+      "drift": 0.02,
+      "season_drift": 5
+     },
+     "tuning_score": 0.6076092768008462,
+     "sd": 12.040281752992033,
+     "grid": [
+      {
+       "score": 0.60761,
+       "drift": 0.02,
+       "season_drift": 5
+      },
+      {
+       "score": 0.61163,
+       "drift": 0.02,
+       "season_drift": 20
+      },
+      {
+       "score": 0.6175,
+       "drift": 0.02,
+       "season_drift": 50
+      },
+      {
+       "score": 0.61101,
+       "drift": 0.05,
+       "season_drift": 5
+      },
+      {
+       "score": 0.61447,
+       "drift": 0.05,
+       "season_drift": 20
+      },
+      {
+       "score": 0.61935,
+       "drift": 0.05,
+       "season_drift": 50
+      },
+      {
+       "score": 0.61604,
+       "drift": 0.1,
+       "season_drift": 5
+      },
+      {
+       "score": 0.61863,
+       "drift": 0.1,
+       "season_drift": 20
+      },
+      {
+       "score": 0.62239,
+       "drift": 0.1,
+       "season_drift": 50
+      },
+      {
+       "score": 0.62344,
+       "drift": 0.2,
+       "season_drift": 5
+      },
+      {
+       "score": 0.62508,
+       "drift": 0.2,
+       "season_drift": 20
+      },
+      {
+       "score": 0.62763,
+       "drift": 0.2,
+       "season_drift": 50
+      }
+     ]
+    },
+    "margin": {
+     "params": {
+      "drift": 0.02,
+      "season_drift": 5
+     },
+     "tuning_score": 6.75409142807297,
+     "sd": 12.040281752992033,
+     "grid": [
+      {
+       "score": 6.75409,
+       "drift": 0.02,
+       "season_drift": 5
+      },
+      {
+       "score": 6.82096,
+       "drift": 0.02,
+       "season_drift": 20
+      },
+      {
+       "score": 6.90651,
+       "drift": 0.02,
+       "season_drift": 50
+      },
+      {
+       "score": 6.80425,
+       "drift": 0.05,
+       "season_drift": 5
+      },
+      {
+       "score": 6.85808,
+       "drift": 0.05,
+       "season_drift": 20
+      },
+      {
+       "score": 6.92863,
+       "drift": 0.05,
+       "season_drift": 50
+      },
+      {
+       "score": 6.87349,
+       "drift": 0.1,
+       "season_drift": 5
+      },
+      {
+       "score": 6.91253,
+       "drift": 0.1,
+       "season_drift": 20
+      },
+      {
+       "score": 6.96687,
+       "drift": 0.1,
+       "season_drift": 50
+      },
+      {
+       "score": 6.97586,
+       "drift": 0.2,
+       "season_drift": 5
+      },
+      {
+       "score": 7.00025,
+       "drift": 0.2,
+       "season_drift": 20
+      },
+      {
+       "score": 7.03706,
+       "drift": 0.2,
+       "season_drift": 50
+      }
+     ]
+    },
+    "total": {
+     "params": {
+      "drift": 0.02,
+      "season_drift": 5
+     },
+     "tuning_score": 9.428956831775881,
+     "sd": 16.68416231677643,
+     "grid": [
+      {
+       "score": 9.42896,
+       "drift": 0.02,
+       "season_drift": 5
+      },
+      {
+       "score": 9.48035,
+       "drift": 0.02,
+       "season_drift": 20
+      },
+      {
+       "score": 9.57343,
+       "drift": 0.02,
+       "season_drift": 50
+      },
+      {
+       "score": 9.47236,
+       "drift": 0.05,
+       "season_drift": 5
+      },
+      {
+       "score": 9.52138,
+       "drift": 0.05,
+       "season_drift": 20
+      },
+      {
+       "score": 9.6025,
+       "drift": 0.05,
+       "season_drift": 50
+      },
+      {
+       "score": 9.54006,
+       "drift": 0.1,
+       "season_drift": 5
+      },
+      {
+       "score": 9.58118,
+       "drift": 0.1,
+       "season_drift": 20
+      },
+      {
+       "score": 9.64809,
+       "drift": 0.1,
+       "season_drift": 50
+      },
+      {
+       "score": 9.64858,
+       "drift": 0.2,
+       "season_drift": 5
+      },
+      {
+       "score": 9.67857,
+       "drift": 0.2,
+       "season_drift": 20
+      },
+      {
+       "score": 9.72823,
+       "drift": 0.2,
+       "season_drift": 50
+      }
+     ]
+    }
+   },
+   "C7": {
+    "winner": {
+     "params": {
+      "home_penalty": 30
+     },
+     "tuning_score": 0.6110725342699048,
+     "sd": 12.027474126939925,
+     "grid": [
+      {
+       "score": 0.62259,
+       "home_penalty": 1
+      },
+      {
+       "score": 0.61745,
+       "home_penalty": 3
+      },
+      {
+       "score": 0.61279,
+       "home_penalty": 10
+      },
+      {
+       "score": 0.61107,
+       "home_penalty": 30
+      }
+     ]
+    },
+    "margin": {
+     "params": {
+      "home_penalty": 30
+     },
+     "tuning_score": 6.7443532779675515,
+     "sd": 12.027474126939925,
+     "grid": [
+      {
+       "score": 6.89635,
+       "home_penalty": 1
+      },
+      {
+       "score": 6.8291,
+       "home_penalty": 3
+      },
+      {
+       "score": 6.76816,
+       "home_penalty": 10
+      },
+      {
+       "score": 6.74435,
+       "home_penalty": 30
+      }
+     ]
+    },
+    "total": {
+     "params": {
+      "home_penalty": 10
+     },
+     "tuning_score": 9.34991286796578,
+     "sd": 16.54759520695317,
+     "grid": [
+      {
+       "score": 9.39181,
+       "home_penalty": 1
+      },
+      {
+       "score": 9.36406,
+       "home_penalty": 3
+      },
+      {
+       "score": 9.34991,
+       "home_penalty": 10
+      },
+      {
+       "score": 9.35299,
+       "home_penalty": 30
+      }
+     ]
+    }
+   }
+  }
+ },
+ "NBL": {
+  "tuning_games": 252,
+  "challengers": {
+   "C1": {
+    "winner": {
+     "params": {
+      "penalty": 10
+     },
+     "tuning_score": 0.7102831144956803,
+     "sd": NaN,
+     "grid": [
+      {
+       "score": 0.75624,
+       "penalty": 0.01
+      },
+      {
+       "score": 0.75287,
+       "penalty": 0.1
+      },
+      {
+       "score": 0.73987,
+       "penalty": 1
+      },
+      {
+       "score": 0.71028,
+       "penalty": 10
+      }
+     ]
+    },
+    "margin": {
+     "params": {
+      "penalty": 10
+     },
+     "tuning_score": 8.417807610624758,
+     "sd": 14.594305711004756,
+     "grid": [
+      {
+       "score": 8.51692,
+       "penalty": 0.01
+      },
+      {
+       "score": 8.51302,
+       "penalty": 0.1
+      },
+      {
+       "score": 8.48943,
+       "penalty": 1
+      },
+      {
+       "score": 8.41781,
+       "penalty": 10
+      }
+     ]
+    },
+    "total": {
+     "params": {
+      "penalty": 10
+     },
+     "tuning_score": 9.608511367955332,
+     "sd": 16.87344964647667,
+     "grid": [
+      {
+       "score": 9.63796,
+       "penalty": 0.01
+      },
+      {
+       "score": 9.63578,
+       "penalty": 0.1
+      },
+      {
+       "score": 9.62239,
+       "penalty": 1
+      },
+      {
+       "score": 9.60851,
+       "penalty": 10
+      }
+     ]
+    }
+   },
+   "C2": {
+    "winner": {
+     "params": {
+      "depth": 5,
+      "leaf": 50
+     },
+     "tuning_score": 0.692454921189689,
+     "sd": NaN,
+     "grid": [
+      {
+       "score": 0.69629,
+       "depth": 3,
+       "leaf": 20
+      },
+      {
+       "score": 0.69245,
+       "depth": 3,
+       "leaf": 50
+      },
+      {
+       "score": 0.69654,
+       "depth": 5,
+       "leaf": 20
+      },
+      {
+       "score": 0.69245,
+       "depth": 5,
+       "leaf": 50
+      },
+      {
+       "score": 0.69651,
+       "depth": 8,
+       "leaf": 20
+      },
+      {
+       "score": 0.69245,
+       "depth": 8,
+       "leaf": 50
+      }
+     ]
+    },
+    "margin": {
+     "params": {
+      "depth": 3,
+      "leaf": 20
+     },
+     "tuning_score": 8.201070332767538,
+     "sd": 14.36973028805228,
+     "grid": [
+      {
+       "score": 8.20107,
+       "depth": 3,
+       "leaf": 20
+      },
+      {
+       "score": 8.25909,
+       "depth": 3,
+       "leaf": 50
+      },
+      {
+       "score": 8.20616,
+       "depth": 5,
+       "leaf": 20
+      },
+      {
+       "score": 8.25909,
+       "depth": 5,
+       "leaf": 50
+      },
+      {
+       "score": 8.20644,
+       "depth": 8,
+       "leaf": 20
+      },
+      {
+       "score": 8.25909,
+       "depth": 8,
+       "leaf": 50
+      }
+     ]
+    },
+    "total": {
+     "params": {
+      "depth": 5,
+      "leaf": 20
+     },
+     "tuning_score": 9.66753803802327,
+     "sd": 17.052002670746244,
+     "grid": [
+      {
+       "score": 9.67536,
+       "depth": 3,
+       "leaf": 20
+      },
+      {
+       "score": 10.04438,
+       "depth": 3,
+       "leaf": 50
+      },
+      {
+       "score": 9.66754,
+       "depth": 5,
+       "leaf": 20
+      },
+      {
+       "score": 10.04438,
+       "depth": 5,
+       "leaf": 50
+      },
+      {
+       "score": 9.66819,
+       "depth": 8,
+       "leaf": 20
+      },
+      {
+       "score": 10.04438,
+       "depth": 8,
+       "leaf": 50
+      }
+     ]
+    }
+   },
+   "C3": {
+    "winner": {
+     "params": {
+      "depth": 2,
+      "lr": 0.03,
+      "rounds": 100
+     },
+     "tuning_score": 0.7102436124005769,
+     "sd": NaN,
+     "grid": [
+      {
+       "score": 0.71024,
+       "depth": 2,
+       "lr": 0.03,
+       "rounds": 100
+      },
+      {
+       "score": 0.78826,
+       "depth": 2,
+       "lr": 0.03,
+       "rounds": 300
+      },
+      {
+       "score": 0.80542,
+       "depth": 2,
+       "lr": 0.1,
+       "rounds": 100
+      },
+      {
+       "score": 1.0016,
+       "depth": 2,
+       "lr": 0.1,
+       "rounds": 300
+      },
+      {
+       "score": 0.72809,
+       "depth": 3,
+       "lr": 0.03,
+       "rounds": 100
+      },
+      {
+       "score": 0.84091,
+       "depth": 3,
+       "lr": 0.03,
+       "rounds": 300
+      },
+      {
+       "score": 0.86021,
+       "depth": 3,
+       "lr": 0.1,
+       "rounds": 100
+      },
+      {
+       "score": 1.06138,
+       "depth": 3,
+       "lr": 0.1,
+       "rounds": 300
+      }
+     ]
+    },
+    "margin": {
+     "params": {
+      "depth": 2,
+      "lr": 0.03,
+      "rounds": 100
+     },
+     "tuning_score": 8.39378805270049,
+     "sd": 14.630887196203505,
+     "grid": [
+      {
+       "score": 8.39379,
+       "depth": 2,
+       "lr": 0.03,
+       "rounds": 100
+      },
+      {
+       "score": 8.74835,
+       "depth": 2,
+       "lr": 0.03,
+       "rounds": 300
+      },
+      {
+       "score": 8.84217,
+       "depth": 2,
+       "lr": 0.1,
+       "rounds": 100
+      },
+      {
+       "score": 9.41209,
+       "depth": 2,
+       "lr": 0.1,
+       "rounds": 300
+      },
+      {
+       "score": 8.47201,
+       "depth": 3,
+       "lr": 0.03,
+       "rounds": 100
+      },
+      {
+       "score": 8.8384,
+       "depth": 3,
+       "lr": 0.03,
+       "rounds": 300
+      },
+      {
+       "score": 8.93124,
+       "depth": 3,
+       "lr": 0.1,
+       "rounds": 100
+      },
+      {
+       "score": 9.39797,
+       "depth": 3,
+       "lr": 0.1,
+       "rounds": 300
+      }
+     ]
+    },
+    "total": {
+     "params": {
+      "depth": 2,
+      "lr": 0.03,
+      "rounds": 100
+     },
+     "tuning_score": 9.875217605023698,
+     "sd": 17.391581499936663,
+     "grid": [
+      {
+       "score": 9.87522,
+       "depth": 2,
+       "lr": 0.03,
+       "rounds": 100
+      },
+      {
+       "score": 10.09405,
+       "depth": 2,
+       "lr": 0.03,
+       "rounds": 300
+      },
+      {
+       "score": 10.19118,
+       "depth": 2,
+       "lr": 0.1,
+       "rounds": 100
+      },
+      {
+       "score": 10.82762,
+       "depth": 2,
+       "lr": 0.1,
+       "rounds": 300
+      },
+      {
+       "score": 10.05065,
+       "depth": 3,
+       "lr": 0.03,
+       "rounds": 100
+      },
+      {
+       "score": 10.37277,
+       "depth": 3,
+       "lr": 0.03,
+       "rounds": 300
+      },
+      {
+       "score": 10.35838,
+       "depth": 3,
+       "lr": 0.1,
+       "rounds": 100
+      },
+      {
+       "score": 10.65734,
+       "depth": 3,
+       "lr": 0.1,
+       "rounds": 300
+      }
+     ]
+    }
+   },
+   "C4": {
+    "winner": {
+     "params": {
+      "leaves": 7,
+      "lr": 0.03,
+      "rounds": 100,
+      "l2": 0
+     },
+     "tuning_score": 0.7436283042539276,
+     "sd": NaN,
+     "grid": [
+      {
+       "score": 0.74363,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 0.7461,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 0.86923,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 0.84563,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 1
+      },
+      {
+       "score": 0.88324,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 0.8582,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 1.25955,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 1.13229,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 1
+      },
+      {
+       "score": 0.75064,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 0.74879,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 0.90261,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 0.87505,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 1
+      },
+      {
+       "score": 0.92427,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 0.89657,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 1.41728,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 1.2102,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 1
+      }
+     ]
+    },
+    "margin": {
+     "params": {
+      "leaves": 7,
+      "lr": 0.03,
+      "rounds": 100,
+      "l2": 1
+     },
+     "tuning_score": 8.490908905983519,
+     "sd": 14.786399887568876,
+     "grid": [
+      {
+       "score": 8.53605,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 8.49091,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 8.93799,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 8.89445,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 1
+      },
+      {
+       "score": 8.95535,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 8.97342,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 9.50146,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 9.32347,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 1
+      },
+      {
+       "score": 8.56865,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 8.53008,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 8.96889,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 8.91255,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 1
+      },
+      {
+       "score": 8.98513,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 9.03088,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 9.33998,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 9.35174,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 1
+      }
+     ]
+    },
+    "total": {
+     "params": {
+      "leaves": 15,
+      "lr": 0.03,
+      "rounds": 100,
+      "l2": 1
+     },
+     "tuning_score": 9.814673212310401,
+     "sd": 17.300084195798615,
+     "grid": [
+      {
+       "score": 9.87945,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 9.85826,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 10.09195,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 10.14835,
+       "leaves": 7,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 1
+      },
+      {
+       "score": 10.12367,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 10.19186,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 10.51359,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 10.49594,
+       "leaves": 7,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 1
+      },
+      {
+       "score": 9.84512,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 9.81467,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 10.11271,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 10.12331,
+       "leaves": 15,
+       "lr": 0.03,
+       "rounds": 300,
+       "l2": 1
+      },
+      {
+       "score": 10.09421,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 0
+      },
+      {
+       "score": 10.19003,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 100,
+       "l2": 1
+      },
+      {
+       "score": 10.35975,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 0
+      },
+      {
+       "score": 10.49606,
+       "leaves": 15,
+       "lr": 0.1,
+       "rounds": 300,
+       "l2": 1
+      }
+     ]
+    }
+   },
+   "C5": {
+    "winner": {
+     "params": {
+      "hidden": 32,
+      "penalty": 0.001
+     },
+     "tuning_score": 0.8290038293284783,
+     "sd": NaN,
+     "grid": [
+      {
+       "score": 0.90975,
+       "hidden": 16,
+       "penalty": 0.001
+      },
+      {
+       "score": 0.90972,
+       "hidden": 16,
+       "penalty": 0.01
+      },
+      {
+       "score": 0.829,
+       "hidden": 32,
+       "penalty": 0.001
+      },
+      {
+       "score": 0.82901,
+       "hidden": 32,
+       "penalty": 0.01
+      }
+     ]
+    },
+    "margin": {
+     "params": {
+      "hidden": 32,
+      "penalty": 0.01
+     },
+     "tuning_score": 9.530379602541121,
+     "sd": 16.776966454157858,
+     "grid": [
+      {
+       "score": 9.84844,
+       "hidden": 16,
+       "penalty": 0.001
+      },
+      {
+       "score": 9.86178,
+       "hidden": 16,
+       "penalty": 0.01
+      },
+      {
+       "score": 9.53106,
+       "hidden": 32,
+       "penalty": 0.001
+      },
+      {
+       "score": 9.53038,
+       "hidden": 32,
+       "penalty": 0.01
+      }
+     ]
+    },
+    "total": {
+     "params": {
+      "hidden": 32,
+      "penalty": 0.001
+     },
+     "tuning_score": 11.658160307289661,
+     "sd": 20.69219539375646,
+     "grid": [
+      {
+       "score": 12.69288,
+       "hidden": 16,
+       "penalty": 0.001
+      },
+      {
+       "score": 12.69274,
+       "hidden": 16,
+       "penalty": 0.01
+      },
+      {
+       "score": 11.65816,
+       "hidden": 32,
+       "penalty": 0.001
+      },
+      {
+       "score": 11.66285,
+       "hidden": 32,
+       "penalty": 0.01
+      }
+     ]
+    }
+   },
+   "C6": {
+    "winner": {
+     "params": {
+      "drift": 0.02,
+      "season_drift": 5
+     },
+     "tuning_score": 0.6607968586753137,
+     "sd": 14.278898800470252,
+     "grid": [
+      {
+       "score": 0.6608,
+       "drift": 0.02,
+       "season_drift": 5
+      },
+      {
+       "score": 0.66696,
+       "drift": 0.02,
+       "season_drift": 20
+      },
+      {
+       "score": 0.67554,
+       "drift": 0.02,
+       "season_drift": 50
+      },
+      {
+       "score": 0.66978,
+       "drift": 0.05,
+       "season_drift": 5
+      },
+      {
+       "score": 0.67433,
+       "drift": 0.05,
+       "season_drift": 20
+      },
+      {
+       "score": 0.68099,
+       "drift": 0.05,
+       "season_drift": 50
+      },
+      {
+       "score": 0.67958,
+       "drift": 0.1,
+       "season_drift": 5
+      },
+      {
+       "score": 0.68271,
+       "drift": 0.1,
+       "season_drift": 20
+      },
+      {
+       "score": 0.68757,
+       "drift": 0.1,
+       "season_drift": 50
+      },
+      {
+       "score": 0.69116,
+       "drift": 0.2,
+       "season_drift": 5
+      },
+      {
+       "score": 0.6931,
+       "drift": 0.2,
+       "season_drift": 20
+      },
+      {
+       "score": 0.6963,
+       "drift": 0.2,
+       "season_drift": 50
+      }
+     ]
+    },
+    "margin": {
+     "params": {
+      "drift": 0.02,
+      "season_drift": 5
+     },
+     "tuning_score": 8.163199078081611,
+     "sd": 14.278898800470252,
+     "grid": [
+      {
+       "score": 8.1632,
+       "drift": 0.02,
+       "season_drift": 5
+      },
+      {
+       "score": 8.24526,
+       "drift": 0.02,
+       "season_drift": 20
+      },
+      {
+       "score": 8.34932,
+       "drift": 0.02,
+       "season_drift": 50
+      },
+      {
+       "score": 8.29165,
+       "drift": 0.05,
+       "season_drift": 5
+      },
+      {
+       "score": 8.34557,
+       "drift": 0.05,
+       "season_drift": 20
+      },
+      {
+       "score": 8.41984,
+       "drift": 0.05,
+       "season_drift": 50
+      },
+      {
+       "score": 8.4178,
+       "drift": 0.1,
+       "season_drift": 5
+      },
+      {
+       "score": 8.45132,
+       "drift": 0.1,
+       "season_drift": 20
+      },
+      {
+       "score": 8.50141,
+       "drift": 0.1,
+       "season_drift": 50
+      },
+      {
+       "score": 8.56045,
+       "drift": 0.2,
+       "season_drift": 5
+      },
+      {
+       "score": 8.57929,
+       "drift": 0.2,
+       "season_drift": 20
+      },
+      {
+       "score": 8.60982,
+       "drift": 0.2,
+       "season_drift": 50
+      }
+     ]
+    },
+    "total": {
+     "params": {
+      "drift": 0.02,
+      "season_drift": 5
+     },
+     "tuning_score": 9.55069333909441,
+     "sd": 16.83324433004025,
+     "grid": [
+      {
+       "score": 9.55069,
+       "drift": 0.02,
+       "season_drift": 5
+      },
+      {
+       "score": 9.59049,
+       "drift": 0.02,
+       "season_drift": 20
+      },
+      {
+       "score": 9.67096,
+       "drift": 0.02,
+       "season_drift": 50
+      },
+      {
+       "score": 9.62299,
+       "drift": 0.05,
+       "season_drift": 5
+      },
+      {
+       "score": 9.65956,
+       "drift": 0.05,
+       "season_drift": 20
+      },
+      {
+       "score": 9.72631,
+       "drift": 0.05,
+       "season_drift": 50
+      },
+      {
+       "score": 9.72238,
+       "drift": 0.1,
+       "season_drift": 5
+      },
+      {
+       "score": 9.7509,
+       "drift": 0.1,
+       "season_drift": 20
+      },
+      {
+       "score": 9.80242,
+       "drift": 0.1,
+       "season_drift": 50
+      },
+      {
+       "score": 9.86074,
+       "drift": 0.2,
+       "season_drift": 5
+      },
+      {
+       "score": 9.88037,
+       "drift": 0.2,
+       "season_drift": 20
+      },
+      {
+       "score": 9.9163,
+       "drift": 0.2,
+       "season_drift": 50
+      }
+     ]
+    }
+   },
+   "C7": {
+    "winner": {
+     "params": {
+      "home_penalty": 30
+     },
+     "tuning_score": 0.6516696804520883,
+     "sd": 14.195653995479892,
+     "grid": [
+      {
+       "score": 0.66657,
+       "home_penalty": 1
+      },
+      {
+       "score": 0.66119,
+       "home_penalty": 3
+      },
+      {
+       "score": 0.6551,
+       "home_penalty": 10
+      },
+      {
+       "score": 0.65167,
+       "home_penalty": 30
+      }
+     ]
+    },
+    "margin": {
+     "params": {
+      "home_penalty": 30
+     },
+     "tuning_score": 8.025484447001192,
+     "sd": 14.195653995479892,
+     "grid": [
+      {
+       "score": 8.18138,
+       "home_penalty": 1
+      },
+      {
+       "score": 8.12441,
+       "home_penalty": 3
+      },
+      {
+       "score": 8.06039,
+       "home_penalty": 10
+      },
+      {
+       "score": 8.02548,
+       "home_penalty": 30
+      }
+     ]
+    },
+    "total": {
+     "params": {
+      "home_penalty": 30
+     },
+     "tuning_score": 9.472721246571158,
+     "sd": 16.519640421517597,
+     "grid": [
+      {
+       "score": 9.60752,
+       "home_penalty": 1
+      },
+      {
+       "score": 9.54949,
+       "home_penalty": 3
+      },
+      {
+       "score": 9.49558,
+       "home_penalty": 10
+      },
+      {
+       "score": 9.47272,
+       "home_penalty": 30
+      }
+     ]
+    }
+   }
+  }
+ }
+}
