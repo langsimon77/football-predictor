@@ -1,0 +1,184 @@
+name: New-methods backtest
+
+# The pre-registered test of new model families for home, draw, away, EPL and La Liga
+# (data/audit/preregistration_methods_hda_2026_10.md). One job per method; the last job
+# scores them all with scripts/backtest_methods.py. Results are uploaded as an artifact;
+# nothing is committed and nothing touches the daily run, the ledger or the Model Lab.
+
+on:
+  push:
+    branches: [methods-plan]
+    paths:
+      - ".github/workflows/methods.yml"
+      - "src/fp/research/**"
+      - "scripts/backtest_methods.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: methods
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.2.0  # no floating major tag exists
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - name: Install locked dependencies with the research group
+        run: uv sync --frozen --group research
+      - name: Restore raw data cache
+        uses: actions/cache/restore@v6
+        with:
+          path: data/raw
+          key: raw-${{ github.run_id }}
+          restore-keys: raw-
+      - name: Build data
+        run: make data
+      - name: Features, club histories and sequences
+        run: |
+          uv run --group research python -m fp.research.methods prepare --out out/prepared
+          cp data/processed/matches.parquet out/prepared/matches.parquet
+      - uses: actions/upload-artifact@v7
+        with:
+          name: prepared
+          path: out/prepared/
+          retention-days: 30
+
+  form:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      matrix:
+        kind: [arima, prophet]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - run: uv sync --frozen --group research
+      - uses: actions/download-artifact@v8
+        with:
+          name: prepared
+          path: out/prepared
+      - name: Form features (${{ matrix.kind }})
+        run: >
+          uv run --group research python -m fp.research.form --kind ${{ matrix.kind }}
+          --prepared out/prepared --out out/form/form_${{ matrix.kind }}.parquet --jobs 4
+      - uses: actions/upload-artifact@v7
+        with:
+          name: form-${{ matrix.kind }}
+          path: out/form/
+          retention-days: 30
+
+  model-base:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      matrix:
+        method: [lightgbm, lstm, transformer]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - run: uv sync --frozen --group research
+      - uses: actions/download-artifact@v8
+        with:
+          name: prepared
+          path: out/prepared
+      - name: Walk-forward (${{ matrix.method }})
+        run: >
+          uv run --group research python -m fp.research.methods run
+          --method ${{ matrix.method }} --prepared out/prepared --out out/preds
+      - uses: actions/upload-artifact@v7
+        with:
+          name: methods-${{ matrix.method }}
+          path: out/preds/
+          retention-days: 30
+
+  model-form:
+    needs: [prepare, form]
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      matrix:
+        method: [arima_multinomial, arima_lightgbm, prophet_multinomial, prophet_lightgbm]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - run: uv sync --frozen --group research
+      - uses: actions/download-artifact@v8
+        with:
+          name: prepared
+          path: out/prepared
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: form-*
+          path: out/form
+          merge-multiple: true
+      - name: Walk-forward (${{ matrix.method }})
+        run: |
+          kind="${{ matrix.method }}"
+          kind="${kind%%_*}"
+          uv run --group research python -m fp.research.methods run \
+            --method ${{ matrix.method }} --prepared out/prepared \
+            --form "out/form/form_${kind}.parquet" --out out/preds
+      - uses: actions/upload-artifact@v7
+        with:
+          name: methods-${{ matrix.method }}
+          path: out/preds/
+          retention-days: 30
+
+  score:
+    needs: [prepare, model-base, model-form]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - run: uv sync --frozen --group research
+      - uses: actions/download-artifact@v8
+        with:
+          name: prepared
+          path: out/prepared
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: methods-*
+          path: out/preds
+          merge-multiple: true
+      - name: Score the pre-registered checks
+        run: >
+          uv run --group research python scripts/backtest_methods.py --preds out/preds
+          --matches out/prepared/matches.parquet
+          --report out/results/methods_hda_backtest_2026_10.md
+          --results out/results/methods_results_2026_10.json
+          --predictions out/results/methods_walkforward_2021_2025.parquet
+      - name: Keep the settings chosen by cross-validation
+        if: always()
+        run: mkdir -p out/results && cp out/preds/*_cv.parquet out/results/ || true
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: methods-results
+          path: out/results/
+          retention-days: 90

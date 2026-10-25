@@ -29,10 +29,12 @@ def pre_match_elo(matches: pd.DataFrame) -> pd.DataFrame:
     for league in leagues.codes_in(matches["league"]):
         lg = matches[matches["league"] == league].sort_values("kickoff_utc")
         tracker = elo.EloTracker(lg, season_teams(matches, league))
-        for r in lg.itertuples():
-            tracker.advance_to(r.kickoff_utc)
-            tracker.ensure_season(int(r.season))
-            out.append((r.match_id, tracker.ratings[r.home_id], tracker.ratings[r.away_id]))
+        cols = zip(lg["match_id"], lg["kickoff_utc"], lg["season"], lg["home_id"],
+                   lg["away_id"], strict=True)
+        for match_id, kickoff, season, home, away in cols:
+            tracker.advance_to(pd.Timestamp(kickoff))
+            tracker.ensure_season(int(season))
+            out.append((str(match_id), tracker.ratings[str(home)], tracker.ratings[str(away)]))
     return pd.DataFrame(out, columns=["match_id", "home_elo", "away_elo"]).set_index("match_id")
 
 

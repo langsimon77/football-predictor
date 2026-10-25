@@ -13,7 +13,7 @@ keeping the best pass. Five seeds (1 to 5) are trained and their probabilities a
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from functools import lru_cache
+from functools import cache
 from typing import Any
 
 import jax
@@ -145,7 +145,7 @@ def _cross_entropy(logits: Any, y: Any) -> Any:
     return -jnp.take_along_axis(logp, y[:, None], axis=1).mean()
 
 
-@lru_cache(maxsize=None)
+@cache
 def _compiled(kind: str) -> tuple[Any, Any, Any]:
     """Jitted training step, held-back loss and prediction for one network kind."""
 

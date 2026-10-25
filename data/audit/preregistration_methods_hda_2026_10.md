@@ -135,6 +135,19 @@ Details the plan left open, fixed now; no check, grid, season or threshold chang
    2022/23, both stacks use cross-fitted forecasts (weights from the other season), Phase 4's
    rule, so no candidate is judged on a season that set its own weights.
 
+7. **A failed ARIMA fit is skipped** (added 25 Oct 2026, still before any method was
+   scored, after a trial on 2017/18 and 2018/19 only). "Failed" means: the optimiser did not
+   converge, an AR or MA root lies within 0.001 of the unit circle, or the error variance is
+   more than 100 times the series' own. Reason: in the trial, one broken fit (West Ham,
+   August 2017, order (2, 0, 1), variance 1.29 million) reported an AIC of 10.0, won the AIC
+   choice and forecast minus 390 goals. The AIC rule itself is unchanged.
+8. **Prophet's yearly pattern follows Prophet's own default** (added 25 Oct 2026, same
+   trial, before any method was scored): it is used once a club's history spans two years,
+   instead of always. Reason: forced on with one season of history (and an empty summer),
+   Prophet forecast from minus 442 to plus 316 goals or shots on target in the 2017/18
+   trial; with its default rule the 2017/18 and 2018/19 trial forecasts ran from minus 0.6
+   to 11.2. Weekly and daily patterns stay off.
+
 ## 6. Not in this plan
 
 - Goal lines, corners, cards, Serie A and Ligue 1, the Champions League and the Europa and
