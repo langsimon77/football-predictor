@@ -1,1 +1,1262 @@
-[]
+[
+{
+"match_id": "UEL_2627_milan_ferencvaros_2026-11-05",
+"lg": "Europa League",
+"h": "Milan",
+"a": "Ferencv\u00e1ros",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 4",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Milan win",
+"p": 0.6191,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.5464,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.5126,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UEL_2627_sparta_praha_bournemouth_2026-11-05",
+"lg": "Europa League",
+"h": "Sparta Prague",
+"a": "Bournemouth",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 4",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "A",
+"label": "Bournemouth win",
+"p": 0.6584,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.6541,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.5775,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UEL_2627_crystal_palace_hoffenheim_2026-11-05",
+"lg": "Europa League",
+"h": "Crystal Palace",
+"a": "TSG Hoffenheim",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 4",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Crystal Palace win",
+"p": 0.6487,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.6844,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.6149,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UEL_2627_lillestrom_viktoria_plzen_2026-11-05",
+"lg": "Europa League",
+"h": "Lillestr\u00f8m",
+"a": "Viktoria Plze\u0148",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 4",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "A",
+"label": "Viktoria Plze\u0148 win",
+"p": 0.4407,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.5125,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.5515,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UEL_2627_nec_nijmegen_omonia_2026-11-05",
+"lg": "Europa League",
+"h": "NEC",
+"a": "Omonia",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 4",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "NEC win",
+"p": 0.4083,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.6071,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.6312,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UEL_2627_levski_sofia_jagiellonia_bialystok_2026-11-05",
+"lg": "Europa League",
+"h": "Levski Sofia",
+"a": "Jagiellonia Bia\u0142ystok",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 4",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "A",
+"label": "Jagiellonia Bia\u0142ystok win",
+"p": 0.3917,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G<2.5",
+"label": "Under 2.5 goals",
+"p": 0.5935,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "NoBTTS",
+"label": "Both score: no",
+"p": 0.5338,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UEL_2627_real_sociedad_lyon_2026-11-05",
+"lg": "Europa League",
+"h": "Real Sociedad",
+"a": "Lyon",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 4",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "A",
+"label": "Lyon win",
+"p": 0.4127,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.5902,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.6165,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UEL_2627_anderlecht_salzburg_2026-11-05",
+"lg": "Europa League",
+"h": "Anderlecht",
+"a": "Red Bull Salzburg",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 4",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Anderlecht win",
+"p": 0.4662,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.6226,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.634,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UEL_2627_rennes_olympiacos_2026-11-05",
+"lg": "Europa League",
+"h": "Rennes",
+"a": "Olympiacos",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 4",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Rennes win",
+"p": 0.4299,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G<2.5",
+"label": "Under 2.5 goals",
+"p": 0.583,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "NoBTTS",
+"label": "Both score: no",
+"p": 0.5267,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UEL_2627_az_juventus_2026-11-05",
+"lg": "Europa League",
+"h": "AZ",
+"a": "Juventus",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 4",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "A",
+"label": "Juventus win",
+"p": 0.5274,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.5367,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.5464,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UEL_2627_bayer_leverkusen_marseille_2026-11-05",
+"lg": "Europa League",
+"h": "Bayer Leverkusen",
+"a": "Marseille",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 4",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Bayer Leverkusen win",
+"p": 0.5677,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.6621,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.6423,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UEL_2627_celtic_besiktas_2026-11-05",
+"lg": "Europa League",
+"h": "Celtic",
+"a": "Be\u015fikta\u015f",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 4",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Celtic win",
+"p": 0.4773,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.6059,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.6204,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UEL_2627_hapoel_beer_sheva_ofi_2026-11-05",
+"lg": "Europa League",
+"h": "Hapoel Be'er Sheva",
+"a": "OFI",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 4",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Hapoel Be'er Sheva win",
+"p": 0.3982,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G<2.5",
+"label": "Under 2.5 goals",
+"p": 0.6911,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "NoBTTS",
+"label": "Both score: no",
+"p": 0.6173,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UEL_2627_celta_vigo_union_saint_gilloise_2026-11-05",
+"lg": "Europa League",
+"h": "Celta Vigo",
+"a": "Union SG",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 4",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Celta Vigo win",
+"p": 0.3657,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G<2.5",
+"label": "Under 2.5 goals",
+"p": 0.589,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "NoBTTS",
+"label": "Both score: no",
+"p": 0.5255,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UEL_2627_torreense_ararat_armenia_2026-11-05",
+"lg": "Europa League",
+"h": "Torreense",
+"a": "Ararat-Armenia",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 4",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Torreense win",
+"p": 0.6963,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.6534,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.535,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UEL_2627_sturm_graz_celje_2026-11-05",
+"lg": "Europa League",
+"h": "Sturm Graz",
+"a": "Celje",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 4",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Sturm Graz win",
+"p": 0.6484,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.6603,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.5933,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UEL_2627_benfica_lech_poznan_2026-11-05",
+"lg": "Europa League",
+"h": "Benfica",
+"a": "Lech Pozna\u0144",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 4",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Benfica win",
+"p": 0.7272,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.6782,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.5595,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UEL_2627_sunderland_dinamo_zagreb_2026-11-05",
+"lg": "Europa League",
+"h": "Sunderland",
+"a": "Dinamo Zagreb",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 4",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Sunderland win",
+"p": 0.677,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.523,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "NoBTTS",
+"label": "Both score: no",
+"p": 0.5573,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UECL_2627_agf_braga_2026-11-05",
+"lg": "Conference League",
+"h": "AGF",
+"a": "Braga",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 3",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "A",
+"label": "Braga win",
+"p": 0.4593,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.5523,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.5804,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UECL_2627_atalanta_kairat_2026-11-05",
+"lg": "Conference League",
+"h": "Atalanta",
+"a": "Kairat",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 3",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Atalanta win",
+"p": 0.8558,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.6187,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "NoBTTS",
+"label": "Both score: no",
+"p": 0.678,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UECL_2627_midtjylland_ajax_2026-11-05",
+"lg": "Conference League",
+"h": "Midtjylland",
+"a": "Ajax",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 3",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Midtjylland win",
+"p": 0.4708,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.6456,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.6541,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UECL_2627_thun_hearts_2026-11-05",
+"lg": "Conference League",
+"h": "Thun",
+"a": "Heart of Midlothian",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 3",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "A",
+"label": "Heart of Midlothian win",
+"p": 0.4497,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.5966,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.6183,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UECL_2627_crvena_zvezda_inter_escaldes_2026-11-05",
+"lg": "Conference League",
+"h": "Red Star Belgrade",
+"a": "Inter Escaldes",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 3",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Red Star Belgrade win",
+"p": 0.8062,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.826,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.6016,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UECL_2627_kups_gent_2026-11-05",
+"lg": "Conference League",
+"h": "KuPS",
+"a": "Gent",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 3",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "A",
+"label": "Gent win",
+"p": 0.5364,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.5202,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.5153,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UECL_2627_lincoln_red_imps_hajduk_split_2026-11-05",
+"lg": "Conference League",
+"h": "Lincoln Red Imps",
+"a": "Hajduk Split",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 3",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "A",
+"label": "Hajduk Split win",
+"p": 0.4365,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G<2.5",
+"label": "Under 2.5 goals",
+"p": 0.6017,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "NoBTTS",
+"label": "Both score: no",
+"p": 0.5547,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UECL_2627_mjallby_borac_banja_luka_2026-11-05",
+"lg": "Conference League",
+"h": "Mj\u00e4llby AIF",
+"a": "Borac Banja Luka",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 3",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Mj\u00e4llby AIF win",
+"p": 0.5117,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G<2.5",
+"label": "Under 2.5 goals",
+"p": 0.6006,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "NoBTTS",
+"label": "Both score: no",
+"p": 0.5787,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UECL_2627_trabzonspor_freiburg_2026-11-05",
+"lg": "Conference League",
+"h": "Trabzonspor",
+"a": "SC Freiburg",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 3",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "A",
+"label": "SC Freiburg win",
+"p": 0.4463,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.631,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.6464,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UECL_2627_monaco_nordsjaelland_2026-11-05",
+"lg": "Conference League",
+"h": "Monaco",
+"a": "Nordsj\u00e6lland",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 3",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Monaco win",
+"p": 0.7661,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.7655,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.6068,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UECL_2627_kobenhavn_iberia_1999_2026-11-05",
+"lg": "Conference League",
+"h": "Copenhagen",
+"a": "Iberia 1999",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 3",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Copenhagen win",
+"p": 0.8249,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.6821,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "NoBTTS",
+"label": "Both score: no",
+"p": 0.5867,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UECL_2627_lugano_kauno_zalgiris_2026-11-05",
+"lg": "Conference League",
+"h": "Lugano",
+"a": "Kauno \u017dalgiris",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 3",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Lugano win",
+"p": 0.6545,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.5509,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "NoBTTS",
+"label": "Both score: no",
+"p": 0.5245,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UECL_2627_twente_pafos_2026-11-05",
+"lg": "Conference League",
+"h": "Twente",
+"a": "Pafos",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 3",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Twente win",
+"p": 0.5997,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G<2.5",
+"label": "Under 2.5 goals",
+"p": 0.5023,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "NoBTTS",
+"label": "Both score: no",
+"p": 0.5153,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UECL_2627_getafe_brighton_hove_albion_2026-11-05",
+"lg": "Conference League",
+"h": "Getafe",
+"a": "Brighton & Hove Albion",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 3",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "A",
+"label": "Brighton & Hove Albion win",
+"p": 0.513,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G<2.5",
+"label": "Under 2.5 goals",
+"p": 0.632,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "NoBTTS",
+"label": "Both score: no",
+"p": 0.5969,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UECL_2627_sint_truiden_brann_2026-11-05",
+"lg": "Conference League",
+"h": "Sint-Truiden",
+"a": "Brann",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 3",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Sint-Truiden win",
+"p": 0.4419,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.6141,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.6335,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UECL_2627_panathinaikos_cska_sofia_2026-11-05",
+"lg": "Conference League",
+"h": "Panathinaikos",
+"a": "CSKA Sofia",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 3",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Panathinaikos win",
+"p": 0.6801,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G<2.5",
+"label": "Under 2.5 goals",
+"p": 0.5107,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "NoBTTS",
+"label": "Both score: no",
+"p": 0.5873,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UECL_2627_riga_jablonec_2026-11-05",
+"lg": "Conference League",
+"h": "Riga",
+"a": "Jablonec",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 3",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "Riga win",
+"p": 0.4046,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G>2.5",
+"label": "Over 2.5 goals",
+"p": 0.5339,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "BTTS",
+"label": "Both score: yes",
+"p": 0.5707,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+},
+{
+"match_id": "UECL_2627_universitatea_craiova_egnatia_2026-11-05",
+"lg": "Conference League",
+"h": "U Craiova",
+"a": "Egnatia",
+"kickoff": "2026-11-05T15:30Z",
+"round": "League phase, matchday 3",
+"locked_at": "2026-10-27T11:52Z",
+"model_version": "eur-1",
+"calls": [
+{
+"mkt": "result",
+"k": "H",
+"label": "U Craiova win",
+"p": 0.502,
+"result": null
+},
+{
+"mkt": "goals",
+"k": "G<2.5",
+"label": "Under 2.5 goals",
+"p": 0.5283,
+"result": null
+},
+{
+"mkt": "btts",
+"k": "NoBTTS",
+"label": "Both score: no",
+"p": 0.5003,
+"result": null
+}
+],
+"score": null,
+"settled_utc": null
+}
+]
