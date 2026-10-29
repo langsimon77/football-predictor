@@ -1,12 +1,12 @@
 # Latest predictions
 
-Updated Wed 28 Oct 2026, 08:19 Juba time. Primary model: `dc_bayes_v1` (Bayesian Dixon-Coles with shots on target). Probabilities are locked and never edited. The range after the home-win chance is the model's 80% interval. Tier: how far to trust the home, draw, away forecast, then over 2.5 goals (High, Medium, Low; see `docs/LEARN.md` chapter 4).
+Updated Thu 29 Oct 2026, 08:29 Juba time. Primary model: `dc_bayes_v1` (Bayesian Dixon-Coles with shots on target). Probabilities are locked and never edited. The range after the home-win chance is the model's 80% interval. Tier: how far to trust the home, draw, away forecast, then over 2.5 goals (High, Medium, Low; see `docs/LEARN.md` chapter 4).
 
 ## Locked, not yet played
 
 | Kickoff (Juba) | Match | Home (80% range) | Draw | Away | Tier | Over 2.5 | BTTS | Exp. goals | Exp. corners | Exp. yellows | Flags |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| none | | | | | | | | | | | |
+| Fri 30 Oct 22:00 | Villarreal v Espanyol | 66% (59% to 72%) | 20% | 14% | Low, Low | 59% | 56% | 2.1 to 0.9 | 5.9 to 4.2 | 4.2 | manager_change, shape_v1, unanswered_question |
 
 ## Scored so far
 

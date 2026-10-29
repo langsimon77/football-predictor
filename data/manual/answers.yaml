@@ -610,3 +610,15 @@
   threat_out: false
   source: 'Issue #18'
   used_at_utc: 2026-10-25T05:20Z
+- question: LaLiga_2627_villarreal_espanyol:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #20'
+  used_at_utc: 2026-10-29T06:29Z
+- question: LaLiga_2627_villarreal_espanyol:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #20'
+  used_at_utc: 2026-10-29T06:29Z
