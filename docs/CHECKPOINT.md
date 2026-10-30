@@ -8,8 +8,12 @@
   `scripts/check_ledger.py` covers it, builder `basketball_block` and `--basketball-upcoming`.
   Tests `tests/test_basketball_live.py`. Local dry run on 30 Oct: 4 NBL games in the window
   (2 late), EuroLeague round 10 not yet on Wikipedia.
+- Merged into main (CI 41116547591 green). First run on GitHub (41117082033, 30 Oct 19:42 UTC,
+  all steps green): 4 NBL games locked (2 on time, 32 and 34 hours ahead; 2 late, 13 and 15
+  hours, the step did not exist earlier). No EuroLeague game yet: Wikipedia had not listed
+  round 10. 87 upcoming NBL games had no published tip-off time.
 - Model Lab version 27 (30 Oct): refreshed; Serie A and Ligue 1 have their own League buttons.
-  Basketball section built in the private page source; published after the first GitHub run.
+  Version 28 (30 Oct): Basketball section (NBL cards now; EuroLeague when round 10 is listed).
 - Match news (25 Oct notes) covers only that gameweek; refresh it on request.
 
 ## Earlier: 22 Oct 2026, Model Lab audit (version 23) and the Europe pipeline in the repository
