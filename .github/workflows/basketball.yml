@@ -1,0 +1,85 @@
+name: Basketball forecasts
+
+on:
+  schedule:
+    # Twice a day, 12 hours apart, so every game has a run inside its 24 to 48 hour lock
+    # window even when GitHub starts a run late. 08:47 and 20:47 UTC = 10:47 and 22:47 Juba.
+    # Off the hour: GitHub delays on-the-hour jobs most.
+    - cron: "47 8,20 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run: compute everything, lock nothing, commit nothing"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write  # commit ledger/basketball
+  issues: write    # open an issue if the run fails
+
+concurrency:
+  group: daily  # shares the daily run's queue, so they never push at once
+  cancel-in-progress: false
+
+jobs:
+  basketball:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install locked dependencies
+        run: uv sync --frozen
+
+      - name: Restore cached Wikipedia pages (earlier seasons never change)
+        uses: actions/cache@v6
+        with:
+          path: data/raw
+          key: basketball-raw-${{ github.run_id }}
+          restore-keys: basketball-raw-
+
+      - name: Forecast, lock and record results
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            uv run python basketball/live.py --dry-run
+          else
+            uv run python basketball/live.py
+          fi
+
+      - name: Ledgers are append-only against the last commit
+        env:
+          BASE_SHA: HEAD
+        run: uv run python scripts/check_ledger.py
+
+      - name: No banned dash characters
+        run: uv run python scripts/check_dashes.py
+
+      - name: Commit the basketball ledger
+        if: env.DRY_RUN != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ledger/basketball
+          if git diff --cached --quiet; then
+            echo "Nothing new."
+          else
+            git commit -m "Basketball run $(date -u +%F): lock forecasts, record results"
+            git pull --rebase
+            git push
+          fi
+
+      - name: Open an issue if the run failed
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "Basketball run failed: $(date -u +%F)" \
+            --body "Football runs are not affected. Log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

@@ -425,6 +425,38 @@ def euro_blocks(path: Path, pairs: dict) -> dict:
     return {"uel": e["uel"], "uecl": e["uecl"]}
 
 
+BASKETBALL_UPCOMING = ROOT / "ledger" / "basketball" / "upcoming.parquet"
+BASKETBALL_TESTS = ROOT / "data" / "basketball" / "b1_results.json"
+
+
+def basketball_block(path: Path, tests: Path = BASKETBALL_TESTS) -> dict | None:
+    """EuroLeague and NBL (basketball/live.py, Lang approved 30 Oct 2026): cards only, for
+    the markets that passed their B1 test. Winner chances, and for the EuroLeague the
+    margin and total-points bell curves (mean and width), so the page can price any line."""
+    if not path.exists():
+        return None
+    up = pd.read_parquet(path)
+    num = lambda v: None if pd.isna(v) else round(float(v), 3)  # noqa: E731
+    rows = [{"id": r.game_id, "lg": r.league, "round": r.round,
+             "kickoff": (f"{pd.Timestamp(r.tip_utc):%Y-%m-%dT%H:%MZ}" if pd.notna(r.tip_utc)
+                         else None),
+             "date": str(r.date), "h": r.home_name, "a": r.away_name, "locked": bool(r.locked),
+             "p": round(float(r.p_home), 4),
+             "margin": ([num(r.margin_mean), num(r.margin_sd)] if pd.notna(r.margin_mean)
+                        else None),
+             "total": [num(r.total_mean), num(r.total_sd)] if pd.notna(r.total_mean) else None}
+            for r in up.itertuples()]
+    test = {}
+    if tests.exists():
+        res = json.loads(tests.read_text(encoding="utf-8"))
+        for lg in ("EuroLeague", "NBL"):
+            c = res[lg]["checks"]
+            test[lg] = {"games": res[lg]["test_games"], "acc": round(c["L"]["accuracy"]["elo"], 3),
+                        "seasons": "2022/23 to 2025/26" if lg == "EuroLeague"
+                        else "2023/24 to 2025/26"}
+    return {"rows": rows, "as_of": as_of_text(up), "test": test}
+
+
 def simulator_block(matches: pd.DataFrame, fixtures: pd.DataFrame, names: dict[str, int],
                     now: pd.Timestamp) -> dict:
     second = pd.read_parquet(PROCESSED / "second_tier.parquet")
@@ -549,6 +581,8 @@ def main(argv: list[str] | None = None) -> int:
                     help="Serie A and Ligue 1 forecasts (written by fp.pipeline.trial)")
     ap.add_argument("--ucl-upcoming", type=Path, default=UCL_UPCOMING,
                     help="Champions League forecasts (written by fp.pipeline.ucl)")
+    ap.add_argument("--basketball-upcoming", type=Path, default=BASKETBALL_UPCOMING,
+                    help="EuroLeague and NBL forecasts (written by basketball/live.py)")
     ap.add_argument("--bets-json", type=Path, default=None,
                     help="optional private betting-record summary, kept outside this repository")
     args = ap.parse_args(argv)
@@ -597,6 +631,7 @@ def main(argv: list[str] | None = None) -> int:
                              pairs_lab.bookmaker(odds_files[-1] if odds_files else None)),
         "ucl": ucl_block(args.ucl_upcoming, short, pairs),
         **euro_blocks(EURO_GAMEWEEK, pairs),
+        "basketball": basketball_block(args.basketball_upcoming),
         "sim": simulator_block(matches, fixtures, names, now),
         "ev": evidence_block(),
     }

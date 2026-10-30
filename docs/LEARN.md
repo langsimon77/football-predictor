@@ -788,3 +788,26 @@ As always, I wrote the rules first (`data/audit/preregistration_ucl_2026_10.md`)
 ### 12.4 What you see
 
 The Champions League now appears in Predictions and Pairs, for the markets the test covered: home, draw, away (so double chance and draw no bet too) and goal lines. Corners and cards are not shown: no free source has Champions League corners or cards to test them. Each pick has its own safety margin from Champions League history. Double chance has no reliable margin there (its safe chances failed the check), so it is flagged. A few clubs (Shakhtar, Slavia, Sabah and Slovan) come from leagues with no free domestic results. They are rated from European matches only, and their cards say so. Treat those forecasts with more caution.
+
+## Chapter 13: Basketball forecasts
+
+### 13.1 No draws, and a spread of outcomes
+
+A basketball game has no draw: overtime decides it. So a forecast is one number for the winner
+(say, Barcelona 56%). For the handicap and the total, the model gives a middle value and a
+width: Barcelona by about 2 points, total about 178, and 90% of games land within about 20
+points of the middle for the margin and 28 for the total. With that bell curve, any line can be
+priced. If Gal offers Barcelona -5.5, the chance they win by 6 or more is about 37%.
+
+### 13.2 Why the NBL shows the winner only
+
+The tests in phase B1 passed for the NBL winner but not for its handicap (the ranges were too
+narrow: 85% of results fell inside a range meant to hold 90%) or its total (no better than a
+plain average). Showing those would be showing numbers we cannot stand behind.
+
+### 13.3 Locking, and the data's limits
+
+Basketball forecasts lock like football: 24 to 48 hours before tip-off, into a record that can
+only grow. The only free source is Wikipedia, which lists EuroLeague rounds shortly before they
+are played and sometimes adds NBL tip-off times late. So the step runs twice a day, and a game
+locks only once its time is known. Some games will lock late or not at all; those are flagged.
