@@ -1,6 +1,18 @@
 # Checkpoint
 
-## Latest: 22 Oct 2026, Model Lab audit (version 23) and the Europe pipeline in the repository
+## Latest: 30 Oct 2026, basketball live forecasts (B3 and B4); Ligue 1 button
+
+- Lang: "Approved: build it" (30 Oct). Branch `basketball-live`: `basketball/live.py` (EuroLeague
+  winner, handicap, total; NBL winner), `basketball/ledger_bb.py` (own hash-chained ledger
+  `ledger/basketball/`), `.github/workflows/basketball.yml` (08:47 and 20:47 UTC),
+  `scripts/check_ledger.py` covers it, builder `basketball_block` and `--basketball-upcoming`.
+  Tests `tests/test_basketball_live.py`. Local dry run on 30 Oct: 4 NBL games in the window
+  (2 late), EuroLeague round 10 not yet on Wikipedia.
+- Model Lab version 27 (30 Oct): refreshed; Serie A and Ligue 1 have their own League buttons.
+  Basketball section built in the private page source; published after the first GitHub run.
+- Match news (25 Oct notes) covers only that gameweek; refresh it on request.
+
+## Earlier: 22 Oct 2026, Model Lab audit (version 23) and the Europe pipeline in the repository
 
 - 25 Oct 2026, basketball phase B2 (challengers) built, tested and merged into main (Lang approved the plan and the results): of 42 comparisons (7 challengers, 3 markets, 2 leagues) only the points model with a home edge per club passes, for EuroLeague total points (-0.054 CRPS, 99% range -0.096 to -0.014, better in all 4 test seasons); random forest, XGBoost, histogram boosting, regression, a small neural network and Kalman ratings were no better than Elo and the points model, several clearly worse. The NBL width idea is judged on 2026/27 games once 100 are played. Report `reports/basketball_b2_challengers_2026_10.md`. Next: B3 and B4, and B0-D2 (NBA lock rule), each waiting for Lang.
 - 24 Oct 2026, basketball phase B1 built, tested and merged into main on 25 Oct (Lang approved the plan and the results): by the pre-registered rules, EuroLeague winner, handicap and total points pass, and NBL winner passes; NBL handicap fails calibration (84.9% of results inside its 90% range) and NBL totals show no clear gain over a simple average. Elo is kept over the points model for winner and handicap in both leagues. No market benchmark (no free odds). Report `reports/basketball_b1_backtest_2026_10.md`. Next: B2 (challengers, NBL handicap width) and B0-D2 (NBA lock rule), each waiting for Lang.

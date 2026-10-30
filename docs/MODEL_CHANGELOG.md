@@ -47,3 +47,25 @@ Holm correction for five tries). Nothing changes. The new-club Elo start is a le
 (uncorrected interval -0.0055 to -0.0002 on 63 thin-data matches); proposed next: a
 pre-registered replication on the next 300 European matches. Bookmaker benchmark (domestic,
 13,038 matches): the bookmakers beat the goals model by 0.022 log loss.
+
+## 30 Oct 2026: Basketball live forecasts (phases B3 and B4)
+
+Approved by Lang ("Approved: build it", 30 Oct 2026). Model `bb_b1_v1`, the B1 settings
+(`data/basketball/b1_settings.json`, fixed before the tests).
+
+- B3, the model per market (by the B1 and B2 results): EuroLeague winner and handicap from Elo;
+  EuroLeague total points from the B1 points model (C7 from B2 is watched on 2026/27 games
+  before any switch); NBL winner from Elo. NBL handicap and totals failed their B1 tests and
+  are not shown.
+- B4, the live run: `basketball/live.py`, twice a day (`.github/workflows/basketball.yml`, 08:47
+  and 20:47 UTC). It reads this season's games from Wikipedia, fits on every game played so far,
+  locks each game 24 to 48 hours before tip-off (never within an hour of it) into its own
+  hash-chained ledger `ledger/basketball/` (own columns: home win chance, and the margin and
+  total bell curves), records results, and writes `ledger/basketball/upcoming.parquet`. A game
+  locks only once Wikipedia shows its tip-off time.
+- Model Lab: a Basketball section in Predictions. EuroLeague cards give the margin and total
+  ranges and price any handicap or total line Lang types. No tested safety margin; not in Pairs
+  or the slip pages.
+- Evidence: `reports/basketball_b1_backtest_2026_10.md` (EuroLeague 1,293 test games, favourite
+  won 66%, calibration slope 0.99, 90% ranges held 90.3% of margins and 90.9% of totals; NBL
+  450 games, favourite won 62%). Tests: `tests/test_basketball_live.py`.
