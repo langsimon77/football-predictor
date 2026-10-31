@@ -15,6 +15,7 @@
 - Model Lab version 27 (30 Oct): refreshed; Serie A and Ligue 1 have their own League buttons.
   Version 28 (30 Oct): Basketball section (NBL cards now; EuroLeague when round 10 is listed).
 - Match news (25 Oct notes) covers only that gameweek; refresh it on request.
+- Model Lab version 29 (31 Oct): "My slips (upload)" in the Slip finder (private page source, `src/js/myslips.js`).
 
 ## Earlier: 22 Oct 2026, Model Lab audit (version 23) and the Europe pipeline in the repository
 
