@@ -730,3 +730,63 @@
   threat_out: false
   source: 'Issue #21'
   used_at_utc: 2026-10-30T06:28Z
+- question: EPL_2627_liverpool_arsenal:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #22'
+  used_at_utc: 2026-10-31T06:19Z
+- question: EPL_2627_liverpool_arsenal:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #22'
+  used_at_utc: 2026-10-31T06:19Z
+- question: LaLiga_2627_athletic_bilbao_real_sociedad:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #22'
+  used_at_utc: 2026-10-31T06:19Z
+- question: LaLiga_2627_athletic_bilbao_real_sociedad:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #22'
+  used_at_utc: 2026-10-31T06:19Z
+- question: LaLiga_2627_elche_valencia:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #22'
+  used_at_utc: 2026-10-31T06:19Z
+- question: LaLiga_2627_elche_valencia:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #22'
+  used_at_utc: 2026-10-31T06:19Z
+- question: LaLiga_2627_getafe_sevilla:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #22'
+  used_at_utc: 2026-10-31T06:19Z
+- question: LaLiga_2627_getafe_sevilla:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #22'
+  used_at_utc: 2026-10-31T06:19Z
+- question: LaLiga_2627_racing_santander_real_madrid:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #22'
+  used_at_utc: 2026-10-31T06:19Z
+- question: LaLiga_2627_racing_santander_real_madrid:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #22'
+  used_at_utc: 2026-10-31T06:19Z
