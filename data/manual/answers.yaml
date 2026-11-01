@@ -790,3 +790,27 @@
   threat_out: false
   source: 'Issue #22'
   used_at_utc: 2026-10-31T06:19Z
+- question: EPL_2627_newcastle_everton:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #23'
+  used_at_utc: 2026-11-01T06:52Z
+- question: EPL_2627_newcastle_everton:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #23'
+  used_at_utc: 2026-11-01T06:52Z
+- question: LaLiga_2627_deportivo_la_coruna_osasuna:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #23'
+  used_at_utc: 2026-11-01T06:52Z
+- question: LaLiga_2627_deportivo_la_coruna_osasuna:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #23'
+  used_at_utc: 2026-11-01T06:52Z
