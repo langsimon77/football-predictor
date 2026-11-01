@@ -59,5 +59,22 @@ Any change to model structure, features, or code that affects forecasts is propo
 <!-- live-record:start -->
 ## Live record, 2026/27
 
-No locked forecast scored yet (as of 01 Oct 2026).
+Updated by the monthly run on 01 Nov 2026 [V: ledger]. Home, draw, away; lower is better.
+
+| forecast | matches | rps | log_loss |
+|---|---|---|---|
+| Published (Bayesian) | 69 | 0.1870 | 0.9461 |
+| Elo | 69 | 0.1856 | 0.9419 |
+| Base rates | 69 | 0.2224 | 1.0567 |
+| Stack (shadow) | 69 | 0.1904 | 0.9546 |
+| Market, Friday | 56 | 0.1714 | 0.9097 |
+| Market, closing | 56 | 0.1676 | 0.8942 |
+
+Confidence tiers (published forecast):
+
+| tier | matches | promised | won |
+|---|---|---|---|
+| High | 2 | 0.6978 | 1.0000 |
+| Low | 38 | 0.4310 | 0.4211 |
+| Medium | 29 | 0.5611 | 0.7241 |
 <!-- live-record:end -->
