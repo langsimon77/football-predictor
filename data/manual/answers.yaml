@@ -814,3 +814,27 @@
   threat_out: false
   source: 'Issue #23'
   used_at_utc: 2026-11-01T06:52Z
+- question: EPL_2627_everton_coventry:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #25'
+  used_at_utc: 2026-11-05T07:25Z
+- question: EPL_2627_everton_coventry:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #25'
+  used_at_utc: 2026-11-05T07:25Z
+- question: LaLiga_2627_sevilla_alaves:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #25'
+  used_at_utc: 2026-11-05T07:25Z
+- question: LaLiga_2627_sevilla_alaves:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #25'
+  used_at_utc: 2026-11-05T07:25Z
