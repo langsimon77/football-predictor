@@ -1,6 +1,6 @@
-# Champions League: 2026-11-08 06:52 UTC
+# Champions League: 2026-11-09 07:19 UTC
 
 Model `club_dc_v1` (passed its pre-registered test, `reports/ucl_backtest_2026_10.md`). Markets: home, draw, away and goal lines.
 
 - Matches locked so far: 36
-- Fit: 18116 results, 602 clubs, converged True
+- Fit: 18060 results, 602 clubs, converged True
