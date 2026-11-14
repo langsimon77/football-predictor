@@ -25,7 +25,7 @@ EuroLeague winner, handicap and total points; NBL winner). B5 (14 Nov 2026) adde
 | `ledger_bb.py` | B4: the append-only, hash-chained ledger of locked forecasts (`ledger/basketball/`). |
 | `more_leagues.py` | B5: the ACB, LBA and ABA game tables from Spanish, Italian and Serbian Wikipedia (plus the ACB's API-Basketball test history). Writes `data/processed/basketball/games_more.parquet` and `data/basketball/b5_data_summary.json`. |
 | `backtest_more.py` | B5: `tune`, `test` and `seed` for those three leagues (`data/basketball/b5_*.json`). |
-| `live.py` | B4: the twice-daily run (`.github/workflows/basketball.yml`): this season from Wikipedia, fit, lock 24 to 48 hours before tip-off, results, `ledger/basketball/upcoming.parquet` for the Model Lab. |
+| `live.py` | B4: the four-times-daily run (`.github/workflows/basketball.yml`): this season from Wikipedia, fit, lock 24 to 48 hours before tip-off, results, `ledger/basketball/upcoming.parquet` for the Model Lab. |
 
 Run order: `uv run python basketball/data.py`, then `basketball/backtest.py tune` and
 `basketball/backtest.py test` (add `--offline` to the data step to use cached copies).

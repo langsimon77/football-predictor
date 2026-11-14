@@ -5,7 +5,7 @@ on:
     # Twice a day, 12 hours apart, so every game has a run inside its 24 to 48 hour lock
     # window even when GitHub starts a run late. 08:47 and 20:47 UTC = 10:47 and 22:47 Juba.
     # Off the hour: GitHub delays on-the-hour jobs most.
-    - cron: "47 8,20 * * *"
+    - cron: "47 2,8,14,20 * * *"  # four a day: GitHub often starts scheduled runs hours late
   workflow_dispatch:
     inputs:
       dry_run:
@@ -52,6 +52,10 @@ jobs:
           else
             uv run python basketball/live.py
           fi
+
+      - name: Model Lab feed (ledger/basketball/page_feed.json)
+        if: env.DRY_RUN != 'true'
+        run: uv run python scripts/basketball_feed.py
 
       - name: Ledgers are append-only against the last commit
         env:
