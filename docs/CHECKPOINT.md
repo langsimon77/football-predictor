@@ -12,6 +12,14 @@
   `basketball/backtest_more.py tune|test|seed`.
 - Open for Lang: paid data for the other leagues (about $15 a month [E]); a winner fix for the
   LBA and ABA, tested on the games locked from 14 Nov; EuroCup and FIBA Champions League.
+- Model Lab version 49 (14 Nov): merged onto the live page, which had a second basketball
+  pipeline built outside this repository (NBA, Turkish BSL, CBA from betexplorer.com; Gal odds;
+  its own data/basketball.json). Our five leagues (EuroLeague, NBL, ACB, LBA, ABA) replace that
+  pipeline's rows for the same leagues. Merge kit: football-lab tools/merge_live/.
+- Live refresh: the workflow writes ledger/basketball/page_feed.json after each run (now four
+  scheduled runs a day: GitHub starts them hours late). The routine "Refresh Model Lab
+  basketball" (trig_01G7zzE6WV2mqJMkNksApAJb, 03:30, 09:30, 15:30, 21:30 UTC) copies it into
+  the page's database, document live/basketball; the page reads it on open and redraws.
 
 ## Earlier: 30 Oct 2026, basketball live forecasts (B3 and B4); Ligue 1 button
 
