@@ -1,4 +1,4 @@
-# Basketball: 2026-11-13 16:43 UTC
+# Basketball: 2026-11-14 01:02 UTC
 
 Model `bb_b1_v1` (B1 settings; reports/basketball_b1_backtest_2026_10.md). EuroLeague: winner, handicap, total points. NBL: winner.
 
