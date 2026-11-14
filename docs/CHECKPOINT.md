@@ -1,6 +1,19 @@
 # Checkpoint
 
-## Latest: 30 Oct 2026, basketball live forecasts (B3 and B4); Ligue 1 button
+## Latest: 14 Nov 2026, basketball in three more leagues (B5)
+
+- Lang asked (third time) for ten more basketball leagues; chose "Stay free ($0)". Live from
+  14 Nov: Liga ACB (winner, handicap), Lega Basket Serie A and the ABA League (handicap, total
+  points; dates only). Not possible for free: Turkey, Greece, France, Germany, VTB, China,
+  Japan. Report `reports/basketball_more_leagues_2026_11.md`; code `basketball/more_leagues.py`,
+  `basketball/backtest_more.py`; tests `tests/test_basketball_more.py`.
+- To rerun the test: `basketball/more_leagues.py` (needs the cached API-Basketball files in
+  `data/raw/apisports_basketball/`, or `API_FOOTBALL_KEY` for 3 requests), then
+  `basketball/backtest_more.py tune|test|seed`.
+- Open for Lang: paid data for the other leagues (about $15 a month [E]); a winner fix for the
+  LBA and ABA, tested on the games locked from 14 Nov; EuroCup and FIBA Champions League.
+
+## Earlier: 30 Oct 2026, basketball live forecasts (B3 and B4); Ligue 1 button
 
 - Lang: "Approved: build it" (30 Oct). Branch `basketball-live`: `basketball/live.py` (EuroLeague
   winner, handicap, total; NBL winner), `basketball/ledger_bb.py` (own hash-chained ledger

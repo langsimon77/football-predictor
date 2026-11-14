@@ -7,6 +7,7 @@
    "left_out": 0,
    "with_time": 0,
    "clubs": 14,
+   "listed_twice": [],
    "source": [
     "sr.wikipedia"
    ]
@@ -17,6 +18,7 @@
    "left_out": 0,
    "with_time": 0,
    "clubs": 14,
+   "listed_twice": [],
    "source": [
     "sr.wikipedia"
    ]
@@ -27,6 +29,7 @@
    "left_out": 0,
    "with_time": 0,
    "clubs": 16,
+   "listed_twice": [],
    "source": [
     "sr.wikipedia"
    ]
@@ -37,6 +40,7 @@
    "left_out": 0,
    "with_time": 0,
    "clubs": 18,
+   "listed_twice": [],
    "source": [
     "sr.wikipedia"
    ]
@@ -47,6 +51,7 @@
    "left_out": 0,
    "with_time": 0,
    "clubs": 20,
+   "listed_twice": [],
    "source": [
     "sr.wikipedia"
    ]
@@ -57,6 +62,7 @@
    "left_out": 0,
    "with_time": 306,
    "clubs": 18,
+   "listed_twice": [],
    "source": [
     "api-basketball"
    ]
@@ -67,6 +73,7 @@
    "left_out": 0,
    "with_time": 306,
    "clubs": 18,
+   "listed_twice": [],
    "source": [
     "api-basketball"
    ]
@@ -77,6 +84,7 @@
    "left_out": 0,
    "with_time": 306,
    "clubs": 18,
+   "listed_twice": [],
    "source": [
     "api-basketball"
    ]
@@ -87,6 +95,7 @@
    "left_out": 0,
    "with_time": 306,
    "clubs": 18,
+   "listed_twice": [],
    "source": [
     "es.wikipedia"
    ]
@@ -97,6 +106,9 @@
    "left_out": 0,
    "with_time": 297,
    "clubs": 18,
+   "listed_twice": [
+    "ACB_202627_club_baloncesto_san_pablo_burgos_club_baloncesto_breogan_2"
+   ],
    "source": [
     "es.wikipedia"
    ]
@@ -107,6 +119,7 @@
    "left_out": 0,
    "with_time": 0,
    "clubs": 16,
+   "listed_twice": [],
    "source": [
     "it.wikipedia"
    ]
@@ -117,6 +130,9 @@
    "left_out": 0,
    "with_time": 0,
    "clubs": 16,
+   "listed_twice": [
+    "LBA_202324_virtus_bologna_derthona_tortona_2"
+   ],
    "source": [
     "it.wikipedia"
    ]
@@ -127,6 +143,7 @@
    "left_out": 0,
    "with_time": 0,
    "clubs": 16,
+   "listed_twice": [],
    "source": [
     "it.wikipedia"
    ]
@@ -137,6 +154,7 @@
    "left_out": 15,
    "with_time": 0,
    "clubs": 16,
+   "listed_twice": [],
    "source": [
     "it.wikipedia"
    ]
@@ -147,6 +165,7 @@
    "left_out": 0,
    "with_time": 0,
    "clubs": 16,
+   "listed_twice": [],
    "source": [
     "it.wikipedia"
    ]

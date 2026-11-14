@@ -811,3 +811,14 @@ Basketball forecasts lock like football: 24 to 48 hours before tip-off, into a r
 only grow. The only free source is Wikipedia, which lists EuroLeague rounds shortly before they
 are played and sometimes adds NBL tip-off times late. So the step runs twice a day, and a game
 locks only once its time is known. Some games will lock late or not at all; those are flagged.
+
+### 13.4 More leagues, and why a cautious model is still hidden
+
+In November 2026 Spain, Italy and the Adriatic League joined, each tested on two past seasons
+first. In Italy and the Adriatic League the winner chances failed one check in an unusual way:
+they were too cautious. Favourites the model gave 80% to 90% won 93% of the time. That sounds
+like good news, but a forecast is useful only if its numbers mean what they say: a "75%" that
+really wins 85% of the time makes you skip good bets and misjudge your slips. So those winner
+chances stay hidden until a fix is tested, while the handicap and total ranges, which passed,
+are shown. Seven other leagues have no free source that lists coming games, so they cannot
+be forecast at all without paid data.

@@ -1,5 +1,6 @@
-"""Basketball phase B4: daily EuroLeague and NBL forecasts (Lang: "Approved: build it",
-30 Oct 2026).
+"""Basketball phases B4 and B5: daily forecasts for the EuroLeague and the NBL (Lang:
+"Approved: build it", 30 Oct 2026), and from 14 Nov 2026 for the ACB (Spain), the LBA (Italy)
+and the ABA League (Lang asked for them; data/audit/preregistration_basketball_b5_2026_11.md).
 
 Each run:
 1. Reads this season's games from Wikipedia (basketball/data.py; earlier seasons come from
@@ -10,12 +11,17 @@ Each run:
    - handicap (margin), EuroLeague: Elo's margin line, width from the tuning seasons;
    - total points, EuroLeague: the points model, width from the tuning seasons.
    NBL handicap and totals failed their tests (reports/basketball_b1_backtest_2026_10.md),
-   so the NBL shows the winner only.
+   so the NBL shows the winner only. B5 (reports/basketball_more_leagues_2026_11.md): ACB
+   winner and handicap; LBA and ABA handicap and total points (their winner chances were too
+   cautious in testing, so they are locked but not shown). Settings in
+   data/basketball/b5_settings.json; the ACB's Elo starts from data/basketball/b5_seed_ratings.json.
 3. Locks the forecast of every game 24 to 48 hours before tip-off into its own hash-chained
    ledger (ledger/basketball/), records the results of locked games, and writes
    ledger/basketball/upcoming.parquet for the Model Lab.
 
-A game needs a tip-off time to lock, and is not locked within an hour of it. Wikipedia
+A game needs a tip-off time to lock, and is not locked within an hour of it. The LBA and the
+ABA publish dates only: their stand-in tip-off is 00:00 local time on the first possible day
+(more_leagues.py), so they lock a day or more before the real game. Wikipedia
 lists EuroLeague rounds shortly before they are played and adds NBL times late in some
 weeks, so some games lock late (flagged) or not at all. Nothing here touches a football
 file.
@@ -40,6 +46,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).parent))
 
 import ledger_bb  # noqa: E402
+import more_leagues  # noqa: E402
 from audit_sample import CURRENT  # noqa: E402
 from models import (  # noqa: E402
     EloSettings,
@@ -63,12 +70,16 @@ RESULTS = DIR / "results.parquet"
 UPCOMING = DIR / "upcoming.parquet"
 REPORT = DIR / "latest.md"
 SETTINGS = ROOT / "data" / "basketball" / "b1_settings.json"
+SETTINGS_B5 = ROOT / "data" / "basketball" / "b5_settings.json"
+SEEDS = ROOT / "data" / "basketball" / "b5_seed_ratings.json"
 MODEL = "bb_b1_v1"
 HORIZON_DAYS = 8
 # A game this close to tip-off is not locked at all: Wikipedia times can be off by minutes.
 MIN_LEAD = pd.Timedelta(hours=1)
 # B3: the markets each league shows (the ones whose B1 test passed).
-MARKETS = {"EuroLeague": ("winner", "handicap", "total"), "NBL": ("winner",)}
+MARKETS = {"EuroLeague": ("winner", "handicap", "total"), "NBL": ("winner",),
+           "ACB": ("winner", "handicap"), "LBA": ("handicap", "total"),
+           "ABA": ("handicap", "total")}
 # Display names: Wikipedia titles without the club-type words.
 SHORT = {
     "Anadolu Efes S.K.": "Anadolu Efes", "ASVEL Basket": "ASVEL", "BC Žalgiris": "Žalgiris",
@@ -83,7 +94,7 @@ SHORT = {
 }
 UPCOMING_COLUMNS = ["game_id", "league", "round", "date", "tip_utc", "home_name", "away_name",
                     "locked", "lock_utc", "p_home", "margin_mean", "margin_sd", "total_mean",
-                    "total_sd", "as_of_utc", "model_version"]
+                    "total_sd", "as_of_utc", "model_version", "date_only", "markets"]
 
 
 def short_name(title: str) -> str:
@@ -102,11 +113,17 @@ class Context:
     upcoming_path: Path | None = UPCOMING
     report_path: Path | None = REPORT
     fits: dict = field(default_factory=dict)
+    seeds: dict = field(default_factory=dict)
 
 
 def load_context(offline: bool) -> Context:
     games, _ = bb_data.build(offline)
-    return Context(games=games, settings=json.loads(SETTINGS.read_text(encoding="utf-8")))
+    more, _ = more_leagues.build(offline, history=False)  # Wikipedia only, never the API
+    games = pd.concat([games.assign(date_only=False), more], ignore_index=True)
+    settings = json.loads(SETTINGS.read_text(encoding="utf-8"))
+    settings.update(json.loads(SETTINGS_B5.read_text(encoding="utf-8")))
+    seeds = {lg: v["ratings"] for lg, v in json.loads(SEEDS.read_text(encoding="utf-8")).items()}
+    return Context(games=games, settings=settings, seeds=seeds)
 
 
 def played_games(games: pd.DataFrame, league: str) -> pd.DataFrame:
@@ -124,7 +141,7 @@ def forecast(ctx: Context, fx: pd.DataFrame, now: pd.Timestamp) -> pd.DataFrame:
         e = st["elo"]
         played = played_games(ctx.games, league)
         ratings = elo_ratings(played, EloSettings(e["k"], e["home"], e["carry"], e["mov"]),
-                              season=CURRENT)
+                              season=CURRENT, start=ctx.seeds.get(league))
         pt = st["points"]
         spread = Spread(pt["sd_home"], pt["sd_away"], pt["rho"])
         for r in part.itertuples():
@@ -143,8 +160,11 @@ def forecast(ctx: Context, fx: pd.DataFrame, now: pd.Timestamp) -> pd.DataFrame:
                 row["total_mean"], row["total_sd"] = float(mh + ma), spread.sd_total
             tip = pd.Timestamp(r.tip_utc) if pd.notna(r.tip_utc) else pd.NaT
             late = bool(pd.notna(tip) and (tip - now) < pd.Timedelta(hours=LOCK_MIN_HOURS))
+            date_only = bool(getattr(r, "date_only", False))
             flags = ["basketball"] + (["late_lock"] if late else []) + (
-                ["nbl_time_home_zone"] if league == "NBL" else [])
+                ["nbl_time_home_zone"] if league == "NBL" else []) + (
+                ["date_only"] if date_only else []) + (
+                ["winner_not_shown"] if "winner" not in MARKETS[league] else [])
             out.append({
                 "prediction_id": f"{r.game_id}:{MODEL}", "game_id": r.game_id, "league": league,
                 "season": int(r.season), "round": r.section, "home_id": r.home_id,
@@ -152,7 +172,8 @@ def forecast(ctx: Context, fx: pd.DataFrame, now: pd.Timestamp) -> pd.DataFrame:
                 "away_name": short_name(r.away_title), "tip_utc": tip, "lock_utc": now,
                 "as_of_utc": now, "model_name": MODEL, "model_version": version,
                 "code_dirty": dirty, "late_lock": late, **row, "flags": json.dumps(flags),
-                "date": r.date,
+                "date": r.date, "date_only": date_only,
+                "markets": ",".join(MARKETS[league]),
             })
     return pd.DataFrame(out)
 
@@ -163,6 +184,8 @@ def fixtures(games: pd.DataFrame, now: pd.Timestamp) -> pd.DataFrame:
     today = now.tz_convert("Africa/Juba").date()
     g = g[[d is not None and pd.notna(d) and d >= today for d in g["date"]]]
     g = g[g["tip_utc"].isna() | (g["tip_utc"] > now)]
+    if "suspect" in g:  # a pair listed twice (more_leagues.py): wait for the page to be fixed
+        g = g[~g["suspect"].fillna(False).astype(bool)]
     return g.sort_values(["tip_utc", "date", "game_id"], na_position="last")
 
 
@@ -175,7 +198,8 @@ def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataF
                 & ~fx["game_id"].isin(have)]
     new = forecast(ctx, window, now)
     if len(new) and not dry_run:
-        locked = ledger_bb.append(new.drop(columns=["date"]), ctx.ledger_path)
+        locked = ledger_bb.append(new.drop(columns=["date", "date_only", "markets"]),
+                                  ctx.ledger_path)
     if not dry_run:
         record_results(ctx.games, locked, now, ctx.results_path)
         if ctx.upcoming_path is not None:
@@ -210,10 +234,17 @@ def export_upcoming(ctx: Context, fx: pd.DataFrame, locked: pd.DataFrame, now: p
     if len(locked) and len(rows):
         lk = locked.sort_values("lock_utc").drop_duplicates("game_id", keep="last")
         lk = lk[lk["game_id"].isin(soon["game_id"])].assign(locked=True)
-        lk = lk.assign(date=lk["game_id"].map(soon.set_index("game_id")["date"]))
+        only = soon["date_only"] if "date_only" in soon else pd.Series(False, soon.index)
+        lk = lk.assign(date=lk["game_id"].map(soon.set_index("game_id")["date"]),
+                       date_only=lk["game_id"].map(pd.Series(
+                           only.fillna(False).astype(bool).to_numpy(), index=soon["game_id"])),
+                       markets=lk["league"].map(lambda lg: ",".join(MARKETS[lg])))
         rows = pd.concat([rows[~rows["game_id"].isin(lk["game_id"])], lk], ignore_index=True)
     if len(rows):
         rows.loc[~rows["locked"].astype(bool), "lock_utc"] = pd.NaT
+        # A stand-in tip-off is not a real time: the page shows the date only.
+        rows["date_only"] = rows["date_only"].fillna(False).astype(bool)
+        rows.loc[rows["date_only"], "tip_utc"] = pd.NaT
         rows["date"] = rows["date"].astype(str)
     out = rows.reindex(columns=UPCOMING_COLUMNS)
     if len(out):
@@ -228,8 +259,10 @@ def write_report(locked: pd.DataFrame, fx: pd.DataFrame, now: pd.Timestamp, path
     late = int(locked["late_lock"].fillna(False).sum()) if len(locked) else 0
     no_time = int(fx["tip_utc"].isna().sum())
     lines = [f"# Basketball: {now:%Y-%m-%d %H:%M} UTC", "",
-             f"Model `{MODEL}` (B1 settings; reports/basketball_b1_backtest_2026_10.md). "
-             "EuroLeague: winner, handicap, total points. NBL: winner.", "",
+             f"Model `{MODEL}` (B1 and B5 settings; reports/basketball_b1_backtest_2026_10.md, "
+             "reports/basketball_more_leagues_2026_11.md). EuroLeague: winner, handicap, total "
+             "points. NBL: winner. ACB: winner, handicap. LBA and ABA: handicap, total points "
+             "(dates only, no tip-off times).", "",
              f"- Games locked so far: {n} ({late} late)",
              f"- Upcoming games this season without a published tip-off time: {no_time}"]
     path.parent.mkdir(parents=True, exist_ok=True)

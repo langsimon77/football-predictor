@@ -69,3 +69,23 @@ Approved by Lang ("Approved: build it", 30 Oct 2026). Model `bb_b1_v1`, the B1 s
 - Evidence: `reports/basketball_b1_backtest_2026_10.md` (EuroLeague 1,293 test games, favourite
   won 66%, calibration slope 0.99, 90% ranges held 90.3% of margins and 90.9% of totals; NBL
   450 games, favourite won 62%). Tests: `tests/test_basketball_live.py`.
+
+## 14 Nov 2026: Basketball in three more leagues (phase B5)
+
+Lang asked for ten more leagues at $0 ("Stay free"). Same model `bb_b1_v1` and B1 grids; each
+league's own settings (`data/basketball/b5_settings.json`, committed before the test).
+
+- Sources: Spanish, Italian and Serbian Wikipedia (`basketball/more_leagues.py`); the ACB's
+  2022/23 to 2024/25 test history from API-Basketball's free plan, cached locally, never
+  committed, never read by the daily run. Club names: `data/manual/basketball_more_clubs.csv`.
+- Pre-registered test (`data/audit/preregistration_basketball_b5_2026_11.md`) on 2024/25 and
+  2025/26: ACB winner and handicap pass (total fails T1); LBA and ABA handicap and total pass
+  (winner fails K1: too cautious). `reports/basketball_more_leagues_2026_11.md`.
+- Live from 14 Nov 2026 in `basketball/live.py`: ACB winner and handicap; LBA and ABA handicap
+  and total points. LBA and ABA have dates only: stand-in tip-off 00:00 local on the first
+  possible day, flag `date_only`. Their winner chances are locked but not shown (flag
+  `winner_not_shown`). The ACB's Elo starts from `data/basketball/b5_seed_ratings.json`, so the
+  daily numbers equal the tested ones.
+- Not possible at $0: Turkey, Greece, France, Germany, VTB, China, Japan (no free list of
+  coming games). Tests: `tests/test_basketball_more.py`.
+

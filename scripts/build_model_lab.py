@@ -427,33 +427,50 @@ def euro_blocks(path: Path, pairs: dict) -> dict:
 
 BASKETBALL_UPCOMING = ROOT / "ledger" / "basketball" / "upcoming.parquet"
 BASKETBALL_TESTS = ROOT / "data" / "basketball" / "b1_results.json"
+BASKETBALL_TESTS_B5 = ROOT / "data" / "basketball" / "b5_results.json"
+# Seasons each league was tested on (B1 and B5 pre-registrations).
+BASKETBALL_SEASONS = {"EuroLeague": "2022/23 to 2025/26", "NBL": "2023/24 to 2025/26",
+                      "ACB": "2024/25 and 2025/26", "LBA": "2024/25 and 2025/26",
+                      "ABA": "2024/25 and 2025/26"}
 
 
-def basketball_block(path: Path, tests: Path = BASKETBALL_TESTS) -> dict | None:
-    """EuroLeague and NBL (basketball/live.py, Lang approved 30 Oct 2026): cards only, for
-    the markets that passed their B1 test. Winner chances, and for the EuroLeague the
-    margin and total-points bell curves (mean and width), so the page can price any line."""
+def basketball_block(path: Path, tests: Path = BASKETBALL_TESTS,
+                     tests_b5: Path = BASKETBALL_TESTS_B5) -> dict | None:
+    """Basketball (basketball/live.py): cards only, for the markets that passed their tests
+    (B1: EuroLeague, NBL, Lang approved 30 Oct 2026; B5: ACB, LBA, ABA, 14 Nov 2026). Winner
+    chances where the winner passed, and the margin and total-points bell curves (mean and
+    width) where those passed, so the page can price any line. LBA and ABA rows have dates
+    but no tip-off times (date_only)."""
     if not path.exists():
         return None
     up = pd.read_parquet(path)
     num = lambda v: None if pd.isna(v) else round(float(v), 3)  # noqa: E731
+    markets = (up["markets"] if "markets" in up else up["league"].map(
+        {"EuroLeague": "winner,handicap,total", "NBL": "winner"})).fillna("winner")
     rows = [{"id": r.game_id, "lg": r.league, "round": r.round,
              "kickoff": (f"{pd.Timestamp(r.tip_utc):%Y-%m-%dT%H:%MZ}" if pd.notna(r.tip_utc)
                          else None),
              "date": str(r.date), "h": r.home_name, "a": r.away_name, "locked": bool(r.locked),
-             "p": round(float(r.p_home), 4),
-             "margin": ([num(r.margin_mean), num(r.margin_sd)] if pd.notna(r.margin_mean)
-                        else None),
-             "total": [num(r.total_mean), num(r.total_sd)] if pd.notna(r.total_mean) else None}
-            for r in up.itertuples()]
+             "dateOnly": isinstance(getattr(r, "date_only", None), bool | np.bool_)
+                         and bool(r.date_only),
+             "p": round(float(r.p_home), 4) if "winner" in mk else None,
+             "margin": ([num(r.margin_mean), num(r.margin_sd)]
+                        if "handicap" in mk and pd.notna(r.margin_mean) else None),
+             "total": ([num(r.total_mean), num(r.total_sd)]
+                       if "total" in mk and pd.notna(r.total_mean) else None)}
+            for r, mk in zip(up.itertuples(), markets, strict=True)]
     test = {}
-    if tests.exists():
-        res = json.loads(tests.read_text(encoding="utf-8"))
-        for lg in ("EuroLeague", "NBL"):
-            c = res[lg]["checks"]
-            test[lg] = {"games": res[lg]["test_games"], "acc": round(c["L"]["accuracy"]["elo"], 3),
-                        "seasons": "2022/23 to 2025/26" if lg == "EuroLeague"
-                        else "2023/24 to 2025/26"}
+    for file in (tests, tests_b5):
+        if not file.exists():
+            continue
+        for lg, res in json.loads(file.read_text(encoding="utf-8")).items():
+            c, d = res["checks"], res["decision"]
+            test[lg] = {"games": res["test_games"], "seasons": BASKETBALL_SEASONS.get(lg, ""),
+                        "acc": round(c["L"]["accuracy"]["elo"], 3),
+                        "winner": d["winner"], "handicap": d["handicap"],
+                        "total": d["total_points"],
+                        "coverMargin": round(c["K2"]["margin"], 3),
+                        "coverTotal": round(c["K2"]["total"], 3)}
     return {"rows": rows, "as_of": as_of_text(up), "test": test}
 
 

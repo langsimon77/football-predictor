@@ -40,20 +40,21 @@ def elo_run(games: pd.DataFrame, s: EloSettings) -> pd.DataFrame:
                         index=games.index)
 
 
-def elo_ratings(games: pd.DataFrame, s: EloSettings, season: int | None = None
-                ) -> dict[str, float]:
+def elo_ratings(games: pd.DataFrame, s: EloSettings, season: int | None = None,
+                start: dict[str, float] | None = None) -> dict[str, float]:
     """Every club's rating after all of `games` (played games, sorted by date), ready for the
     next game day (phase B4, live forecasts). If `season` is a new season, the ratings get the
-    same pull toward 1500 that elo_run applies at a season's first game day."""
-    _, ratings, last = _elo_walk(games, s)
+    same pull toward 1500 that elo_run applies at a season's first game day. `start`: ratings
+    at the end of the season before `games` begin (B5: the ACB's earlier seasons)."""
+    _, ratings, last = _elo_walk(games, s, start)
     if season is not None and last is not None and season != last:
         ratings = {c: s.carry * r + (1 - s.carry) * START for c, r in ratings.items()}
     return ratings
 
 
-def _elo_walk(games: pd.DataFrame, s: EloSettings
+def _elo_walk(games: pd.DataFrame, s: EloSettings, start: dict[str, float] | None = None
               ) -> tuple[np.ndarray, dict[str, float], object]:
-    ratings: dict[str, float] = {}
+    ratings: dict[str, float] = dict(start or {})
     season = None
     diff = np.empty(len(games))
     home, away = games["home_id"].to_numpy(), games["away_id"].to_numpy()

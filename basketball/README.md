@@ -7,7 +7,8 @@ workflow when those exist (like `pipeline_euro/`).
 
 Each phase waited for Lang's approval: B0 data audit, B1 baseline with Elo and a points model,
 B2 challengers, B3 the model per market and B4 the live run and Model Lab display (30 Oct 2026:
-EuroLeague winner, handicap and total points; NBL winner).
+EuroLeague winner, handicap and total points; NBL winner). B5 (14 Nov 2026) added the ACB
+(winner, handicap), the LBA and the ABA (handicap, total points): reports/basketball_more_leagues_2026_11.md.
 
 ## Files
 
@@ -22,6 +23,8 @@ EuroLeague winner, handicap and total points; NBL winner).
 | `challengers.py` | B2: the seven challengers (regression, random forest, XGBoost, histogram boosting, small neural network, Kalman ratings, club home edges). |
 | `backtest_b2.py` | B2: `tune` (`data/basketball/b2_settings.json`), then `test` once (`data/basketball/b2_results.json`). |
 | `ledger_bb.py` | B4: the append-only, hash-chained ledger of locked forecasts (`ledger/basketball/`). |
+| `more_leagues.py` | B5: the ACB, LBA and ABA game tables from Spanish, Italian and Serbian Wikipedia (plus the ACB's API-Basketball test history). Writes `data/processed/basketball/games_more.parquet` and `data/basketball/b5_data_summary.json`. |
+| `backtest_more.py` | B5: `tune`, `test` and `seed` for those three leagues (`data/basketball/b5_*.json`). |
 | `live.py` | B4: the twice-daily run (`.github/workflows/basketball.yml`): this season from Wikipedia, fit, lock 24 to 48 hours before tip-off, results, `ledger/basketball/upcoming.parquet` for the Model Lab. |
 
 Run order: `uv run python basketball/data.py`, then `basketball/backtest.py tune` and

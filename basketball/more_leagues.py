@@ -378,12 +378,23 @@ def build(offline: bool = False, history: bool = True) -> tuple[pd.DataFrame, di
         f"{lg}_{season_key(s).replace('/', '')}_" + (f"{ph}_" if ph != "rs" else "") + f"{h}_{a}"
         for lg, s, ph, h, a in zip(games["league"], games["season"], games["phase"],
                                    games["home_id"], games["away_id"], strict=True)]
-    dupes = games["game_id"].duplicated(keep=False)
-    if dupes.any():
-        games.loc[dupes, "game_id"] += "_" + (games[dupes].groupby("game_id").cumcount() + 1
-                                              ).astype(str)
+    games = mark_listed_twice(games)
     check_counts(games)
     return games, summarise(games)
+
+
+def mark_listed_twice(games: pd.DataFrame) -> pd.DataFrame:
+    """A pair listed twice at the same ground (an editing slip: the ACB's 2026/27 page lists
+    Burgos v Breogán twice and Breogán v Burgos never [V: 14 Nov 2026]). The earliest keeps
+    the plain ID, so fixing the slip later never renames a locked game; the later copies get
+    "_2", "_3" and, in the ACB and the LBA (one game per ground per season), are not locked
+    while the slip stays (suspect)."""
+    games = games.sort_values(["league", "season", "date", "time_local"], na_position="last",
+                              kind="stable").reset_index(drop=True)
+    nth = games.groupby("game_id").cumcount()
+    games["suspect"] = (nth > 0) & (games["phase"] == "rs") & games["league"].isin(["ACB", "LBA"])
+    games.loc[nth > 0, "game_id"] += "_" + (nth[nth > 0] + 1).astype(str)
+    return games
 
 
 def check_counts(games: pd.DataFrame) -> None:
@@ -413,6 +424,7 @@ def summarise(games: pd.DataFrame) -> dict:
             "games": int(len(g)), "played": int(g["played"].sum()),
             "left_out": int(g["left_out"].sum()), "with_time": int(g["time_local"].notna().sum()),
             "clubs": int(pd.concat([g["home_id"], g["away_id"]]).nunique()),
+            "listed_twice": sorted(g.loc[g["suspect"], "game_id"]),
             "source": sorted(set(g["source"]))}
     return out
 

@@ -27,6 +27,8 @@ from more_leagues import GAMES  # noqa: E402
 from fp import ROOT  # noqa: E402
 
 SETTINGS = ROOT / "data" / "basketball" / "b5_settings.json"
+SEED = ROOT / "data" / "basketball" / "b5_seed_ratings.json"
+SEED_SEASON = {"ACB": 2024}  # the last season the daily run cannot read (API-Basketball)
 RESULTS = ROOT / "data" / "basketball" / "b5_results.json"
 ROLES = {lg: {"warmup": [2022], "tuning": [2023], "test": [2024, 2025]}
          for lg in ("ACB", "LBA", "ABA")}
@@ -44,12 +46,28 @@ def tune() -> dict:
     return out
 
 
-def cold_start(st: dict) -> dict:
-    """ACB: home-win chances on 2026/27 games from Wikipedia-only ratings (2025/26 on, as the
-    daily run) against ratings with the API-Basketball seasons too."""
+def acb_games() -> pd.DataFrame:
     g = pd.read_parquet(GAMES)
     g = g[(g["league"] == "ACB") & g["played"] & ~g["left_out"]].sort_values(["date", "game_id"])
-    g = g.assign(home_pts=g["home_pts"].astype(float), away_pts=g["away_pts"].astype(float))
+    return g.assign(home_pts=g["home_pts"].astype(float), away_pts=g["away_pts"].astype(float))
+
+
+def seed(st: dict) -> dict:
+    """ACB Elo ratings after 2024/25, the last API-Basketball season. The daily run starts
+    from these and walks the Wikipedia seasons, so it gives the tested model's numbers. Our
+    own ratings (18 numbers), not API-Basketball data."""
+    e = st["elo"]
+    g = acb_games()
+    g = g[g["season"] <= SEED_SEASON["ACB"]]
+    r = elo_ratings(g, EloSettings(e["k"], e["home"], e["carry"], e["mov"]))
+    return {"ACB": {"after_season": SEED_SEASON["ACB"], "settings": "b5_settings.json",
+                    "ratings": {k: round(v, 6) for k, v in sorted(r.items())}}}
+
+
+def cold_start(st: dict, seeds: dict | None = None) -> dict:
+    """ACB: home-win chances on 2026/27 games from Wikipedia-only ratings (2025/26 on, as the
+    daily run) against ratings with the API-Basketball seasons too."""
+    g = acb_games()
     e = st["elo"]
     s = EloSettings(e["k"], e["home"], e["carry"], e["mov"])
     now = g[g["season"] == 2026]
@@ -57,7 +75,8 @@ def cold_start(st: dict) -> dict:
     for day, part in now.groupby("date"):
         before = g[g["date"] < day]
         full = elo_ratings(before, s, season=2026)
-        wiki = elo_ratings(before[before["season"] >= 2025], s, season=2026)
+        wiki = elo_ratings(before[before["season"] >= 2025], s, season=2026,
+                           start=(seeds or {}).get("ACB", {}).get("ratings"))
         for r in part.itertuples():
             pf = 1 / (1 + 10 ** (-(full.get(r.home_id, 1500) + e["home"]
                                    - full.get(r.away_id, 1500)) / 400))
@@ -71,13 +90,22 @@ def cold_start(st: dict) -> dict:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Basketball B5 backtest")
-    parser.add_argument("stage", choices=["tune", "test"])
+    parser.add_argument("stage", choices=["tune", "test", "seed"])
     args = parser.parse_args(argv)
     if args.stage == "tune":
         SETTINGS.write_text(json.dumps(tune(), indent=1) + "\n", encoding="utf-8")
         print(f"written {SETTINGS.relative_to(ROOT)}")
         return 0
     settings = json.loads(SETTINGS.read_text(encoding="utf-8"))
+    if args.stage == "seed":
+        seeds = seed(settings["ACB"])
+        check = cold_start(settings["ACB"], seeds)
+        if check["max_abs_diff"] > 1e-9:
+            raise SystemExit(f"seeded ratings differ from the tested walk: {check}")
+        SEED.write_text(json.dumps(seeds, indent=1) + "\n", encoding="utf-8")
+        print("seeded run matches the tested walk:", check)
+        print(f"written {SEED.relative_to(ROOT)}")
+        return 0
     results = {lg: b1.test_league(lg, settings[lg], ROLES[lg], GAMES) for lg in ROLES}
     results["ACB"]["cold_start"] = cold_start(settings["ACB"])
     RESULTS.write_text(json.dumps(results, indent=1) + "\n", encoding="utf-8")

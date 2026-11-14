@@ -1,0 +1,30 @@
+{
+ "ACB": {
+  "after_season": 2024,
+  "settings": "b5_settings.json",
+  "ratings": {
+   "baloncesto_fuenlabrada": 1233.68743,
+   "basket_zaragoza_2002": 1434.238102,
+   "basquet_club_andorra": 1469.943048,
+   "basquet_girona": 1423.887157,
+   "basquet_manresa": 1536.934412,
+   "bilbao_basket": 1416.44274,
+   "club_baloncesto_breogan": 1406.325533,
+   "club_baloncesto_canarias": 1656.561919,
+   "club_baloncesto_gran_canaria": 1550.662111,
+   "club_baloncesto_malaga": 1699.617594,
+   "club_basquet_coruna": 1327.427398,
+   "club_joventut_badalona": 1561.280884,
+   "forca_lleida_club_esportiu": 1409.280944,
+   "fundacion_club_baloncesto_granada": 1374.065348,
+   "futbol_club_barcelona_baloncesto": 1676.047709,
+   "obradoiro_club_de_amigos_del_baloncesto": 1406.694288,
+   "palencia_baloncesto": 1363.198033,
+   "real_betis_baloncesto": 1415.019749,
+   "real_madrid_baloncesto": 1824.924172,
+   "saski_baskonia": 1564.960224,
+   "ucam_murcia_club_de_baloncesto": 1562.2167,
+   "valencia_basket": 1686.584503
+  }
+ }
+}
