@@ -65,10 +65,12 @@ def season_name(year: int) -> str:
     return f"{year}/{(year + 1) % 100:02d}"
 
 
-def league_games(league: str, last_season: int, regulation: bool = False) -> pd.DataFrame:
+def league_games(league: str, last_season: int, regulation: bool = False,
+                 path=None) -> pd.DataFrame:
     """Played, kept, regular-season games up to `last_season`, sorted by date. With
-    `regulation`, scores are the sum of the four quarters (games with quarters only)."""
-    g = pd.read_parquet(GAMES)
+    `regulation`, scores are the sum of the four quarters (games with quarters only).
+    `path`: another games table (B5 reads data/processed/basketball/games_more.parquet)."""
+    g = pd.read_parquet(path or GAMES)
     g = g[(g["league"] == league) & g["played"] & ~g["left_out"] & (g["season"] <= last_season)]
     if regulation:
         g = g[g["home_reg"].notna() & g["away_reg"].notna()].copy()
@@ -82,9 +84,9 @@ def league_games(league: str, last_season: int, regulation: bool = False) -> pd.
 # ---------------------------------------------------------------- stage 1: tune
 
 
-def tune_league(league: str) -> dict:
-    roles = ROLES[league]
-    g = league_games(league, min(roles["test"]) - 1)  # never a test-season game
+def tune_league(league: str, roles: dict | None = None, path=None) -> dict:
+    roles = roles or ROLES[league]
+    g = league_games(league, min(roles["test"]) - 1, path=path)  # never a test-season game
     tune = g["season"].isin(roles["tuning"]).to_numpy()
     y = (g["home_pts"] > g["away_pts"]).to_numpy(float)
     margin = (g["home_pts"] - g["away_pts"]).to_numpy()
@@ -126,10 +128,11 @@ def tune_league(league: str) -> dict:
     }
 
 
-def tune_regulation(league: str, points: PointsSettings) -> dict:
+def tune_regulation(league: str, points: PointsSettings, roles: dict | None = None,
+                    path=None) -> dict:
     """Widths and naive values for the regulation-time version (reported, not judged)."""
-    roles = ROLES[league]
-    g = league_games(league, min(roles["test"]) - 1, regulation=True)
+    roles = roles or ROLES[league]
+    g = league_games(league, min(roles["test"]) - 1, regulation=True, path=path)
     tune = g["season"].isin(roles["tuning"]).to_numpy()
     pred = points_run(g, points)
     spread = spread_from(g[tune], pred[tune])
@@ -152,9 +155,9 @@ def interval(diff: np.ndarray, day: np.ndarray) -> dict:
     return {"mean": mean, "low": lo, "high": hi}
 
 
-def test_league(league: str, st: dict) -> dict:
-    roles = ROLES[league]
-    g = league_games(league, max(roles["test"]))
+def test_league(league: str, st: dict, roles: dict | None = None, path=None) -> dict:
+    roles = roles or ROLES[league]
+    g = league_games(league, max(roles["test"]), path=path)
     test = g["season"].isin(roles["test"]).to_numpy()
     day = g["date"].astype(str).to_numpy()[test]
     y = (g["home_pts"] > g["away_pts"]).to_numpy(float)[test]
@@ -236,15 +239,31 @@ def test_league(league: str, st: dict) -> dict:
                                            "naive": float(np.abs(total - t_naive).mean())},
                   "home_win_share": float(y.mean())},
         "checks": checks, "decision": decision, "by_season": by_season,
-        "regulation_time": test_regulation(league, st),
+        "regulation_time": (test_regulation(league, st, roles, path) if "regulation" in st
+                            else None),
+        "favourite_hits": favourite_hits(p_chosen, y),
     }
 
 
-def test_regulation(league: str, st: dict) -> dict:
+def favourite_hits(p: np.ndarray, y: np.ndarray) -> dict:
+    """How often the model's favourite won, by how sure the model was (reported, not judged)."""
+    fav = np.maximum(p, 1 - p)
+    won = np.where(p >= 0.5, y == 1, y == 0)
+    out = {}
+    for lo, hi in ((0.5, 0.6), (0.6, 0.7), (0.7, 0.8), (0.8, 0.9), (0.9, 1.01)):
+        sel = (fav >= lo) & (fav < hi)
+        if sel.any():
+            out[f"{int(lo * 100)}-{min(int(hi * 100), 100)}%"] = {
+                "games": int(sel.sum()), "favourite_won": float(won[sel].mean()),
+                "model_said": float(fav[sel].mean())}
+    return out
+
+
+def test_regulation(league: str, st: dict, roles: dict | None = None, path=None) -> dict:
     """The points model on regulation-time scores (sum of the four quarters): reported, not
     judged. Ties after four quarters are left out of the winner score."""
-    roles, rt = ROLES[league], st["regulation"]
-    g = league_games(league, max(roles["test"]), regulation=True)
+    roles, rt = roles or ROLES[league], st["regulation"]
+    g = league_games(league, max(roles["test"]), regulation=True, path=path)
     test = g["season"].isin(roles["test"]).to_numpy()
     day = g["date"].astype(str).to_numpy()[test]
     pt = st["points"]

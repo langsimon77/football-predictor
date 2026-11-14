@@ -1,0 +1,108 @@
+league,name,club_id,display
+ACB,Fútbol Club Barcelona (baloncesto),futbol_club_barcelona_baloncesto,Barça
+ACB,Barcelona,futbol_club_barcelona_baloncesto,
+ACB,Basket Zaragoza 2002,basket_zaragoza_2002,Casademont Zaragoza
+ACB,Basket Zaragoza,basket_zaragoza_2002,
+ACB,Saski Baskonia,saski_baskonia,Kosner Baskonia
+ACB,Baskonia,saski_baskonia,
+ACB,Bàsquet Girona,basquet_girona,FIATC Girona
+ACB,Basquet Girona,basquet_girona,
+ACB,Bilbao Basket,bilbao_basket,Surne Bilbao
+ACB,Bilbao,bilbao_basket,
+ACB,Club Baloncesto Breogán,club_baloncesto_breogan,Río Breogán
+ACB,Breogan,club_baloncesto_breogan,
+ACB,Força Lleida Club Esportiu,forca_lleida_club_esportiu,iLerna Lleida
+ACB,Forca Lleida,forca_lleida_club_esportiu,
+ACB,Fuenlabrada,baloncesto_fuenlabrada,Fuenlabrada
+ACB,Club Baloncesto Gran Canaria,club_baloncesto_gran_canaria,Dreamland Gran Canaria
+ACB,Gran Canaria,club_baloncesto_gran_canaria,
+ACB,Fundación Club Baloncesto Granada,fundacion_club_baloncesto_granada,Covirán Granada
+ACB,Granada,fundacion_club_baloncesto_granada,
+ACB,Club Joventut Badalona,club_joventut_badalona,Asisa Joventut
+ACB,Joventut Badalona,club_joventut_badalona,
+ACB,Club Basquet Coruña,club_basquet_coruna,Leyma Coruña
+ACB,Club Basket Coruña,club_basquet_coruna,
+ACB,Leyma Coruna,club_basquet_coruna,
+ACB,Bàsquet Manresa,basquet_manresa,Kids&Us Manresa
+ACB,Manresa,basquet_manresa,
+ACB,Bàsquet Club Andorra,basquet_club_andorra,MoraBanc Andorra
+ACB,MoraBanc Andorra,basquet_club_andorra,
+ACB,UCAM Murcia Club de Baloncesto,ucam_murcia_club_de_baloncesto,UCAM Murcia
+ACB,UCAM Murcia CB,ucam_murcia_club_de_baloncesto,
+ACB,Murcia,ucam_murcia_club_de_baloncesto,
+ACB,Obradoiro Club de Amigos del Baloncesto,obradoiro_club_de_amigos_del_baloncesto,Monbus Obradoiro
+ACB,Obradoiro CAB,obradoiro_club_de_amigos_del_baloncesto,
+ACB,Palencia,palencia_baloncesto,Palencia
+ACB,Real Betis,real_betis_baloncesto,Real Betis
+ACB,Real Madrid Baloncesto,real_madrid_baloncesto,Real Madrid
+ACB,Real Madrid,real_madrid_baloncesto,
+ACB,Club Baloncesto Canarias,club_baloncesto_canarias,La Laguna Tenerife
+ACB,Tenerife,club_baloncesto_canarias,
+ACB,Club Baloncesto Málaga,club_baloncesto_malaga,Unicaja
+ACB,Unicaja,club_baloncesto_malaga,
+ACB,Valencia Basket,valencia_basket,Valencia Basket
+ACB,Valencia,valencia_basket,
+ACB,Club Baloncesto San Pablo Burgos,club_baloncesto_san_pablo_burgos,Recoletas Salud Burgos
+LBA,EA7 Emporio Armani Milano,olimpia_milano,Olimpia Milano
+LBA,Armani Olimpia Milano,olimpia_milano,
+LBA,Virtus Segafredo Bologna,virtus_bologna,Virtus Bologna
+LBA,Virtus Olidata Bologna,virtus_bologna,
+LBA,Virtus Costa Bologna,virtus_bologna,
+LBA,Bertram Yachts Derthona Tortona,derthona_tortona,Derthona Tortona
+LBA,Bertram Derthona Tortona,derthona_tortona,
+LBA,Betram Derthona Tortona,derthona_tortona,
+LBA,Dolomiti Energia Trentino,trentino,Trento
+LBA,Germani Brescia,brescia,Brescia
+LBA,Banco di Sardegna Sassari,sassari,Sassari
+LBA,Umana Reyer Venezia,reyer_venezia,Reyer Venezia
+LBA,Openjobmetis Varese,varese,Varese
+LBA,UNAHOTELS Reggio Emilia,reggio_emilia,Reggio Emilia
+LBA,UNA Hotels Reggio Emilia,reggio_emilia,
+LBA,NutriBullet Treviso Basket,treviso,Treviso
+LBA,Nutribullet Treviso Basket,treviso,
+LBA,Nutribullet Treviso,treviso,
+LBA,Gevi Napoli Basket,napoli,Napoli
+LBA,GeVi Napoli Basket,napoli,
+LBA,GeVi Napoli,napoli,
+LBA,Napolibasket,napoli,
+LBA,Guerri Napoli,napoli,
+LBA,Napoli Basketball,napoli,
+LBA,Givova Scafati Basket,scafati,Scafati
+LBA,Givova Scafati,scafati,
+LBA,Longobardi Scafati,scafati,
+LBA,Carpegna Prosciutto Pesaro,pesaro,Pesaro
+LBA,Happy Casa Brindisi,brindisi,Brindisi
+LBA,Pallacanestro Trieste,trieste,Trieste
+LBA,Pall. Trieste,trieste,
+LBA,Tezenis Verona,verona,Verona
+LBA,Vanoli Basket Cremona,cremona,Cremona
+LBA,Estra Pistoia,pistoia,Pistoia
+LBA,Trapani Shark,trapani,Trapani
+LBA,APU Old Wild West Udine,udine,Udine
+LBA,Acqua S.Bernardo Cantù,cantu,Cantù
+LBA,BC Roma,bc_roma,BC Roma
+LBA,Maxima Roma,maxima_roma,Maxima Roma
+ABA,Будућност,buducnost,Budućnost
+ABA,Партизан,partizan,Partizan
+ABA,Ц. звезда,crvena_zvezda,Crvena zvezda
+ABA,Цед. Олимпија,cedevita_olimpija,Cedevita Olimpija
+ABA,Цедевита Олимпија,cedevita_olimpija,
+ABA,Беч,bc_wien,BC Wien
+ABA,Борац,borac_cacak,Borac Čačak
+ABA,Босна,bosna,Bosna
+ABA,Дубаи,dubai,Dubai
+ABA,Задар,zadar,Zadar
+ABA,Игокеа,igokea,Igokea
+ABA,Крка,krka,Krka
+ABA,МЗТ Скопље,mzt_skopje,MZT Skopje
+ABA,Мега,mega,Mega
+ABA,Морнар,mornar,Mornar
+ABA,Пер. Илирија,ilirija,Ilirija
+ABA,СЦ Дерби,sc_derby,SC Derby
+ABA,Слован,slovan_bratislava,Slovan Bratislava
+ABA,Спартак,spartak_subotica,Spartak Subotica
+ABA,Сплит,split,Split
+ABA,У-БТ Клуж-Напока,u_bt_cluj,U-BT Cluj-Napoca
+ABA,ФМП,fmp,FMP
+ABA,Цибона,cibona,Cibona
+ABA,Широки,siroki,Široki

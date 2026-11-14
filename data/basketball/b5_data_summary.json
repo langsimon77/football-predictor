@@ -1,0 +1,155 @@
+{
+ "source": "es, it and sr Wikipedia (CC BY-SA 4.0); ACB 2022/23 to 2024/25 from API-Basketball (tests only)",
+ "seasons": {
+  "ABA 2022/23": {
+   "games": 182,
+   "played": 182,
+   "left_out": 0,
+   "with_time": 0,
+   "clubs": 14,
+   "source": [
+    "sr.wikipedia"
+   ]
+  },
+  "ABA 2023/24": {
+   "games": 182,
+   "played": 182,
+   "left_out": 0,
+   "with_time": 0,
+   "clubs": 14,
+   "source": [
+    "sr.wikipedia"
+   ]
+  },
+  "ABA 2024/25": {
+   "games": 240,
+   "played": 240,
+   "left_out": 0,
+   "with_time": 0,
+   "clubs": 16,
+   "source": [
+    "sr.wikipedia"
+   ]
+  },
+  "ABA 2025/26": {
+   "games": 226,
+   "played": 226,
+   "left_out": 0,
+   "with_time": 0,
+   "clubs": 18,
+   "source": [
+    "sr.wikipedia"
+   ]
+  },
+  "ABA 2026/27": {
+   "games": 180,
+   "played": 60,
+   "left_out": 0,
+   "with_time": 0,
+   "clubs": 20,
+   "source": [
+    "sr.wikipedia"
+   ]
+  },
+  "ACB 2022/23": {
+   "games": 306,
+   "played": 306,
+   "left_out": 0,
+   "with_time": 306,
+   "clubs": 18,
+   "source": [
+    "api-basketball"
+   ]
+  },
+  "ACB 2023/24": {
+   "games": 306,
+   "played": 306,
+   "left_out": 0,
+   "with_time": 306,
+   "clubs": 18,
+   "source": [
+    "api-basketball"
+   ]
+  },
+  "ACB 2024/25": {
+   "games": 306,
+   "played": 306,
+   "left_out": 0,
+   "with_time": 306,
+   "clubs": 18,
+   "source": [
+    "api-basketball"
+   ]
+  },
+  "ACB 2025/26": {
+   "games": 306,
+   "played": 306,
+   "left_out": 0,
+   "with_time": 306,
+   "clubs": 18,
+   "source": [
+    "es.wikipedia"
+   ]
+  },
+  "ACB 2026/27": {
+   "games": 306,
+   "played": 63,
+   "left_out": 0,
+   "with_time": 297,
+   "clubs": 18,
+   "source": [
+    "es.wikipedia"
+   ]
+  },
+  "LBA 2022/23": {
+   "games": 240,
+   "played": 240,
+   "left_out": 0,
+   "with_time": 0,
+   "clubs": 16,
+   "source": [
+    "it.wikipedia"
+   ]
+  },
+  "LBA 2023/24": {
+   "games": 239,
+   "played": 239,
+   "left_out": 0,
+   "with_time": 0,
+   "clubs": 16,
+   "source": [
+    "it.wikipedia"
+   ]
+  },
+  "LBA 2024/25": {
+   "games": 238,
+   "played": 238,
+   "left_out": 0,
+   "with_time": 0,
+   "clubs": 16,
+   "source": [
+    "it.wikipedia"
+   ]
+  },
+  "LBA 2025/26": {
+   "games": 225,
+   "played": 210,
+   "left_out": 15,
+   "with_time": 0,
+   "clubs": 16,
+   "source": [
+    "it.wikipedia"
+   ]
+  },
+  "LBA 2026/27": {
+   "games": 64,
+   "played": 56,
+   "left_out": 0,
+   "with_time": 0,
+   "clubs": 16,
+   "source": [
+    "it.wikipedia"
+   ]
+  }
+ }
+}
