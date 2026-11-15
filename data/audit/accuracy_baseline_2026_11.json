@@ -1,0 +1,358 @@
+{
+ "football": [
+  {
+   "where": "Premier League",
+   "market": "home, draw, away",
+   "n": 1140,
+   "log_loss": 0.9758489837670861,
+   "lo": 0.9477854805491072,
+   "hi": 1.0038375964696025,
+   "brier": 0.5812262164492001,
+   "rps": 0.19905286804904948,
+   "slope": 1.0003036585641623,
+   "slope_ci": [
+    0.8919988818791503,
+    1.1513825162107685
+   ]
+  },
+  {
+   "where": "Premier League",
+   "market": "over 2.5 goals",
+   "n": 1140,
+   "log_loss": 0.6751618245054023,
+   "lo": 0.6630642649822538,
+   "hi": 0.6877942595937652,
+   "brier": 0.24109805974785978,
+   "rps": null,
+   "slope": 0.6142616711648038,
+   "slope_ci": [
+    0.25353944533860157,
+    1.011310716844867
+   ]
+  },
+  {
+   "where": "Premier League",
+   "market": "both teams score",
+   "n": 1140,
+   "log_loss": 0.682297156809845,
+   "lo": 0.670932775543888,
+   "hi": 0.6941346451633679,
+   "brier": 0.24457656816945425,
+   "rps": null,
+   "slope": 0.33819800886345797,
+   "slope_ci": [
+    -0.0741968980207968,
+    0.7909146986322733
+   ]
+  },
+  {
+   "where": "Premier League",
+   "market": "over 9.5 corners",
+   "n": 1140,
+   "log_loss": 0.6758434923416429,
+   "lo": 0.6644270626482656,
+   "hi": 0.6874576916817334,
+   "brier": 0.24136274920037434,
+   "rps": null,
+   "slope": 0.5288179971783936,
+   "slope_ci": [
+    -0.03775699306882847,
+    1.135190008653637
+   ]
+  },
+  {
+   "where": "Premier League",
+   "market": "over 4.5 yellow cards",
+   "n": 1140,
+   "log_loss": 0.6631382223060671,
+   "lo": 0.6436790832372495,
+   "hi": 0.6820721633627167,
+   "brier": 0.2349334809396317,
+   "rps": null,
+   "slope": 0.628686509213566,
+   "slope_ci": [
+    0.29217283883099027,
+    0.9725788272192207
+   ]
+  },
+  {
+   "where": "La Liga",
+   "market": "home, draw, away",
+   "n": 1140,
+   "log_loss": 0.9687492651347008,
+   "lo": 0.9434197219405186,
+   "hi": 0.9942841474145807,
+   "brier": 0.5749771734477466,
+   "rps": 0.1933555462143486,
+   "slope": 1.127213277984654,
+   "slope_ci": [
+    0.9704100335026161,
+    1.2723708516125514
+   ]
+  },
+  {
+   "where": "La Liga",
+   "market": "over 2.5 goals",
+   "n": 1140,
+   "log_loss": 0.6706944161736598,
+   "lo": 0.657891477134659,
+   "hi": 0.6835830722913417,
+   "brier": 0.23886438558680514,
+   "rps": null,
+   "slope": 0.9328225844744809,
+   "slope_ci": [
+    0.6638879800786085,
+    1.1960487946400404
+   ]
+  },
+  {
+   "where": "La Liga",
+   "market": "both teams score",
+   "n": 1140,
+   "log_loss": 0.6848194917466524,
+   "lo": 0.6767811608950165,
+   "hi": 0.6935213485287058,
+   "brier": 0.24584845545235057,
+   "rps": null,
+   "slope": 0.916134492247499,
+   "slope_ci": [
+    0.5720125242747564,
+    1.325551709787277
+   ]
+  },
+  {
+   "where": "La Liga",
+   "market": "over 9.5 corners",
+   "n": 1140,
+   "log_loss": 0.6818126466919291,
+   "lo": 0.6741405057653235,
+   "hi": 0.6892996292504516,
+   "brier": 0.24439772760798265,
+   "rps": null,
+   "slope": 1.1583532548824262,
+   "slope_ci": [
+    0.658751278617884,
+    1.6795278896365444
+   ]
+  },
+  {
+   "where": "La Liga",
+   "market": "over 4.5 yellow cards",
+   "n": 1140,
+   "log_loss": 0.6686682899282168,
+   "lo": 0.6585867687417177,
+   "hi": 0.678517619908686,
+   "brier": 0.2380557953799446,
+   "rps": null,
+   "slope": 1.2845419039183172,
+   "slope_ci": [
+    0.9394023781832533,
+    1.6435623212256352
+   ]
+  },
+  {
+   "where": "Serie A",
+   "market": "home, draw, away",
+   "n": 1140,
+   "log_loss": 0.9808022462275193,
+   "lo": 0.956735873479324,
+   "hi": 1.0042100928583602,
+   "brier": 0.586498678319684,
+   "rps": 0.19329263652951367,
+   "slope": 1.0674858805992633,
+   "slope_ci": [
+    0.9249099607907686,
+    1.2067638580212776
+   ]
+  },
+  {
+   "where": "Serie A",
+   "market": "over 4.5 yellow cards",
+   "n": 1140,
+   "log_loss": 0.6242476967859283,
+   "lo": 0.6111294489880185,
+   "hi": 0.6374301512464869,
+   "brier": 0.2172511383715331,
+   "rps": null,
+   "slope": 1.57244119194804,
+   "slope_ci": [
+    1.2187162254236292,
+    1.9284090184963945
+   ]
+  },
+  {
+   "where": "Ligue 1",
+   "market": "home, draw, away",
+   "n": 917,
+   "log_loss": 1.00106184680737,
+   "lo": 0.9723533061795525,
+   "hi": 1.0286180057623495,
+   "brier": 0.5981546280983339,
+   "rps": 0.208956488631366,
+   "slope": 1.0022024359215747,
+   "slope_ci": [
+    0.8435430559789251,
+    1.173866355817047
+   ]
+  },
+  {
+   "where": "Ligue 1",
+   "market": "over 4.5 yellow cards",
+   "n": 917,
+   "log_loss": 0.623567048485724,
+   "lo": 0.6006433037784196,
+   "hi": 0.6477353212078265,
+   "brier": 0.21683907319769175,
+   "rps": null,
+   "slope": 1.1249438158625398,
+   "slope_ci": [
+    0.6951644062716494,
+    1.6602495593930222
+   ]
+  }
+ ],
+ "champions_league": {
+  "where": "Champions League",
+  "market": "home, draw, away",
+  "n": 753,
+  "log_loss": 0.9027815727958084,
+  "lo": null,
+  "hi": null,
+  "brier": 0.5302632945942415,
+  "rps": 0.19045356194609767,
+  "slope": 1.2181551484340583,
+  "slope_ci": null,
+  "gain_vs_base_rps": {
+   "mean": -0.04522757011916982,
+   "lo": -0.055013046087181425,
+   "hi": -0.03520442738923375
+  }
+ },
+ "basketball": [
+  {
+   "league": "EuroLeague",
+   "n": 1293,
+   "winner_log_loss": 0.6178776644601703,
+   "winner_vs_naive": {
+    "mean": -0.04014768382560902,
+    "low": -0.053979526758217565,
+    "high": -0.026210839689043593,
+    "pass": true,
+    "model": "elo"
+   },
+   "slope": 0.9848844638676253,
+   "margin_crps": 6.561891345738025,
+   "total_crps": 9.283855498904117,
+   "cover_margin": 0.9025522041763341,
+   "cover_total": 0.908739365815932,
+   "shown": {
+    "winner": true,
+    "handicap": true,
+    "total_points": true
+   }
+  },
+  {
+   "league": "NBL",
+   "n": 450,
+   "winner_log_loss": 0.6527619041947608,
+   "winner_vs_naive": {
+    "mean": -0.03618317063646662,
+    "low": -0.06121340096938862,
+    "high": -0.010446251041474152,
+    "pass": true,
+    "model": "elo"
+   },
+   "slope": 0.9484529100378672,
+   "margin_crps": 8.5473907024684,
+   "total_crps": 10.708209625250692,
+   "cover_margin": 0.8488888888888889,
+   "cover_total": 0.8666666666666667,
+   "shown": {
+    "winner": true,
+    "handicap": false,
+    "total_points": false
+   }
+  },
+  {
+   "league": "ACB",
+   "n": 612,
+   "winner_log_loss": 0.5822613168155604,
+   "winner_vs_naive": {
+    "mean": -0.09467883387500448,
+    "low": -0.1299684920421004,
+    "high": -0.057978391151906804,
+    "pass": true,
+    "model": "elo"
+   },
+   "slope": 0.9563336059314183,
+   "margin_crps": 6.7901198898864115,
+   "total_crps": 9.646213878344419,
+   "cover_margin": 0.8839869281045751,
+   "cover_total": 0.8888888888888888,
+   "shown": {
+    "winner": true,
+    "handicap": true,
+    "total_points": false
+   }
+  },
+  {
+   "league": "LBA",
+   "n": 448,
+   "winner_log_loss": 0.6010910736886631,
+   "winner_vs_naive": {
+    "mean": -0.0825079286191505,
+    "low": -0.1098689850505513,
+    "high": -0.05432921533036927,
+    "pass": true,
+    "model": "elo"
+   },
+   "slope": 1.2732984401629854,
+   "margin_crps": 6.671484869033974,
+   "total_crps": 10.004083570270897,
+   "cover_margin": 0.9375,
+   "cover_total": 0.8772321428571429,
+   "shown": {
+    "winner": false,
+    "handicap": true,
+    "total_points": true
+   }
+  },
+  {
+   "league": "ABA",
+   "n": 466,
+   "winner_log_loss": 0.48422068840824345,
+   "winner_vs_naive": {
+    "mean": -0.18802590534663546,
+    "low": -0.22251142662134926,
+    "high": -0.15105674621123757,
+    "pass": true,
+    "model": "elo"
+   },
+   "slope": 1.4368636671394055,
+   "margin_crps": 6.623078835504487,
+   "total_crps": 9.64643152455236,
+   "cover_margin": 0.9313304721030042,
+   "cover_total": 0.9034334763948498,
+   "shown": {
+    "winner": false,
+    "handicap": true,
+    "total_points": true
+   }
+  }
+ ],
+ "flagged": [
+  "Premier League over 2.5 goals (0.61): too bold (weak evidence)",
+  "Premier League both teams score (0.34): too bold",
+  "Premier League over 9.5 corners (0.53): too bold (weak evidence)",
+  "Premier League over 4.5 yellow cards (0.63): too bold (weak evidence)",
+  "La Liga over 4.5 yellow cards (1.28): too cautious (weak evidence)",
+  "Serie A over 4.5 yellow cards (1.57): too cautious",
+  "Champions League home, draw, away (1.22): too cautious",
+  "LBA basketball winner (1.27): too cautious",
+  "ABA basketball winner (1.44): too cautious"
+ ],
+ "limits": [
+  0.8,
+  1.2
+ ]
+}
