@@ -20,6 +20,13 @@
   scheduled runs a day: GitHub starts them hours late). The routine "Refresh Model Lab
   basketball" (trig_01G7zzE6WV2mqJMkNksApAJb, 03:30, 09:30, 15:30, 21:30 UTC) copies it into
   the page's database, document live/basketball; the page reads it on open and redraws.
+- NBA (15 Nov, Lang: "automate NBA, twice a day"): basketball/nba_page.py ports the page
+  pipeline's NBA model unchanged (same hoopR-nba-data schedules, same ratings; checked equal
+  to 1e-16). Routine "Refresh Model Lab NBA" (trig_017bUi3pEsfPWq8tTkLdVSte, 13:30 and
+  19:30 UTC, after hoopR's daily update at about 12:35 UTC) writes document live/nba; the
+  page shows the newer of that and data/basketball.json. Model Lab version 51. Both refresh
+  routines have no connectors. The page's own "Basketball refresh" routine (Mon, Wed, Fri)
+  and "Gal odds reader" republish the live page unchanged, so these edits survive them.
 
 ## Earlier: 30 Oct 2026, basketball live forecasts (B3 and B4); Ligue 1 button
 
