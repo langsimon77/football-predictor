@@ -67,3 +67,29 @@ def test_files_are_written_as_compact_json(tmp_path):
     for name in sizes:
         text = (tmp_path / f"{name}.json").read_text(encoding="utf-8")
         assert json.loads(text) is not None and "\n" not in text
+
+
+def test_calibration_flags_for_the_page(tmp_path):
+    path = tmp_path / "baseline.json"
+    path.write_text(json.dumps({"limits": [0.8, 1.2], "football": [
+        {"where": "Premier League", "market": "home, draw, away", "slope": 1.0,
+         "slope_ci": [0.89, 1.15]},
+        {"where": "Premier League", "market": "both teams score", "slope": 0.34,
+         "slope_ci": [-0.07, 0.79]},
+        {"where": "Premier League", "market": "over 2.5 goals", "slope": 0.61,
+         "slope_ci": [0.25, 1.01]},
+        {"where": "Serie A", "market": "over 4.5 yellow cards", "slope": 1.57,
+         "slope_ci": [1.22, 1.93]}],
+        "champions_league": {"where": "Champions League", "market": "home, draw, away",
+                             "slope": 1.22, "slope_ci": None}}), encoding="utf-8")
+    flags = lab.calibration_flags(path)
+    assert flags == [
+        {"where": "Premier League", "market": "both teams score", "slope": 0.34,
+         "lean": "bold", "weak": False},
+        {"where": "Premier League", "market": "over 2.5 goals", "slope": 0.61,
+         "lean": "bold", "weak": True},
+        {"where": "Serie A", "market": "over 4.5 yellow cards", "slope": 1.57,
+         "lean": "cautious", "weak": False},
+        {"where": "Champions League", "market": "home, draw, away", "slope": 1.22,
+         "lean": "cautious", "weak": False}]
+    assert lab.calibration_flags(tmp_path / "missing.json") == []

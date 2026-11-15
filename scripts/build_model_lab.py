@@ -586,6 +586,28 @@ def check_fresh(pages_meta: dict) -> None:
                          "or pass --allow-stale.")
 
 
+CALIBRATION = ROOT / "data" / "audit" / "accuracy_baseline_2026_11.json"
+
+
+def calibration_flags(path: Path = CALIBRATION) -> list[dict]:
+    """Football markets whose tested calibration slope is outside the limits
+    (scripts/accuracy_baseline.py), for the note under each section of the page.
+    `weak`: the 95% interval of the slope still reaches inside the limits."""
+    if not path.exists():
+        return []
+    res = json.loads(path.read_text(encoding="utf-8"))
+    low, high = res["limits"]
+    out = []
+    for r in [*res["football"], res["champions_league"]]:
+        if low <= r["slope"] <= high:
+            continue
+        ci = r.get("slope_ci")
+        out.append({"where": r["where"], "market": r["market"], "slope": round(r["slope"], 2),
+                    "lean": "cautious" if r["slope"] > high else "bold",
+                    "weak": bool(ci and ci[0] <= high and ci[1] >= low)})
+    return out
+
+
 # The page fetches its data as three files (the same split as the private page build):
 # gameweek.json first (forecasts, pairs, competitions), core.json after (past-season tests,
 # club strength, decisions), history-seed.json for the nightly settling task.
@@ -701,6 +723,7 @@ def main(argv: list[str] | None = None) -> int:
         pairs["safety_ucl"] = ucl_safety["safety_table"]
         pairs["record_ucl"] = ucl_safety["record"]
     pairs["odds_file"] = odds_files[-1].parent.name if odds_files else None
+    pairs["calibration"] = calibration_flags()
     data = {
         "built": f"{pd.Timestamp.now(tz='UTC'):%Y-%m-%d %H:%M} UTC",
         "data_as_of": meta["generated_utc"], "model_version": meta["model_version"],
