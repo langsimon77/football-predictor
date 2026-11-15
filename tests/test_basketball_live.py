@@ -169,6 +169,45 @@ def test_results_are_recorded_for_locked_games(tmp_path):
     assert list(res["game_id"]) == list(gid) and int(res["home_pts"].iloc[0]) == 90
 
 
+def test_a_recorded_result_stays_when_the_page_later_loses_the_score(tmp_path):
+    # Review of Nov 2026: the results file was written from scratch on every run, so an
+    # edit on the source page could remove a recorded score, and the time a result was
+    # first recorded was lost.
+    now = pd.Timestamp("2026-10-30 08:00", tz="UTC")
+    ctx = context(tmp_path, now)
+    live.run_once(now, ctx)
+    g = ctx.games
+    first = g.loc[(g["league"] == "EuroLeague") & ~g["played"] & (g["home_id"] == "a"),
+                  "game_id"]
+    g.loc[g["game_id"].isin(first), ["home_pts", "away_pts", "played"]] = [90.0, 80.0, True]
+    t1 = now + pd.Timedelta(hours=40)
+    live.run_once(t1, ctx)
+    g.loc[g["game_id"].isin(first), ["home_pts", "away_pts", "played"]] = [np.nan, np.nan, False]
+    second = g.loc[(g["league"] == "NBL") & ~g["played"] & (g["home_id"] == "c"), "game_id"]
+    g.loc[g["game_id"].isin(second), ["home_pts", "away_pts", "played"]] = [70.0, 75.0, True]
+    live.run_once(now + pd.Timedelta(hours=46), ctx)
+    res = pd.read_parquet(ctx.results_path).set_index("game_id")
+    assert set(res.index) == set(first) | set(second)
+    assert int(res.loc[first.iloc[0], "home_pts"]) == 90
+    assert res.loc[first.iloc[0], "recorded_utc"] == t1
+
+
+def test_a_corrected_score_replaces_the_recorded_one(tmp_path):
+    now = pd.Timestamp("2026-10-30 08:00", tz="UTC")
+    ctx = context(tmp_path, now)
+    live.run_once(now, ctx)
+    g = ctx.games
+    gid = g.loc[(g["league"] == "EuroLeague") & ~g["played"] & (g["home_id"] == "a"), "game_id"]
+    g.loc[g["game_id"].isin(gid), ["home_pts", "away_pts", "played"]] = [90.0, 80.0, True]
+    live.run_once(now + pd.Timedelta(hours=40), ctx)
+    g.loc[g["game_id"].isin(gid), ["home_pts", "away_pts"]] = [91.0, 80.0]
+    t2 = now + pd.Timedelta(hours=46)
+    live.run_once(t2, ctx)
+    res = pd.read_parquet(ctx.results_path)
+    assert len(res) == 1 and int(res["home_pts"].iloc[0]) == 91
+    assert res["recorded_utc"].iloc[0] == t2
+
+
 def test_basketball_files_are_apart_from_football_files():
     from fp import ledger
     assert live.LEDGER.parent.name == "basketball"

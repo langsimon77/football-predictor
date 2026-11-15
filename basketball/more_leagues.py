@@ -39,7 +39,14 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from audit_sample import CURRENT, params, plain, season_key, templates  # noqa: E402
+from audit_sample import (  # noqa: E402
+    CURRENT,
+    PAGE_MAX_AGE_HOURS,
+    params,
+    plain,
+    season_key,
+    templates,
+)
 
 import data as bb_data  # noqa: E402
 from fp import ROOT  # noqa: E402
@@ -79,7 +86,8 @@ def wikitext(lang: str, page: str, refresh: bool) -> str | None:
            + urlencode({"action": "parse", "page": page, "prop": "wikitext", "redirects": 1,
                         "format": "json", "formatversion": 2}))
     name = f"{lang}_" + re.sub(r"\W+", "_", page, flags=re.U).strip("_") + ".json"
-    data = json.loads(http.fetch(url, SOURCE, name, refresh=refresh).read_text(encoding="utf-8"))
+    data = json.loads(http.fetch(url, SOURCE, name, refresh=refresh,
+                                 max_age_hours=PAGE_MAX_AGE_HOURS).read_text(encoding="utf-8"))
     return (data.get("parse") or {}).get("wikitext")
 
 

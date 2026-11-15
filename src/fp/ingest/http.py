@@ -4,7 +4,9 @@ Rules enforced here:
 - A clear User-Agent names the project.
 - At most 1 request every 3 seconds per domain.
 - Every response is saved under data/raw/<source>/<YYYY-MM-DD>/ and never edited.
-- A file that is already cached is read from disk instead of downloaded again.
+- A file that is already cached is read from disk instead of downloaded again. A caller
+  that runs several times a day may ask for today's copy to be replaced once it is older
+  than a set number of hours (max_age_hours).
 - Timeouts and dropped connections are retried, because connections can be slow.
 """
 
@@ -59,15 +61,26 @@ def fetch(
     *,
     refresh: bool = True,
     headers: dict[str, str] | None = None,
+    max_age_hours: float | None = None,
 ) -> Path:
     """Download url into data/raw/<source>/<today>/<filename> and return the path.
 
     refresh=True: download unless today's copy already exists.
     refresh=False: reuse the newest copy from any date. Use this for files that
     no longer change, such as completed seasons.
+    max_age_hours (with refresh=True): also download when today's copy is older than
+    this. For jobs that run several times a day: without it, every run after the first
+    reads the first run's copy. If that download fails, the copy we have is kept.
     """
     todays = RAW_DIR / source / today_utc() / filename
     if todays.exists():
+        age_hours = (time.time() - todays.stat().st_mtime) / 3600
+        if not refresh or max_age_hours is None or age_hours <= max_age_hours:
+            return todays
+        try:
+            todays.write_bytes(_get_with_retries(url, headers or {}))
+        except requests.RequestException:
+            pass
         return todays
     if not refresh:
         copies = cached_copies(source, filename)
