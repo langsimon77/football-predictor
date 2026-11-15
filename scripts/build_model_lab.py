@@ -586,12 +586,78 @@ def check_fresh(pages_meta: dict) -> None:
                          "or pass --allow-stale.")
 
 
+# The page fetches its data as three files (the same split as the private page build):
+# gameweek.json first (forecasts, pairs, competitions), core.json after (past-season tests,
+# club strength, decisions), history-seed.json for the nightly settling task.
+GAMEWEEK_KEYS = ["built", "data_as_of", "model_version", "clubs", "up", "trial", "ucl", "uel",
+                 "uecl", "basketball", "pairs", "bets"]
+CORE_KEYS = ["bt", "sim", "ev"]
+SEED_MARKETS = (("goals", "G>2.5", "G<2.5"), ("btts", "BTTS", "NoBTTS"),
+                ("corners", "C>9.5", "C<9.5"), ("cards", "Y>4.5", "Y<4.5"))
+
+
+def market_calls() -> dict[str, str]:
+    """Pick code -> the label of that call, from data/markets/markets.json."""
+    import gen_markets
+    spec = json.loads((ROOT / "data" / "markets" / "markets.json").read_text(encoding="utf-8"))
+    return {k: v.get("call", v["label"]) for k, v in gen_markets.expand(spec).items()}
+
+
+def history_seed(data: dict) -> list[dict]:
+    """One record per match: the most likely result, and the likelier side of 2.5 goals,
+    both teams to score, 9.5 corners and 4.5 yellow cards where the model covers them."""
+    out, call = [], market_calls()
+    for mid, m in sorted(data["pairs"]["matches"].items(), key=lambda kv: kv[1]["kickoff"]):
+        picks = {p["k"]: p for p in m["picks"]}
+        calls = []
+        res = max((picks[k] for k in ("H", "D", "A") if k in picks), key=lambda p: p["p"],
+                  default=None)
+        if res:
+            calls.append({"mkt": "result", "k": res["k"], "label": res["label"],
+                          "p": round(res["p"], 4), "result": None})
+        for mkt, a, b in SEED_MARKETS:
+            pa, pb = picks.get(a), picks.get(b)
+            if pa is None or pb is None:
+                continue
+            k, best = (a, pa) if pa["p"] >= pb["p"] else (b, pb)
+            calls.append({"mkt": mkt, "k": k, "label": call[k], "p": round(best["p"], 4),
+                          "result": None})
+        out.append({"match_id": mid, "lg": m.get("lg"), "h": m["h"], "a": m["a"],
+                    "kickoff": m["kickoff"], "calls": calls,
+                    "made_from": data.get("data_as_of"), "score": None, "settled_utc": None})
+    return out
+
+
+def page_files(data: dict) -> dict[str, object]:
+    """The three files the page reads. A block that belongs to no file is an error, so a new
+    block cannot be dropped without anyone noticing."""
+    left = set(data) - set(GAMEWEEK_KEYS) - set(CORE_KEYS)
+    if left:
+        raise SystemExit(f"unassigned data keys: {sorted(left)}")
+    return {"gameweek": {k: data[k] for k in GAMEWEEK_KEYS if k in data},
+            "core": {k: data[k] for k in CORE_KEYS if k in data},
+            "history-seed": history_seed(data)}
+
+
+def write_page_files(data: dict, out_dir: Path) -> dict[str, int]:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    sizes = {}
+    for name, obj in page_files(data).items():
+        f = out_dir / f"{name}.json"
+        f.write_text(json.dumps(obj, separators=(",", ":"), allow_nan=False), encoding="utf-8")
+        sizes[name] = f.stat().st_size
+    return sizes
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("out", type=Path, nargs="?", default=None,
                     help="write the page here (the template with the data inside)")
     ap.add_argument("--data-json", type=Path, default=None,
                     help="write the data alone here (the Model Lab page build keeps them apart)")
+    ap.add_argument("--out-dir", type=Path, default=None,
+                    help="write the page's data files here: gameweek.json, core.json and "
+                         "history-seed.json (the daily job publishes them)")
     ap.add_argument("--pages-dir", type=Path, required=True)
     ap.add_argument("--allow-stale", action="store_true")
     ap.add_argument("--trial-upcoming", type=Path, default=TRIAL_UPCOMING,
@@ -657,6 +723,10 @@ def main(argv: list[str] | None = None) -> int:
         args.data_json.parent.mkdir(parents=True, exist_ok=True)
         args.data_json.write_text(blob, encoding="utf-8")
         print(f"wrote {args.data_json} ({len(blob) / 1e6:.2f} MB)")
+    if args.out_dir:
+        sizes = write_page_files(data, args.out_dir)
+        print("wrote " + ", ".join(f"{k}.json {v / 1e3:.0f} KB" for k, v in sizes.items())
+              + f" to {args.out_dir}")
     if args.out:
         page = TEMPLATE.read_text(encoding="utf-8").replace("/*__DATA__*/null", blob)
         args.out.parent.mkdir(parents=True, exist_ok=True)
