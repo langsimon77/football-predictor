@@ -208,6 +208,23 @@ def test_a_corrected_score_replaces_the_recorded_one(tmp_path):
     assert res["recorded_utc"].iloc[0] == t2
 
 
+def test_results_file_survives_a_run_with_nothing_new_and_a_doubled_row(tmp_path):
+    now = pd.Timestamp("2026-10-30 08:00", tz="UTC")
+    ctx = context(tmp_path, now)
+    live.run_once(now, ctx)
+    g = ctx.games
+    gid = g.loc[(g["league"] == "EuroLeague") & ~g["played"] & (g["home_id"] == "a"), "game_id"]
+    g.loc[g["game_id"].isin(gid), ["home_pts", "away_pts", "played"]] = [90.0, 80.0, True]
+    t1 = now + pd.Timedelta(hours=40)
+    live.run_once(t1, ctx)
+    first = pd.read_parquet(ctx.results_path)
+    pd.concat([first, first]).to_parquet(ctx.results_path, index=False)  # a doubled row
+    live.run_once(now + pd.Timedelta(hours=46), ctx)  # nothing new to record
+    res = pd.read_parquet(ctx.results_path)
+    assert list(res["game_id"]) == list(gid) and res["recorded_utc"].iloc[0] == t1
+    assert res.dtypes.to_dict() == first.dtypes.to_dict()
+
+
 def test_basketball_files_are_apart_from_football_files():
     from fp import ledger
     assert live.LEDGER.parent.name == "basketball"

@@ -221,7 +221,8 @@ def record_results(games: pd.DataFrame, locked: pd.DataFrame, now: pd.Timestamp,
     if path.exists():
         # A recorded result stays, with the time it was first recorded, even if the page
         # later loses the score. A changed score replaces the old row.
-        old = pd.read_parquet(path)
+        old = pd.read_parquet(path).drop_duplicates("game_id", keep="last")
+        out = out.drop_duplicates("game_id", keep="last")
         both = out.merge(old, on="game_id", how="left", suffixes=("", "_old"))
         same = ((both["home_pts"] == both["home_pts_old"])
                 & (both["away_pts"] == both["away_pts_old"])).fillna(False).to_numpy()

@@ -159,6 +159,12 @@ jobs:
           git pull --rebase  # in case code was pushed while this run was working
           git push
 
+      - name: Package the static fixtures page
+        if: env.DRY_RUN != 'true' && vars.PAGES_ENABLED == 'true' && hashFiles('site/index.html') != ''
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
       - name: Model Lab data files (branch lab-data); never blocks the run
         # The Model Lab page reads three data files. This step builds them from today's
         # run and puts them on the branch lab-data as one commit that replaces the last,
@@ -167,6 +173,7 @@ jobs:
         id: lab
         if: env.DRY_RUN != 'true'
         continue-on-error: true
+        timeout-minutes: 10
         run: |
           uv run python scripts/build_model_lab.py --pages-dir app/data --out-dir "$RUNNER_TEMP/lab"
           python3 scripts/model_lab_refresh.py check "$RUNNER_TEMP/lab"
@@ -176,12 +183,6 @@ jobs:
           done
           commit=$(git commit-tree "$(git write-tree)" -m "Model Lab data $(date -u +%F)")
           git push --force origin "$commit:refs/heads/lab-data"
-
-      - name: Package the static fixtures page
-        if: env.DRY_RUN != 'true' && vars.PAGES_ENABLED == 'true' && hashFiles('site/index.html') != ''
-        uses: actions/upload-pages-artifact@v5
-        with:
-          path: site
 
       - name: Open an issue if the run locked with a fallback or skipped a step
         env:

@@ -3,7 +3,8 @@
 Rules enforced here:
 - A clear User-Agent names the project.
 - At most 1 request every 3 seconds per domain.
-- Every response is saved under data/raw/<source>/<YYYY-MM-DD>/ and never edited.
+- Every response is saved under data/raw/<source>/<YYYY-MM-DD>/. A saved file is never
+  edited by hand; today's copy is replaced only by a newer download of the same address.
 - A file that is already cached is read from disk instead of downloaded again. A caller
   that runs several times a day may ask for today's copy to be replaced once it is older
   than a set number of hours (max_age_hours).

@@ -211,22 +211,56 @@
    ]
   }
  ],
- "champions_league": {
-  "where": "Champions League",
+ "champions_league": [
+  {
+   "where": "Champions League",
+   "market": "home, draw, away",
+   "n": 753,
+   "log_loss": 0.9027815727958084,
+   "lo": 0.8672274189870295,
+   "hi": 0.9379653628514913,
+   "brier": 0.5302632945942415,
+   "rps": 0.19045356194609767,
+   "slope": 1.2181551484340583,
+   "slope_ci": [
+    1.0772755067949313,
+    1.4234053879790909
+   ]
+  },
+  {
+   "where": "Champions League",
+   "market": "over 2.5 goals",
+   "n": 753,
+   "log_loss": 0.6546667431185332,
+   "lo": 0.6355822063691258,
+   "hi": 0.6743214008517542,
+   "brier": 0.2315935519761904,
+   "rps": null,
+   "slope": 0.9245195318191447,
+   "slope_ci": [
+    0.5722465195619637,
+    1.2880640730407935
+   ]
+  }
+ ],
+ "europe": {
+  "where": "Europa and Conference League",
   "market": "home, draw, away",
-  "n": 753,
-  "log_loss": 0.9027815727958084,
+  "n": 678,
+  "log_loss": 0.9587,
   "lo": null,
   "hi": null,
-  "brier": 0.5302632945942415,
-  "rps": 0.19045356194609767,
-  "slope": 1.2181551484340583,
+  "brier": null,
+  "rps": null,
+  "slope": 1.1409813215995166,
   "slope_ci": null,
-  "gain_vs_base_rps": {
-   "mean": -0.04522757011916982,
-   "lo": -0.055013046087181425,
-   "hi": -0.03520442738923375
-  }
+  "base_log_loss": 1.0399,
+  "span": "2023/09 to 2026/10"
+ },
+ "champions_league_gain": {
+  "mean": -0.04522757011916982,
+  "lo": -0.055013046087181425,
+  "hi": -0.03520442738923375
  },
  "basketball": [
   {
@@ -347,9 +381,9 @@
   "Premier League over 4.5 yellow cards (0.63): too bold (weak evidence)",
   "La Liga over 4.5 yellow cards (1.28): too cautious (weak evidence)",
   "Serie A over 4.5 yellow cards (1.57): too cautious",
-  "Champions League home, draw, away (1.22): too cautious",
-  "LBA basketball winner (1.27): too cautious",
-  "ABA basketball winner (1.44): too cautious"
+  "Champions League home, draw, away (1.22): too cautious (weak evidence)",
+  "LBA basketball winner (1.27): too cautious (no interval)",
+  "ABA basketball winner (1.44): too cautious (no interval)"
  ],
  "limits": [
   0.8,

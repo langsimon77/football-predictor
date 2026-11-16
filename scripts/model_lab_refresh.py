@@ -1,8 +1,9 @@
 """Checks for the routine that copies the daily Model Lab data files to the page.
 
 The daily job writes gameweek.json, core.json and history-seed.json to the branch
-`lab-data` (scripts/build_model_lab.py --out-dir). A scheduled Claude routine fetches that
-branch, runs this script, and publishes the files to the page only when this script says so.
+`lab-data` (scripts/build_model_lab.py --out-dir). A scheduled Claude routine (see
+docs/CHECKPOINT.md for whether it is switched on) fetches that branch, runs this script, and
+publishes the files to the page only when this script says so.
 
     python3 scripts/model_lab_refresh.py check DIR [--live-gameweek FILE] [--now ISO]
         exit 0 and "PUBLISH" : the files are sound and newer than the page's

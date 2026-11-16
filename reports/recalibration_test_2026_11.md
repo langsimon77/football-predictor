@@ -11,4 +11,6 @@ Change in log loss, recalibrated minus published (below 0 is better), test seaso
 | over 9.5 corners | 2,280 | +0.0019 (-0.0003 to +0.0041) | Premier League +0.0001 (-0.0017 to +0.0019); La Liga +0.0038 (-0.0001 to +0.0076) | 1.01 | 1.25 | fail |
 | over 4.5 yellow cards | 4,337 | -0.0006 (-0.0028 to +0.0016) | Premier League -0.0012 (-0.0064 to +0.0039); La Liga +0.0026 (-0.0006 to +0.0060); Ligue 1 +0.0035 (+0.0010 to +0.0061); Serie A -0.0068 (-0.0118 to -0.0016) | 1.01 | 0.90 | fail |
 
+Note: the script skips a league and market with fewer than 300 earlier matches to fit on. That guard is not in the pre-registration. It never applied: all 30 fits ran, the smallest on 760 matches.
+
 No live forecast changed. A passing market is a candidate for Lang's decision only.

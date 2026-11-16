@@ -1,6 +1,6 @@
-"""Baseline accuracy of every live market on matches the models never saw.
+"""Baseline accuracy of the live markets on matches the models never saw.
 
-Review of Nov 2026 (checklist C1 and C5). Nothing is fitted here: the script reads the
+Review of Nov 2026 (checklist C1 and C5). No new model is fitted here: the script reads the
 stored walk-forward forecasts and results, scores them, and writes
 reports/accuracy_baseline_2026_11.md and data/audit/accuracy_baseline_2026_11.json.
 
@@ -144,13 +144,38 @@ def football() -> list[dict]:
     return rows
 
 
-def champions_league() -> dict:
-    u = json.loads((ROOT / "data" / "audit" / "ucl_backtest_2026_10.json").read_text("utf-8"))
-    t = u["table"]["club_dc"]
-    return {"where": "Champions League", "market": "home, draw, away", "n": u["n"],
-            "log_loss": t["log_loss"], "lo": None, "hi": None, "brier": t["brier"],
-            "rps": t["rps"], "slope": t["slope"], "slope_ci": None,
-            "gain_vs_base_rps": u["U1"]}  # the stored paired interval against base rates
+def champions_league() -> tuple[list[dict], dict]:
+    """Scored from the stored walk-forward forecasts, so the slopes get intervals too."""
+    f = pd.read_parquet(BT / "ucl" / "club_dc_walkforward_2021_2025.parquet")
+    f = f.dropna(subset=["club_dc_home", "home_goals", "away_goals"])
+    hg, ag = f["home_goals"].to_numpy(int), f["away_goals"].to_numpy(int)
+    p = f[["club_dc_home", "club_dc_draw", "club_dc_away"]].to_numpy(float)
+    rows = [row_1x2("Champions League", p, metrics.outcome_1x2(hg, ag)),
+            row_binary("Champions League", "over 2.5 goals",
+                       f["club_dc_over_2_5"].to_numpy(float), hg + ag > 2.5)]
+    stored = json.loads((ROOT / "data" / "audit" / "ucl_backtest_2026_10.json").read_text("utf-8"))
+    return rows, stored["U1"]  # the stored paired interval against base rates
+
+
+def europe() -> dict:
+    """Europa and Conference League: the Europe pipeline stores its test score and a binned
+    record, not each forecast. The slope here is fitted on the bins, so it has no interval."""
+    rec = json.loads((ROOT / "data" / "euro" / "eurrec.json").read_text("utf-8"))
+    bins = np.array([b[:3] for b in rec["record"]["result"]], float)
+    mid, n, hits = np.clip(bins[:, 0] + 0.025, 0.01, 0.99), bins[:, 1], bins[:, 2]
+    x = np.column_stack([np.ones_like(mid), np.log(mid / (1 - mid))])
+    b = np.zeros(2)
+    for _ in range(50):
+        q = 1 / (1 + np.exp(-(x @ b)))
+        step = np.linalg.solve(x.T @ (x * (n * q * (1 - q))[:, None]), x.T @ (hits - n * q))
+        b += step
+        if np.max(np.abs(step)) < 1e-10:
+            break
+    t = rec["test"]
+    return {"where": "Europa and Conference League", "market": "home, draw, away",
+            "n": t["n"], "log_loss": t["ll"], "lo": None, "hi": None, "brier": None,
+            "rps": None, "slope": float(b[1]), "slope_ci": None, "base_log_loss": t["base"],
+            "span": t["span"]}
 
 
 def basketball() -> list[dict]:
@@ -169,47 +194,59 @@ def basketball() -> list[dict]:
     return rows
 
 
-def flag(slope: float, ci: tuple[float, float] | None = None) -> str:
+def flag(slope: float, ci: tuple[float, float] | None = None, known: bool = True) -> str:
     """Outside 0.8 to 1.2 is flagged. When the 95% interval still reaches into that band,
-    the evidence is weak and the flag says so."""
+    the evidence is weak and the flag says so; with no interval it says that instead."""
     if LOW <= slope <= HIGH:
         return "ok"
     word = "too cautious" if slope > HIGH else "too bold"
-    weak = ci is not None and ci[0] <= HIGH and ci[1] >= LOW
+    if ci is None:
+        return f"**{word}**" + ("" if known else " (no interval)")
+    weak = ci[0] <= HIGH and ci[1] >= LOW
     return f"**{word}**" + (" (weak evidence)" if weak else "")
 
 
-def write(fb: list[dict], ucl: dict, bb: list[dict]) -> None:
+def write(fb: list[dict], ucl: list[dict], gain: dict, eu: dict, bb: list[dict]) -> None:
     def num(v: float | None, d: int = 3) -> str:
         return "" if v is None else f"{v:.{d}f}"
 
-    lines = ["# Baseline accuracy of every live market (review of November 2026)", "",
+    def verdict(r: dict) -> str:
+        return flag(r["slope"], r["slope_ci"], known=r["slope_ci"] is not None)
+
+    rows = [*fb, *ucl, eu]
+    lines = ["# Baseline accuracy of the live markets (review of November 2026)", "",
              "Every number is from matches the model had not seen when it made the forecast "
-             "(walk-forward). Nothing was fitted for this report: it scores the stored test "
-             "forecasts. [V] verified by `scripts/accuracy_baseline.py`.", "",
+             "(walk-forward). No new model was fitted for this report: it scores the stored "
+             "test forecasts. [V] verified by `scripts/accuracy_baseline.py`.", "",
              "How to read it: lower log loss, Brier and RPS are better. The calibration slope "
              "says whether a 70% forecast happens 70% of the time: 1 is honest, above 1 the "
              f"model is too cautious, below 1 too bold. Outside {LOW} to {HIGH} is flagged.", "",
              "## Football", "",
              "Premier League, La Liga, Serie A and Ligue 1: test seasons 2023/24 to 2025/26, "
              "the published model (Bayesian Dixon-Coles with the goals fix). Champions League: "
-             "2021/22 to 2025/26, from `data/audit/ucl_backtest_2026_10.json`.", "",
-             "| Competition | Market | Matches | Log loss (95% interval) | Brier | RPS | Slope | "
-             "Calibration |", "|---|---|---|---|---|---|---|---|"]
-    for r in [*fb, ucl]:
+             "2021/22 to 2025/26, scored from `data/backtests/ucl/`. Europa and Conference "
+             f"League: {eu['span']}, from the Europe pipeline's stored test "
+             "(`data/euro/eurrec.json`).", "",
+             "| Competition | Market | Matches | Log loss (95% interval) | Brier | RPS | "
+             "Slope (95% interval) | Calibration |", "|---|---|---|---|---|---|---|---|"]
+    for r in rows:
         ci = f" ({r['lo']:.3f} to {r['hi']:.3f})" if r["lo"] is not None else ""
         lines.append(f"| {r['where']} | {r['market']} | {r['n']:,} | {r['log_loss']:.3f}{ci} | "
                      f"{num(r['brier'])} | {num(r['rps'])} | {r['slope']:.2f}"
                      + (f" ({r['slope_ci'][0]:.2f} to {r['slope_ci'][1]:.2f})"
-                        if r["slope_ci"] else "")
-                     + f" | {flag(r['slope'], r['slope_ci'])} |")
-    g = ucl["gain_vs_base_rps"]
-    lines += ["", f"Champions League gain over base rates, RPS: {g['mean']:.3f} "
-              f"(95% interval {g['lo']:.3f} to {g['hi']:.3f}; below 0 is better).", "",
+                        if r["slope_ci"] else " (no interval)")
+                     + f" | {verdict(r)} |")
+    lines += ["", f"Champions League gain over base rates, RPS: {gain['mean']:.3f} "
+              f"(95% interval {gain['lo']:.3f} to {gain['hi']:.3f}; below 0 is better). "
+              f"Europa and Conference League log loss {eu['log_loss']:.3f} against "
+              f"{eu['base_log_loss']:.3f} for base rates; its slope is fitted on the stored "
+              "bins of the record, so it is an estimate [E] with no interval.", "",
               "## Basketball", "",
               "Test seasons as in each league's report. Winner: log loss of the Elo model and "
               "its gain over a naive forecast. Margin and total: CRPS in points, and how often "
-              "the 90% range held the result (target 0.90, pass from 0.87 to 0.93).", "",
+              "the 90% range held the result (target 0.90, pass from 0.87 to 0.93). The stored "
+              "results hold each slope but not each game's forecast, so the slopes have no "
+              "interval here.", "",
               "| League | Games | Winner log loss | Gain over naive (95% interval) | Slope | "
               "Calibration | Margin CRPS | Total CRPS | 90% range held: margin, total | Shown "
               "on the page |", "|---|---|---|---|---|---|---|---|---|---|"]
@@ -218,27 +255,38 @@ def write(fb: list[dict], ucl: dict, bb: list[dict]) -> None:
         shown = ", ".join(k.replace("_", " ") for k, v in r["shown"].items() if v) or "nothing"
         lines.append(f"| {r['league']} | {r['n']:,} | {r['winner_log_loss']:.3f} | "
                      f"{w['mean']:.3f} ({w['low']:.3f} to {w['high']:.3f}) | {r['slope']:.2f} | "
-                     f"{flag(r['slope'])} | {r['margin_crps']:.2f} | {r['total_crps']:.2f} | "
-                     f"{r['cover_margin']:.2f}, {r['cover_total']:.2f} | {shown} |")
-    flagged = [f"{r['where']} {r['market']} ({r['slope']:.2f}): "
-               + flag(r["slope"], r["slope_ci"]).replace("*", "") for r in [*fb, ucl]
-               if flag(r["slope"]) != "ok"]
+                     f"{flag(r['slope'], known=False)} | {r['margin_crps']:.2f} | "
+                     f"{r['total_crps']:.2f} | {r['cover_margin']:.2f}, {r['cover_total']:.2f} "
+                     f"| {shown} |")
+    flagged = [f"{r['where']} {r['market']} ({r['slope']:.2f}): " + verdict(r).replace("*", "")
+               for r in rows if verdict(r) != "ok"]
     flagged += [f"{r['league']} basketball winner ({r['slope']:.2f}): "
-                + flag(r["slope"]).replace("*", "") for r in bb if flag(r["slope"]) != "ok"]
+                + flag(r["slope"], known=False).replace("*", "") for r in bb
+                if flag(r["slope"]) != "ok"]
     lines += ["", "## Flagged markets", ""]
     lines += [f"- {f}" for f in flagged] or ["- none"]
     lines += ["", "A flagged basketball winner market is not shown on the page (the league's "
               "handicap and total are). A flagged football market keeps its forecast, and the "
-              "page says on that section which way it leans.", ""]
+              "page says on that section which way it leans.", "",
+              "## What this table does not cover", "",
+              "- Football lines other than the main one per market (for example over 1.5 or "
+              "3.5 goals, other corner and card lines, handicaps). The picks table on the page "
+              "shows how often each kind of pick came true in testing "
+              "(`reports/pick_safety_2026_10.md`).",
+              "- NBA, Turkish and Chinese basketball on the page. They come from a second "
+              "pipeline that lives inside the page, not from this repository's tested models.",
+              "- The league football forecasts of that second pipeline (`data/football.json` "
+              "on the page), for the same reason.", ""]
     REPORT.write_text("\n".join(lines), encoding="utf-8")
-    RESULTS.write_text(json.dumps({"football": fb, "champions_league": ucl, "basketball": bb,
+    RESULTS.write_text(json.dumps({"football": fb, "champions_league": ucl, "europe": eu,
+                                   "champions_league_gain": gain, "basketball": bb,
                                    "flagged": flagged, "limits": [LOW, HIGH]}, indent=1),
                        encoding="utf-8")
 
 
 def main() -> int:
-    fb, ucl, bb = football(), champions_league(), basketball()
-    write(fb, ucl, bb)
+    fb, (ucl, gain), eu, bb = football(), champions_league(), europe(), basketball()
+    write(fb, ucl, gain, eu, bb)
     print(REPORT.read_text(encoding="utf-8"))
     return 0
 

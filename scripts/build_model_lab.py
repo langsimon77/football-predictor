@@ -592,19 +592,22 @@ CALIBRATION = ROOT / "data" / "audit" / "accuracy_baseline_2026_11.json"
 def calibration_flags(path: Path = CALIBRATION) -> list[dict]:
     """Football markets whose tested calibration slope is outside the limits
     (scripts/accuracy_baseline.py), for the note under each section of the page.
-    `weak`: the 95% interval of the slope still reaches inside the limits."""
+    `weak`: the 95% interval of the slope still reaches inside the limits (None: no interval)."""
     if not path.exists():
         return []
     res = json.loads(path.read_text(encoding="utf-8"))
     low, high = res["limits"]
     out = []
-    for r in [*res["football"], res["champions_league"]]:
+    ucl = res["champions_league"]
+    for r in [*res["football"], *(ucl if isinstance(ucl, list) else [ucl]),
+              *([res["europe"]] if "europe" in res else [])]:
         if low <= r["slope"] <= high:
             continue
         ci = r.get("slope_ci")
+        # weak: True or False when the slope has an interval, None when it has none.
         out.append({"where": r["where"], "market": r["market"], "slope": round(r["slope"], 2),
                     "lean": "cautious" if r["slope"] > high else "bold",
-                    "weak": bool(ci and ci[0] <= high and ci[1] >= low)})
+                    "weak": bool(ci[0] <= high and ci[1] >= low) if ci else None})
     return out
 
 

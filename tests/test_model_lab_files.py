@@ -91,5 +91,5 @@ def test_calibration_flags_for_the_page(tmp_path):
         {"where": "Serie A", "market": "over 4.5 yellow cards", "slope": 1.57,
          "lean": "cautious", "weak": False},
         {"where": "Champions League", "market": "home, draw, away", "slope": 1.22,
-         "lean": "cautious", "weak": False}]
+         "lean": "cautious", "weak": None}]  # no interval: strength of evidence not known
     assert lab.calibration_flags(tmp_path / "missing.json") == []

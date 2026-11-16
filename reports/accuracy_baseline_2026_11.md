@@ -1,14 +1,14 @@
-# Baseline accuracy of every live market (review of November 2026)
+# Baseline accuracy of the live markets (review of November 2026)
 
-Every number is from matches the model had not seen when it made the forecast (walk-forward). Nothing was fitted for this report: it scores the stored test forecasts. [V] verified by `scripts/accuracy_baseline.py`.
+Every number is from matches the model had not seen when it made the forecast (walk-forward). No new model was fitted for this report: it scores the stored test forecasts. [V] verified by `scripts/accuracy_baseline.py`.
 
 How to read it: lower log loss, Brier and RPS are better. The calibration slope says whether a 70% forecast happens 70% of the time: 1 is honest, above 1 the model is too cautious, below 1 too bold. Outside 0.8 to 1.2 is flagged.
 
 ## Football
 
-Premier League, La Liga, Serie A and Ligue 1: test seasons 2023/24 to 2025/26, the published model (Bayesian Dixon-Coles with the goals fix). Champions League: 2021/22 to 2025/26, from `data/audit/ucl_backtest_2026_10.json`.
+Premier League, La Liga, Serie A and Ligue 1: test seasons 2023/24 to 2025/26, the published model (Bayesian Dixon-Coles with the goals fix). Champions League: 2021/22 to 2025/26, scored from `data/backtests/ucl/`. Europa and Conference League: 2023/09 to 2026/10, from the Europe pipeline's stored test (`data/euro/eurrec.json`).
 
-| Competition | Market | Matches | Log loss (95% interval) | Brier | RPS | Slope | Calibration |
+| Competition | Market | Matches | Log loss (95% interval) | Brier | RPS | Slope (95% interval) | Calibration |
 |---|---|---|---|---|---|---|---|
 | Premier League | home, draw, away | 1,140 | 0.976 (0.948 to 1.004) | 0.581 | 0.199 | 1.00 (0.89 to 1.15) | ok |
 | Premier League | over 2.5 goals | 1,140 | 0.675 (0.663 to 0.688) | 0.241 |  | 0.61 (0.25 to 1.01) | **too bold** (weak evidence) |
@@ -24,21 +24,23 @@ Premier League, La Liga, Serie A and Ligue 1: test seasons 2023/24 to 2025/26, t
 | Serie A | over 4.5 yellow cards | 1,140 | 0.624 (0.611 to 0.637) | 0.217 |  | 1.57 (1.22 to 1.93) | **too cautious** |
 | Ligue 1 | home, draw, away | 917 | 1.001 (0.972 to 1.029) | 0.598 | 0.209 | 1.00 (0.84 to 1.17) | ok |
 | Ligue 1 | over 4.5 yellow cards | 917 | 0.624 (0.601 to 0.648) | 0.217 |  | 1.12 (0.70 to 1.66) | ok |
-| Champions League | home, draw, away | 753 | 0.903 | 0.530 | 0.190 | 1.22 | **too cautious** |
+| Champions League | home, draw, away | 753 | 0.903 (0.867 to 0.938) | 0.530 | 0.190 | 1.22 (1.08 to 1.42) | **too cautious** (weak evidence) |
+| Champions League | over 2.5 goals | 753 | 0.655 (0.636 to 0.674) | 0.232 |  | 0.92 (0.57 to 1.29) | ok |
+| Europa and Conference League | home, draw, away | 678 | 0.959 |  |  | 1.14 (no interval) | ok |
 
-Champions League gain over base rates, RPS: -0.045 (95% interval -0.055 to -0.035; below 0 is better).
+Champions League gain over base rates, RPS: -0.045 (95% interval -0.055 to -0.035; below 0 is better). Europa and Conference League log loss 0.959 against 1.040 for base rates; its slope is fitted on the stored bins of the record, so it is an estimate [E] with no interval.
 
 ## Basketball
 
-Test seasons as in each league's report. Winner: log loss of the Elo model and its gain over a naive forecast. Margin and total: CRPS in points, and how often the 90% range held the result (target 0.90, pass from 0.87 to 0.93).
+Test seasons as in each league's report. Winner: log loss of the Elo model and its gain over a naive forecast. Margin and total: CRPS in points, and how often the 90% range held the result (target 0.90, pass from 0.87 to 0.93). The stored results hold each slope but not each game's forecast, so the slopes have no interval here.
 
 | League | Games | Winner log loss | Gain over naive (95% interval) | Slope | Calibration | Margin CRPS | Total CRPS | 90% range held: margin, total | Shown on the page |
 |---|---|---|---|---|---|---|---|---|---|
 | EuroLeague | 1,293 | 0.618 | -0.040 (-0.054 to -0.026) | 0.98 | ok | 6.56 | 9.28 | 0.90, 0.91 | winner, handicap, total points |
 | NBL | 450 | 0.653 | -0.036 (-0.061 to -0.010) | 0.95 | ok | 8.55 | 10.71 | 0.85, 0.87 | winner |
 | ACB | 612 | 0.582 | -0.095 (-0.130 to -0.058) | 0.96 | ok | 6.79 | 9.65 | 0.88, 0.89 | winner, handicap |
-| LBA | 448 | 0.601 | -0.083 (-0.110 to -0.054) | 1.27 | **too cautious** | 6.67 | 10.00 | 0.94, 0.88 | handicap, total points |
-| ABA | 466 | 0.484 | -0.188 (-0.223 to -0.151) | 1.44 | **too cautious** | 6.62 | 9.65 | 0.93, 0.90 | handicap, total points |
+| LBA | 448 | 0.601 | -0.083 (-0.110 to -0.054) | 1.27 | **too cautious** (no interval) | 6.67 | 10.00 | 0.94, 0.88 | handicap, total points |
+| ABA | 466 | 0.484 | -0.188 (-0.223 to -0.151) | 1.44 | **too cautious** (no interval) | 6.62 | 9.65 | 0.93, 0.90 | handicap, total points |
 
 ## Flagged markets
 
@@ -48,8 +50,14 @@ Test seasons as in each league's report. Winner: log loss of the Elo model and i
 - Premier League over 4.5 yellow cards (0.63): too bold (weak evidence)
 - La Liga over 4.5 yellow cards (1.28): too cautious (weak evidence)
 - Serie A over 4.5 yellow cards (1.57): too cautious
-- Champions League home, draw, away (1.22): too cautious
-- LBA basketball winner (1.27): too cautious
-- ABA basketball winner (1.44): too cautious
+- Champions League home, draw, away (1.22): too cautious (weak evidence)
+- LBA basketball winner (1.27): too cautious (no interval)
+- ABA basketball winner (1.44): too cautious (no interval)
 
 A flagged basketball winner market is not shown on the page (the league's handicap and total are). A flagged football market keeps its forecast, and the page says on that section which way it leans.
+
+## What this table does not cover
+
+- Football lines other than the main one per market (for example over 1.5 or 3.5 goals, other corner and card lines, handicaps). The picks table on the page shows how often each kind of pick came true in testing (`reports/pick_safety_2026_10.md`).
+- NBA, Turkish and Chinese basketball on the page. They come from a second pipeline that lives inside the page, not from this repository's tested models.
+- The league football forecasts of that second pipeline (`data/football.json` on the page), for the same reason.
