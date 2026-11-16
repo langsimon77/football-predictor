@@ -1,4 +1,49 @@
 {
- "date": "2026-10-12",
- "checks": []
+ "date": "2026-11-16",
+ "checks": [
+  {
+   "market": "1x2",
+   "n": 67,
+   "live_gap": 3.5003339910612376e-05,
+   "baseline_gap": -0.0017808329263164265,
+   "z": 0.4828985606568917,
+   "p_value": 0.31458388192071396,
+   "p_holm": 0.9437516457621419,
+   "flagged": false,
+   "note": "within the backtest norm"
+  },
+  {
+   "market": "over_2_5",
+   "n": 67,
+   "live_gap": -0.04918406925101892,
+   "baseline_gap": -0.014751988692185436,
+   "z": -1.4315880573588533,
+   "p_value": 0.9238691252567803,
+   "p_holm": 1.0,
+   "flagged": false,
+   "note": "within the backtest norm"
+  },
+  {
+   "market": "corners_over_9_5",
+   "n": 67,
+   "live_gap": -0.007674427552157724,
+   "baseline_gap": -0.005538845915508278,
+   "z": -0.12559016083626126,
+   "p_value": 0.5499718241004764,
+   "p_holm": 1.0,
+   "flagged": false,
+   "note": "within the backtest norm"
+  },
+  {
+   "market": "yellows_over_4_5",
+   "n": 67,
+   "live_gap": 0.010224389237479061,
+   "baseline_gap": -0.02333551858048054,
+   "z": 1.8388124843848248,
+   "p_value": 0.03297138568061986,
+   "p_holm": 0.13188554272247943,
+   "flagged": false,
+   "note": "within the backtest norm"
+  }
+ ]
 }
