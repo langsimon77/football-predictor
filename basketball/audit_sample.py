@@ -66,12 +66,18 @@ def no_dashes(text: str | None) -> str | None:
     return None if text is None else text.replace(EN_DASH, "-").replace(EM_DASH, "-")
 
 
-def wikitext(title: str, refresh: bool) -> str | None:
+# The live job runs four times a day. A season page older than this is downloaded again,
+# so a result or a moved tip-off reaches the ledger the same day, not up to a day late.
+PAGE_MAX_AGE_HOURS = 3.0
+
+
+def wikitext(title: str, refresh: bool, max_age_hours: float | None = None) -> str | None:
     """The article's wikitext, or None when there is no such article."""
     url = API + urlencode({"action": "parse", "page": title, "prop": "wikitext",
                            "redirects": 1, "format": "json", "formatversion": 2})
     name = re.sub(r"[^A-Za-z0-9]+", "_", title).strip("_") + ".json"
-    data = json.loads(http.fetch(url, SOURCE, name, refresh=refresh).read_text(encoding="utf-8"))
+    data = json.loads(http.fetch(url, SOURCE, name, refresh=refresh,
+                                 max_age_hours=max_age_hours).read_text(encoding="utf-8"))
     return data.get("parse", {}).get("wikitext")
 
 

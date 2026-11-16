@@ -89,3 +89,20 @@ league's own settings (`data/basketball/b5_settings.json`, committed before the 
 - Not possible at $0: Turkey, Greece, France, Germany, VTB, China, Japan (no free list of
   coming games). Tests: `tests/test_basketball_more.py`.
 
+## 15 Nov 2026: Review of November 2026 (no model change)
+
+Baseline accuracy of the live markets on unseen seasons:
+`reports/accuracy_baseline_2026_11.md` (`scripts/accuracy_baseline.py`; no new model fitted;
+the report lists what it does not cover).
+
+One candidate, pre-registered in `data/audit/preregistration_recalibration_2026_11.md` and
+tested once: a logistic recalibration of the yes/no football markets (over 2.5 goals, both
+teams score, over 9.5 corners, over 4.5 yellow cards), fitted for each test season on the
+earlier seasons of the same league. Change in log loss, pooled, 95% interval: goals +0.0009
+(-0.0007 to +0.0024); both teams score -0.0010 (-0.0031 to +0.0010); corners +0.0019
+(-0.0003 to +0.0041); yellow cards -0.0006 (-0.0028 to +0.0016). No market passed (the whole
+interval below zero). Nothing changes. Honest limit: the idea came from the same seasons the
+test used.
+
+Not a model change, but it affects what is scored: basketball results are now recorded the
+same day (this season's pages are fetched again when older than 3 hours).

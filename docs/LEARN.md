@@ -822,3 +822,32 @@ really wins 85% of the time makes you skip good bets and misjudge your slips. So
 chances stay hidden until a fix is tested, while the handicap and total ranges, which passed,
 are shown. Seven other leagues have no free source that lists coming games, so they cannot
 be forecast at all without paid data.
+
+## Chapter 14: What a full review found (November 2026)
+
+### 14.1 A cache can make four runs behave like one
+
+The basketball job ran four times a day, yet results still arrived a day late. The cause was
+a rule that sounds harmless: "if today's copy of a page is already saved, do not download it
+again". Each run restored the saved pages of the run before it, so runs two to four read the
+first run's pages. The lesson: when a job runs more often, check that its inputs are fetched
+more often too. The fix is one number: a copy older than 3 hours is fetched again.
+
+### 14.2 A test can time the wrong thing
+
+One browser test checked that the page shows its first card within 2 seconds on a slow
+connection. It failed at random, about every second run. The page was never slow: it showed
+the card at 1.3 seconds every time. The test was timing how long the test tool took to
+notice the card. The lesson: before you speed up the thing a test measures, check what the
+test really measures. Now the page itself reports the moment the card appears.
+
+### 14.3 Honest chances, and a fix that did not work
+
+A calibration slope says whether a "70%" happens 70% of the time. For some yes/no markets
+the slope on unseen seasons was far from 1, most clearly "both teams score" in the Premier
+League. The obvious fix is to bend the chances back with a curve learned on earlier seasons.
+It was tested under rules written down first, and it did not help. The test shows only
+that there was no gain; it does not say why. So the chances stay as they are, and the
+page carries a short warning where the slope is off. A failed test is still a result: it
+stops a change that would only have looked like an improvement.
+

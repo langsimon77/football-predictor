@@ -102,8 +102,12 @@ def fixture_features(cands: pd.DataFrame, matches: pd.DataFrame, fixtures: pd.Da
 
 
 def load_stack() -> tuple[list[str], np.ndarray]:
+    """The stack's models and weights. The weekly run stores the weights rounded to four
+    places, so they can add up to 1.0001; they are scaled to add up to 1 exactly, or the
+    stack's three chances would not."""
     data = json.loads(STACK_FILE.read_text(encoding="utf-8"))
-    return list(data["models"]), np.asarray(data["weights"], dtype=float)
+    weights = np.asarray(data["weights"], dtype=float)
+    return list(data["models"]), weights / weights.sum()
 
 
 def add_shadows(new: pd.DataFrame, challengers: dict[str, ml.Challenger],

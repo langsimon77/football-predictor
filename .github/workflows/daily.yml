@@ -165,6 +165,25 @@ jobs:
         with:
           path: site
 
+      - name: Model Lab data files (branch lab-data); never blocks the run
+        # The Model Lab page reads three data files. This step builds them from today's
+        # run and puts them on the branch lab-data as one commit that replaces the last,
+        # so the branch never grows. A scheduled Claude routine copies them to the page
+        # (scripts/model_lab_refresh.py). No private data: the bets block stays empty.
+        id: lab
+        if: env.DRY_RUN != 'true'
+        continue-on-error: true
+        timeout-minutes: 10
+        run: |
+          uv run python scripts/build_model_lab.py --pages-dir app/data --out-dir "$RUNNER_TEMP/lab"
+          python3 scripts/model_lab_refresh.py check "$RUNNER_TEMP/lab"
+          export GIT_INDEX_FILE="$RUNNER_TEMP/lab.index"
+          for f in "$RUNNER_TEMP"/lab/*.json; do
+            git update-index --add --cacheinfo "100644,$(git hash-object -w "$f"),$(basename "$f")"
+          done
+          commit=$(git commit-tree "$(git write-tree)" -m "Model Lab data $(date -u +%F)")
+          git push --force origin "$commit:refs/heads/lab-data"
+
       - name: Open an issue if the run locked with a fallback or skipped a step
         env:
           GH_TOKEN: ${{ github.token }}
@@ -192,6 +211,15 @@ jobs:
           gh issue create \
             --title "Trial leagues step failed: $(date -u +%F)" \
             --body "Serie A and Ligue 1 run in the background only; the live run was not affected. Log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+      - name: Open an issue if the Model Lab data step failed
+        if: steps.lab.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "Model Lab data step failed: $(date -u +%F)" \
+            --body "The page keeps yesterday's football data; the live run was not affected. Log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
       - name: Open an issue if the Champions League step failed
         if: steps.ucl.outcome == 'failure'

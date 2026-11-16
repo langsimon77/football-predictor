@@ -36,6 +36,7 @@ from audit_sample import (  # noqa: E402  (same folder; run as a script or via s
     API,
     CURRENT,
     EN_DASH,
+    PAGE_MAX_AGE_HOURS,
     SOURCE,
     params,
     parse_date,
@@ -187,7 +188,8 @@ def build(offline: bool = False) -> tuple[pd.DataFrame, dict]:
             text = None
             for pattern in ARTICLES[league]:
                 text = wikitext(pattern.format(s=season_label(year)),
-                                refresh=(year == CURRENT) and not offline)
+                                refresh=(year == CURRENT) and not offline,
+                                max_age_hours=PAGE_MAX_AGE_HOURS)
                 if text is not None:
                     break
             if text is None:
@@ -195,7 +197,8 @@ def build(offline: bool = False) -> tuple[pd.DataFrame, dict]:
             raw += parse_boxes(text, league, year)
             if league == "EuroLeague":
                 grid_text = wikitext(GRID_ARTICLE.format(s=season_label(year)),
-                                     refresh=(year == CURRENT) and not offline) or ""
+                                     refresh=(year == CURRENT) and not offline,
+                                     max_age_hours=PAGE_MAX_AGE_HOURS) or ""
                 grids[year] = parse_grid(grid_text)
     games = pd.DataFrame(raw)
     # Regular seasons only (plan, section 1): drop preseason, cup and finals sections.

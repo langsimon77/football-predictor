@@ -1,6 +1,46 @@
 # Checkpoint
 
-## Latest: 14 Nov 2026, basketball in three more leagues (B5)
+## Latest: 15 Nov 2026, full review (branch `review-2026-11`)
+
+A bounded review of the whole system, run from `~/Downloads/Football/FABLE_REVIEW_PROMPT.md`.
+The running record, with every finding and its evidence, is
+`~/Downloads/Football/REVIEW_LEDGER.md`. Nothing is on `main` until Lang merges the pull
+request.
+
+- **Basketball results arrived up to a day late.** The job runs four times a day, but every
+  run after the first of a UTC day read the first run's Wikipedia pages (the raw cache is
+  restored between runs). Fixed: `fetch(..., max_age_hours=3)` for this season's pages
+  (`src/fp/ingest/http.py`, `tests/test_http.py`). A recorded result now also stays if the
+  page later loses the score (`basketball/live.py`).
+- **The Model Lab's football data was built by hand** and went two weeks stale. Now the
+  daily job builds the page's three data files
+  (`scripts/build_model_lab.py --out-dir`) and puts them on the branch `lab-data` (one
+  commit, replaced each day). A scheduled Claude routine, set up at the end of the review,
+  will copy them to the page after the checks in `scripts/model_lab_refresh.py`, and create
+  the History records that were never created automatically.
+- **Baseline accuracy of the live markets:** `reports/accuracy_baseline_2026_11.md` (the
+  report lists what it does not cover). Seven football markets have a calibration slope
+  outside 0.8 to 1.2; the page now says so under their section. Clear cases: Premier League
+  both teams score (0.34, too bold) and Serie A yellow cards (1.57, too cautious). The other
+  five, the Champions League result (1.22) among them, are weak evidence: their 95% interval
+  still reaches the honest range.
+- **One accuracy candidate, pre-registered and tested once:** recalibrating the yes/no
+  football markets on earlier seasons. It failed in all four markets
+  (`reports/recalibration_test_2026_11.md`). No live model changed.
+- **Model Lab page** (private repository `football-lab`): the source now builds the live
+  page (it was about 540 lines behind); every card names the favourite in plain words;
+  every section says when its next forecast locks; Evidence tab and red text fixed; more
+  browser tests (44 before; the count is in the review ledger).
+
+### Open questions for Lang
+
+1. The second league-football pipeline inside the page (`data/football.json`, built by
+   another session) cannot be refreshed from this repository and, when fresh, replaces the
+   tested, locked forecasts on the Predictions tab. Keep it, or remove it?
+2. The odds reader routine is suspended (it needs your computer awake). Switch it on again?
+3. Three older routines carry connectors they do not use. Remove them and run one test each?
+
+## Earlier: 14 Nov 2026, basketball in three more leagues (B5)
 
 - Lang asked (third time) for ten more basketball leagues; chose "Stay free ($0)". Live from
   14 Nov: Liga ACB (winner, handicap), Lega Basket Serie A and the ABA League (handicap, total

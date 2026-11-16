@@ -218,6 +218,19 @@ def record_results(games: pd.DataFrame, locked: pd.DataFrame, now: pd.Timestamp,
                         "away_pts": done["away_pts"].astype("Int64"),
                         "overtime": done["overtime"].astype(bool), "recorded_utc": now,
                         "source": "wikipedia"}).reindex(columns=ledger_bb.RESULT_COLUMNS)
+    if path.exists():
+        # A recorded result stays, with the time it was first recorded, even if the page
+        # later loses the score. A changed score replaces the old row.
+        old = pd.read_parquet(path).drop_duplicates("game_id", keep="last")
+        out = out.drop_duplicates("game_id", keep="last")
+        both = out.merge(old, on="game_id", how="left", suffixes=("", "_old"))
+        same = ((both["home_pts"] == both["home_pts_old"])
+                & (both["away_pts"] == both["away_pts_old"])).fillna(False).to_numpy()
+        out = out.reset_index(drop=True)
+        out.loc[same, "recorded_utc"] = both.loc[same, "recorded_utc_old"].to_numpy()
+        out["recorded_utc"] = pd.to_datetime(out["recorded_utc"], utc=True)
+        kept = old[~old["game_id"].isin(out["game_id"])]
+        out = pd.concat([kept, out], ignore_index=True) if len(kept) else out
     if len(out):
         path.parent.mkdir(parents=True, exist_ok=True)
         out.to_parquet(path, index=False)
