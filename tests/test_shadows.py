@@ -53,6 +53,15 @@ def test_shadow_rows_and_stack_weights():
     assert out.loc["xgboost_v1", "prediction_id"] == "EPL_2627_arsenal_leeds:xgboost_v1"
 
 
+def test_stack_weights_add_up_to_one_even_when_stored_rounded(tmp_path, monkeypatch):
+    # 16 Nov 2026: the weekly run stored weights that add up to 1.0001.
+    f = tmp_path / "stack.json"
+    f.write_text(json.dumps({"models": ["a", "b", "c"], "weights": [0.3334, 0.3334, 0.3333]}))
+    monkeypatch.setattr(shadows, "STACK_FILE", f)
+    models, weights = shadows.load_stack()
+    assert models == ["a", "b", "c"] and weights.sum() == pytest.approx(1.0, abs=1e-12)
+
+
 def test_no_stack_row_without_every_component():
     out = shadows.add_shadows(ledger_rows(with_bayes=False), STUBS, FEATURES)
     assert "stack_v1" not in set(out["model_name"])
