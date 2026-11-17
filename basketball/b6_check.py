@@ -41,6 +41,14 @@ def _width(flags: str, market: str) -> Width:
     return Width("W0")
 
 
+def _alt(flags: str, market: str) -> float:
+    key = "b6_alt_margin_sd:" if market == "handicap" else "b6_alt_total_sd:"
+    for f in flags.strip("[]").replace('"', "").split(", "):
+        if f.startswith(key):
+            return float(f[len(key):])
+    return np.nan
+
+
 def _ll(p: np.ndarray, y: np.ndarray) -> np.ndarray:
     return -(y * np.log(p) + (1 - y) * np.log(1 - p))
 
@@ -81,6 +89,24 @@ def check() -> list[str]:
             else:
                 msg += f"; test waits for {NEED_WIDTH} games"
             lines.append(msg)
+            alt = part["flags"].map(lambda f, m=market: _alt(f, m)).to_numpy(float)
+            if (~np.isnan(alt)).any():
+                ok = ~np.isnan(alt)
+                w1 = Width("W1", 200)
+                c_alt = float(inside_90(x[ok], mu[ok], alt[ok], w1).mean())
+                note = f"- {market} amendment 2 (W1 N=200): range caught {c_alt:.1%}"
+                if ok.sum() >= NEED_WIDTH:
+                    mm = main.drop_duplicates("game_id").set_index("game_id")
+                    base_sd = part["game_id"].map(mm[scol]).to_numpy(float)
+                    k = ok & ~np.isnan(base_sd)
+                    d = (crps(x[k], mu[k], alt[k], w1)
+                         - crps(x[k], mu[k], base_sd[k], Width("W0")))
+                    iv = interval(d, day[k])
+                    passed = 0.86 <= c_alt <= 0.94 and iv["high"] < 0.10
+                    note += f"; CRPS minus W0 {iv['mean']:+.3f}: {'PASS' if passed else 'FAIL'}"
+                else:
+                    note += f" over {int(ok.sum())} games; test waits for {NEED_WIDTH}"
+                lines.append(note)
         lines.append("")
     snaps = odds.load()
     if len(snaps) and len(main):

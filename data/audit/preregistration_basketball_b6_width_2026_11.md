@@ -70,3 +70,17 @@ model `bb_b6_shadow`), locked at the same time as the main forecast, never shown
   it passes if its winner log loss beats both the model alone and the market alone (95% upper
   bound below 0 for each). Only then does it replace the main forecast.
 - **Step 5.** No new machine-learning challenger is added (B2 result).
+
+## 7. Amendment 2 (17 Nov 2026, after tuning and the seen seasons; future games only)
+
+Tuning kept W0 in all four markets (`data/basketball/b6_settings.json`): W1 and W2 were within
+0.006 CRPS points but never lower. On the seen NBL test seasons, a rolling width W1 N=200 caught
+88.9% of margins (W0: 84.9%) with equal CRPS (8.546 against 8.547) [V: rerun 17 Nov 2026].
+Because that was found on seen data, it is a new hypothesis, tested on future games only:
+
+- The shadow ledger records, in its flags, the W1 N=200 width for handicap and totals
+  (`b6_alt_margin_sd`, `b6_alt_total_sd`) for EuroLeague and NBL games locked from today.
+- After 100 NBL games with results, the NBL handicap goes live with W1 N=200 if its 90% range
+  catches 86% to 94% and its CRPS is not worse than W0's by the section 4 rule. Otherwise, if
+  W0 itself passes K2 on those games, the NBL handicap goes live with W0. Otherwise it stays off.
+- The same rule applies to NBL total points, and is reported (not acted on) for the EuroLeague.

@@ -1,0 +1,95 @@
+{
+  "note": "B1 test seasons, already scored in B1 and seen: descriptive only.",
+  "EuroLeague": {
+    "handicap": {
+      "chosen": "W0",
+      "games": 1293,
+      "coverage_90": {
+        "chosen": 0.9026,
+        "W0": 0.9026
+      },
+      "coverage_pass_86_94": true,
+      "crps": {
+        "chosen": 6.5619,
+        "W0": 6.5619
+      },
+      "crps_chosen_minus_W0": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0
+      },
+      "mean_width": {
+        "chosen": 11.996,
+        "W0": 11.996
+      }
+    },
+    "total": {
+      "chosen": "W0",
+      "games": 1293,
+      "coverage_90": {
+        "chosen": 0.9087,
+        "W0": 0.9087
+      },
+      "coverage_pass_86_94": true,
+      "crps": {
+        "chosen": 9.2839,
+        "W0": 9.2839
+      },
+      "crps_chosen_minus_W0": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0
+      },
+      "mean_width": {
+        "chosen": 16.575,
+        "W0": 16.575
+      }
+    }
+  },
+  "NBL": {
+    "handicap": {
+      "chosen": "W0",
+      "games": 450,
+      "coverage_90": {
+        "chosen": 0.8489,
+        "W0": 0.8489
+      },
+      "coverage_pass_86_94": false,
+      "crps": {
+        "chosen": 8.5474,
+        "W0": 8.5474
+      },
+      "crps_chosen_minus_W0": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0
+      },
+      "mean_width": {
+        "chosen": 14.058,
+        "W0": 14.058
+      }
+    },
+    "total": {
+      "chosen": "W0",
+      "games": 450,
+      "coverage_90": {
+        "chosen": 0.8667,
+        "W0": 0.8667
+      },
+      "coverage_pass_86_94": true,
+      "crps": {
+        "chosen": 10.7082,
+        "W0": 10.7082
+      },
+      "crps_chosen_minus_W0": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0
+      },
+      "mean_width": {
+        "chosen": 16.542,
+        "W0": 16.542
+      }
+    }
+  }
+}

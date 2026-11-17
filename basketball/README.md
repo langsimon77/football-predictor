@@ -25,6 +25,11 @@ EuroLeague winner, handicap and total points; NBL winner). B5 (14 Nov 2026) adde
 | `ledger_bb.py` | B4: the append-only, hash-chained ledger of locked forecasts (`ledger/basketball/`). |
 | `more_leagues.py` | B5: the ACB, LBA and ABA game tables from Spanish, Italian and Serbian Wikipedia (plus the ACB's API-Basketball test history). Writes `data/processed/basketball/games_more.parquet` and `data/basketball/b5_data_summary.json`. |
 | `backtest_more.py` | B5: `tune`, `test` and `seed` for those three leagues (`data/basketball/b5_*.json`). |
+| `width.py`, `backtest_width.py` | B6: adaptive range widths and their tuning and seen-season scores (`data/basketball/b6_*.json`). |
+| `odds.py` | B6: The Odds API snapshots (`ledger/basketball/odds_snapshots.parquet`), matching and market view. Needs the `ODDS_API_KEY` secret. |
+| `availability.py` | B6: typed injuries from `data/manual/basketball_availability.csv` as point effects. |
+| `blend.py` | B6: model and market pool, weight fitted after 150 priced games. |
+| `shadow.py`, `b6_check.py` | B6: the shadow forecast (`ledger/basketball/shadow_b6.parquet`) and the progress of its tests. |
 | `live.py` | B4: the four-times-daily run (`.github/workflows/basketball.yml`): this season from Wikipedia, fit, lock 24 to 48 hours before tip-off, results, `ledger/basketball/upcoming.parquet` for the Model Lab. |
 
 Run order: `uv run python basketball/data.py`, then `basketball/backtest.py tune` and
