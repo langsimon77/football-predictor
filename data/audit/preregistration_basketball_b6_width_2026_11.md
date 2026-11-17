@@ -51,3 +51,22 @@ The choice is written to `data/basketball/b6_settings.json` and committed before
 
 The expected margin and total (Elo, points model) are unchanged. ACB, LBA and ABA keep their B5
 widths in this phase; if B6 passes, the same method is pre-registered for them separately.
+
+## 6. Amendment 1 (17 Nov 2026, before any of these was fitted): steps 2 to 4
+
+Same approval. All run as a shadow forecast (`ledger/basketball/shadow_b6.parquet`,
+model `bb_b6_shadow`), locked at the same time as the main forecast, never shown as the main one.
+
+- **Odds benchmark (step 2).** Prices from The Odds API (`basketball/odds.py`), last snapshot
+  before tip-off. Reported per league once 100 locked games have a price: log loss of the
+  main model's winner chance against the market's (margin removed), bootstrap by game day.
+  This is a benchmark only; it changes nothing by itself.
+- **Availability (step 3).** Point effects in `basketball/availability.py` are Assumptions.
+  The shadow applies them. After 100 shadow games that have at least one entry, they pass if the
+  margin CRPS with the effects is lower than without (95% upper bound of the difference below 0).
+  If entries stay rare, this test waits; it is not run early.
+- **Blend (step 4).** `basketball/blend.py`. The weight is fitted once on the first 150 locked
+  games with a pre-tip-off price (per league), frozen and committed, then tested on the next 150:
+  it passes if its winner log loss beats both the model alone and the market alone (95% upper
+  bound below 0 for each). Only then does it replace the main forecast.
+- **Step 5.** No new machine-learning challenger is added (B2 result).
