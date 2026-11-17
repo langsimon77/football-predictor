@@ -47,6 +47,8 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 import ledger_bb  # noqa: E402
 import more_leagues  # noqa: E402
+import odds  # noqa: E402
+import shadow  # noqa: E402
 from audit_sample import CURRENT  # noqa: E402
 from models import (  # noqa: E402
     EloSettings,
@@ -200,6 +202,12 @@ def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataF
     if len(new) and not dry_run:
         locked = ledger_bb.append(new.drop(columns=["date", "date_only", "markets"]),
                                   ctx.ledger_path)
+    if len(new) and ctx.ledger_path == LEDGER:  # B6 shadow: never in tests on other paths
+        played = {lg: played_games(ctx.games, lg) for lg in shadow.LEAGUES}
+        n = shadow.lock(new, played, ctx.settings, dry_run=dry_run)
+        log.info("basketball B6 shadow: %d rows", n)
+    if ctx.ledger_path == LEDGER:
+        log.info("odds: %d price rows", odds.run(fx, now, dry_run=dry_run))
     if not dry_run:
         record_results(ctx.games, locked, now, ctx.results_path)
         if ctx.upcoming_path is not None:

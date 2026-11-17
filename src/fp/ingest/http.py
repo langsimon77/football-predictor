@@ -104,6 +104,11 @@ def _get_with_retries(
             response = requests.get(
                 url, headers={"User-Agent": USER_AGENT, **headers}, timeout=60
             )
+            if response.status_code == 429 and attempt < attempts:
+                # Too many requests: wait as the server asks (at most 2 minutes), then retry.
+                retry_after = response.headers.get("Retry-After", "")
+                time.sleep(min(int(retry_after) if retry_after.isdigit() else 30 * attempt, 120))
+                continue
             response.raise_for_status()
             return response.content
         except (requests.Timeout, requests.ConnectionError):

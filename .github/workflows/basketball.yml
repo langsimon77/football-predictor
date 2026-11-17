@@ -46,6 +46,8 @@ jobs:
           restore-keys: basketball-raw-
 
       - name: Forecast, lock and record results
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}  # The Odds API; empty means no prices
         run: |
           if [ "$DRY_RUN" = "true" ]; then
             uv run python basketball/live.py --dry-run

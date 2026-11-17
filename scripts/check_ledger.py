@@ -22,7 +22,8 @@ sys.path.insert(0, str(ROOT / "basketball"))
 import ledger_bb  # noqa: E402
 
 LEDGER_PATHS = ("ledger/predictions.parquet", "ledger/trial/predictions.parquet",
-                "ledger/ucl/predictions.parquet", "ledger/basketball/predictions.parquet")
+                "ledger/ucl/predictions.parquet", "ledger/basketball/predictions.parquet",
+                "ledger/basketball/shadow_b6.parquet")
 
 
 def kind(path: str):
