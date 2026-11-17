@@ -99,7 +99,8 @@ def check() -> list[str]:
                 continue
             pm, pk = part["p_home"].to_numpy(float)[ok], part["p_home_mkt"].to_numpy(float)[ok]
             yy = y[ok]
-            iv = interval(_ll(pm, yy) - _ll(pk, yy), part["tip_utc"].astype(str).str[:10].to_numpy()[ok])
+            days = part["tip_utc"].astype(str).str[:10].to_numpy()[ok]
+            iv = interval(_ll(pm, yy) - _ll(pk, yy), days)
             lines.append(f"- {league}: model minus market log loss {iv['mean']:+.4f} "
                          f"(range {iv['low']:+.4f} to {iv['high']:+.4f})")
     else:
