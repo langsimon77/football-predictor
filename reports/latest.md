@@ -1,12 +1,12 @@
 # Latest predictions
 
-Updated Wed 18 Nov 2026, 09:57 Juba time. Primary model: `dc_bayes_v1` (Bayesian Dixon-Coles with shots on target). Probabilities are locked and never edited. The range after the home-win chance is the model's 80% interval. Tier: how far to trust the home, draw, away forecast, then over 2.5 goals (High, Medium, Low; see `docs/LEARN.md` chapter 4).
+Updated Thu 19 Nov 2026, 09:57 Juba time. Primary model: `dc_bayes_v1` (Bayesian Dixon-Coles with shots on target). Probabilities are locked and never edited. The range after the home-win chance is the model's 80% interval. Tier: how far to trust the home, draw, away forecast, then over 2.5 goals (High, Medium, Low; see `docs/LEARN.md` chapter 4).
 
 ## Locked, not yet played
 
 | Kickoff (Juba) | Match | Home (80% range) | Draw | Away | Tier | Over 2.5 | BTTS | Exp. goals | Exp. corners | Exp. yellows | Flags |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| none | | | | | | | | | | | |
+| Fri 20 Nov 22:00 | Athletic v Espanyol | 57% (50% to 63%) | 25% | 18% | Low, Low | 45% | 49% | 1.6 to 0.8 | 5.7 to 4.1 | 4.5 | manager_change, shape_v1, unanswered_question |
 
 ## Scored so far
 

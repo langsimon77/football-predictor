@@ -1042,3 +1042,15 @@
   threat_out: false
   source: 'Issue #27'
   used_at_utc: 2026-11-07T06:37Z
+- question: LaLiga_2627_athletic_bilbao_espanyol:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #30'
+  used_at_utc: 2026-11-19T07:57Z
+- question: LaLiga_2627_athletic_bilbao_espanyol:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #30'
+  used_at_utc: 2026-11-19T07:57Z
