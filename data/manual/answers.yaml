@@ -1054,3 +1054,111 @@
   threat_out: false
   source: 'Issue #30'
   used_at_utc: 2026-11-19T07:57Z
+- question: EPL_2627_aston_villa_sunderland:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #31'
+  used_at_utc: 2026-11-20T07:46Z
+- question: EPL_2627_aston_villa_sunderland:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #31'
+  used_at_utc: 2026-11-20T07:46Z
+- question: EPL_2627_bournemouth_nottm_forest:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #31'
+  used_at_utc: 2026-11-20T07:46Z
+- question: EPL_2627_bournemouth_nottm_forest:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #31'
+  used_at_utc: 2026-11-20T07:46Z
+- question: EPL_2627_chelsea_leeds:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #31'
+  used_at_utc: 2026-11-20T07:46Z
+- question: EPL_2627_chelsea_leeds:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #31'
+  used_at_utc: 2026-11-20T07:46Z
+- question: EPL_2627_coventry_crystal_palace:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #31'
+  used_at_utc: 2026-11-20T07:46Z
+- question: EPL_2627_coventry_crystal_palace:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #31'
+  used_at_utc: 2026-11-20T07:46Z
+- question: EPL_2627_man_city_fulham:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #31'
+  used_at_utc: 2026-11-20T07:46Z
+- question: EPL_2627_man_city_fulham:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #31'
+  used_at_utc: 2026-11-20T07:46Z
+- question: EPL_2627_newcastle_arsenal:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #31'
+  used_at_utc: 2026-11-20T07:46Z
+- question: EPL_2627_newcastle_arsenal:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #31'
+  used_at_utc: 2026-11-20T07:46Z
+- question: EPL_2627_tottenham_ipswich:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #31'
+  used_at_utc: 2026-11-20T07:46Z
+- question: EPL_2627_tottenham_ipswich:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #31'
+  used_at_utc: 2026-11-20T07:46Z
+- question: LaLiga_2627_alaves_deportivo_la_coruna:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #31'
+  used_at_utc: 2026-11-20T07:46Z
+- question: LaLiga_2627_alaves_deportivo_la_coruna:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #31'
+  used_at_utc: 2026-11-20T07:46Z
+- question: LaLiga_2627_sevilla_real_betis:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #31'
+  used_at_utc: 2026-11-20T07:46Z
+- question: LaLiga_2627_sevilla_real_betis:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #31'
+  used_at_utc: 2026-11-20T07:46Z
