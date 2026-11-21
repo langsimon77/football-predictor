@@ -184,6 +184,8 @@ jobs:
         run: |
           uv run python scripts/build_model_lab.py --pages-dir app/data --out-dir "$RUNNER_TEMP/lab"
           python3 scripts/model_lab_refresh.py check "$RUNNER_TEMP/lab"
+          # Tips page file (public picks only; written by the tips step above).
+          if [ -f data/tips/tips.json ]; then cp data/tips/tips.json "$RUNNER_TEMP/lab/tips.json"; fi
           export GIT_INDEX_FILE="$RUNNER_TEMP/lab.index"
           for f in "$RUNNER_TEMP"/lab/*.json; do
             git update-index --add --cacheinfo "100644,$(git hash-object -w "$f"),$(basename "$f")"

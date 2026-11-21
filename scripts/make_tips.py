@@ -22,6 +22,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from fp import teams as fpteams  # noqa: E402
 from fp.tips import picks as tp  # noqa: E402
 
 
@@ -35,6 +36,11 @@ def _records(df: pd.DataFrame) -> list[dict]:
     keep = ["match_id", "league", "kickoff_utc", "home_id", "away_id", "market", "pick",
             "prob", "fair_odds", "tier", "status"]
     out = df[[c for c in keep if c in df.columns]].copy()
+    names = dict(zip(fpteams.teams()["team_id"], fpteams.teams()["name"], strict=False))
+    for side in ("home", "away"):
+        if f"{side}_id" in out:
+            out[side] = out[f"{side}_id"].map(
+                lambda t: names.get(t, str(t).replace("_", " ").title()))
     out["kickoff_utc"] = out["kickoff_utc"].astype(str)
     out["prob"] = out["prob"].round(3)
     return out.to_dict("records")
