@@ -58,6 +58,11 @@ def forecasts(matches: pd.DataFrame) -> pd.DataFrame:
     mats = np.stack([np.asarray(m, dtype=float).reshape(11, 11) for m in g["bdc_matrix"]])
     for line in (1.5, 3.5):
         f[f"p_over_{str(line).replace('.', '_')}"] = mats[:, goals > line].sum(axis=1)
+    # Five likeliest exact scores, as the live ledger stores them (top_scorelines).
+    flat = mats.reshape(len(mats), -1)
+    top = np.argsort(-flat, axis=1)[:, :5]
+    f["top_scorelines"] = [json.dumps([{"score": f"{k // 11}-{k % 11}", "p": round(float(r[k]), 4)}
+                                       for k in idx]) for r, idx in zip(flat, top, strict=True)]
     co = co.set_index("match_id")
     ca = ca.set_index("match_id")
     for line in ("8_5", "9_5", "10_5", "11_5"):
@@ -122,8 +127,11 @@ def run(matches_path: Path) -> None:
     m = matches.set_index("match_id")
     results = matches[["match_id", "home_goals", "away_goals", "home_corners",
                        "away_corners", "home_yellows", "away_yellows"]]
-    cand = tp.candidates(add_tiers(forecasts(matches)))
+    fc = add_tiers(forecasts(matches))
+    cand = tp.candidates(fc)
     cand["day"] = pd.to_datetime(cand["kickoff_utc"]).dt.date
+    fc["day"] = pd.to_datetime(fc["kickoff_utc"]).dt.date
+    fc_by_day = dict(tuple(fc.groupby("day")))
     rows, coupon_rows = [], []
     for day, c in cand.groupby("day", sort=True):
         prod = tp.build_day(c)
@@ -131,7 +139,14 @@ def run(matches_path: Path) -> None:
             for rec in tp.settle(prod[name], results).to_dict("records"):
                 rows.append({**rec, "product": name, "day": day,
                              "close_odds": odds_for(rec, m)})
-        for cp in prod["coupons"]:
+        prod["top3"], prod["bankers"] = tp.top3(c), tp.bankers(c)
+        prod["full_card"] = tp.full_card(c)
+        prod["correct_score"] = tp.correct_scores(fc_by_day[day])
+        for name in ("top3", "bankers", "full_card", "correct_score"):
+            for rec in tp.settle(prod[name], results).to_dict("records"):
+                rows.append({**rec, "product": name, "day": day,
+                             "close_odds": odds_for(rec, m)})
+        for cp in prod["coupons"] + tp.accumulators(c):
             odds = [odds_for(leg, m) for leg in cp["legs"]]
             coupon_rows.append({"product": cp["name"], "day": day, "prob": cp["prob"],
                                 "status": tp.settle_coupon(cp, results),
@@ -153,6 +168,18 @@ def run(matches_path: Path) -> None:
     (out_dir / "market_record.json").write_text(json.dumps(
         {"basis": "walk-forward forecasts, EPL and La Liga, 2023/24 to 2025/26",
          "markets": rec}, indent=1) + "\n", encoding="utf-8")
+    prec = {}
+    for name, df in (*((p, singles[singles["product"] == p]) for p in
+                       ("top3", "bankers", "full_card", "correct_score", "diamond")),
+                     *((p, coupons[coupons["product"] == p]) for p in ("3-fold", "4-fold"))):
+        d = df[df["status"] != "pending"]
+        if len(d):
+            won = float((d["status"] == "won").mean())
+            prec[name] = {"picks": int(len(d)), "won": round(won, 3),
+                          "promised": round(float(d["prob"].mean()), 3)}
+    (out_dir / "product_record.json").write_text(json.dumps(
+        {"basis": "walk-forward forecasts, EPL and La Liga, 2023/24 to 2025/26, one product "
+                  "set per match day", "products": prec}, indent=1) + "\n", encoding="utf-8")
     report(singles, coupons, cand)
 
 
@@ -178,10 +205,13 @@ def report(singles: pd.DataFrame, coupons: pd.DataFrame, cand: pd.DataFrame) -> 
             "| Picks with closing odds | Return per 1 unit at Pinnacle close (95% range) |\n"
             "|---|---|---|---|---|---|")
     lines = [summarise(singles[singles["product"] == p], n)
-             for p, n in (("free", "Free tips"), ("premium", "Premium"),
-                          ("diamond", "Diamond"))]
-    lines += [summarise(coupons[coupons["product"] == p], p)
-              for p in ("Double", "Treble") if (coupons["product"] == p).any()]
+             for p, n in (("top3", "Today's Top 3"), ("bankers", "VIP Bankers"),
+                          ("full_card", "VIP Full Card"), ("correct_score", "VIP Correct Score"),
+                          ("diamond", "Diamond"), ("free", "Free tips (old)"),
+                          ("premium", "Premium (old, top 5)"))]
+    lines += [summarise(coupons[coupons["product"] == p], "VIP Accumulator " + p
+                        if "fold" in p else p)
+              for p in ("3-fold", "4-fold", "Double", "Treble") if (coupons["product"] == p).any()]
     by_market = [summarise(g, mk) for mk, g in
                  singles[singles["product"] == "premium"].groupby("market")]
     days = singles["day"].nunique()

@@ -107,3 +107,59 @@ def test_nbl_kept_out_of_diamond_and_coupons(cand):
     assert "n1" in set(tp.premium(both).match_id)          # Premium keeps it
     assert "n1" not in set(tp.diamond(both).match_id)
     assert all(leg["match_id"] != "n1" for c in tp.coupons(both) for leg in c["legs"])
+
+
+def test_top3_bankers_full_card(cand):
+    t3 = tp.top3(cand)
+    assert list(t3.match_id) == ["m4", "m1", "m2"]        # likeliest first, Medium or better
+    assert set(tp.bankers(cand).tier) == {"High"}
+    assert len(tp.bankers(cand)) == 3                      # no cap: every High game
+    fc = tp.full_card(cand)
+    assert fc.groupby("match_id").size().max() <= 2
+    # m1 has result (High) and goals (Low): only Medium or better, so one pick
+    assert (fc.match_id == "m1").sum() == 1
+
+
+def test_full_card_two_families_not_two_goal_lines():
+    rows = [{"match_id": "x", "league": "EPL", "kickoff_utc": "2026-11-22 15:00",
+             "home_id": "a", "away_id": "b", "p_home": 0.70, "p_draw": 0.2, "p_away": 0.1,
+             "p_over_1_5": 0.85, "p_over_2_5": 0.70,
+             "tiers": json.dumps({"rule": "tiers_v1", "1x2": "High", "over_1_5": "High",
+                                  "over_2_5": "High"})}]
+    fc = tp.full_card(tp.candidates(pd.DataFrame(rows)))
+    assert sorted(fc.market) == ["1x2", "over_1_5"]       # one goals pick, one result pick
+
+
+def test_correct_scores_and_settle():
+    fc = pd.DataFrame([
+        {"match_id": "a", "league": "EPL", "kickoff_utc": "t", "home_id": "h", "away_id": "w",
+         "top_scorelines": json.dumps([{"score": "1-1", "p": 0.11}, {"score": "2-1", "p": 0.12}])},
+        {"match_id": "b", "league": "EPL", "kickoff_utc": "t", "home_id": "h", "away_id": "w",
+         "top_scorelines": json.dumps([{"score": "0-0", "p": 0.14}])},
+        {"match_id": "c", "league": "EPL", "kickoff_utc": "t", "home_id": "h", "away_id": "w",
+         "top_scorelines": None}])
+    cs = tp.correct_scores(fc, n=5)
+    assert list(cs.match_id) == ["b", "a"] and list(cs.side) == ["0-0", "2-1"]
+    res = pd.DataFrame([{"match_id": "a", "home_goals": 2, "away_goals": 1},
+                        {"match_id": "b", "home_goals": 1, "away_goals": 0}])
+    st = tp.settle(cs, res).set_index("match_id")["status"]
+    assert st["a"] == "won" and st["b"] == "lost"
+
+
+def test_accumulators_named_by_size(cand):
+    acc = tp.accumulators(cand, sizes=(3,))
+    assert [a["name"] for a in acc] == ["3-fold"]
+    assert acc[0]["prob"] == pytest.approx(0.80 * 0.70 * 0.66)
+
+
+def test_bb_markets_match_live():
+    import importlib.util
+    import sys
+    from pathlib import Path
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location("make_tips", root / "scripts" / "make_tips.py")
+    mt = importlib.util.module_from_spec(spec)
+    sys.path.insert(0, str(root / "basketball"))
+    spec.loader.exec_module(mt)
+    live = importlib.import_module("live")
+    assert {k: tuple(v) for k, v in live.MARKETS.items()} == mt.BB_MARKETS
