@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-11-21T06:19:42.926640+00:00",
+  "generated_utc": "2026-11-21T07:50:02.848643+00:00",
   "rule": "tips_v1, from tiers_v1",
   "note": "Fair odds = 1 / model probability. Bet only if the bookmaker pays more.",
   "free": [
@@ -152,6 +152,66 @@
       "status": "pending",
       "home": "Real Madrid",
       "away": "Celta Vigo"
+    },
+    {
+      "match_id": "LaLiga_2627_barcelona_villarreal",
+      "league": "LaLiga",
+      "kickoff_utc": "2026-11-22 13:00:00+00:00",
+      "home_id": "barcelona",
+      "away_id": "villarreal",
+      "market": "over_1_5",
+      "pick": "Over 1.5 goals",
+      "prob": 0.92,
+      "fair_odds": 1.09,
+      "tier": "Medium",
+      "status": "pending",
+      "home": "Barcelona",
+      "away": "Villarreal"
+    },
+    {
+      "match_id": "EPL_2627_hull_brighton",
+      "league": "EPL",
+      "kickoff_utc": "2026-11-22 14:00:00+00:00",
+      "home_id": "hull",
+      "away_id": "brighton",
+      "market": "yellows_over_5_5",
+      "pick": "Under 5.5 yellow cards",
+      "prob": 0.777,
+      "fair_odds": 1.29,
+      "tier": "Medium",
+      "status": "pending",
+      "home": "Hull City",
+      "away": "Brighton & Hove Albion"
+    },
+    {
+      "match_id": "LaLiga_2627_osasuna_malaga",
+      "league": "LaLiga",
+      "kickoff_utc": "2026-11-22 17:30:00+00:00",
+      "home_id": "osasuna",
+      "away_id": "malaga",
+      "market": "corners_over_11_5",
+      "pick": "Under 11.5 corners",
+      "prob": 0.758,
+      "fair_odds": 1.32,
+      "tier": "Medium",
+      "status": "pending",
+      "home": "Osasuna",
+      "away": "M\u00e1laga"
+    },
+    {
+      "match_id": "LaLiga_2627_getafe_atletico_madrid",
+      "league": "LaLiga",
+      "kickoff_utc": "2026-11-22 20:00:00+00:00",
+      "home_id": "getafe",
+      "away_id": "atletico_madrid",
+      "market": "over_3_5",
+      "pick": "Under 3.5 goals",
+      "prob": 0.839,
+      "fair_odds": 1.19,
+      "tier": "Medium",
+      "status": "pending",
+      "home": "Getafe",
+      "away": "Atl\u00e9tico Madrid"
     }
   ],
   "premium": [

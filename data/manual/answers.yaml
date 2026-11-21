@@ -1162,3 +1162,75 @@
   threat_out: false
   source: 'Issue #31'
   used_at_utc: 2026-11-20T07:46Z
+- question: EPL_2627_hull_brighton:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #32'
+  used_at_utc: 2026-11-21T07:42Z
+- question: EPL_2627_hull_brighton:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #32'
+  used_at_utc: 2026-11-21T07:42Z
+- question: EPL_2627_liverpool_man_united:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #32'
+  used_at_utc: 2026-11-21T07:42Z
+- question: EPL_2627_liverpool_man_united:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #32'
+  used_at_utc: 2026-11-21T07:42Z
+- question: LaLiga_2627_barcelona_villarreal:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #32'
+  used_at_utc: 2026-11-21T07:42Z
+- question: LaLiga_2627_barcelona_villarreal:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #32'
+  used_at_utc: 2026-11-21T07:42Z
+- question: LaLiga_2627_getafe_atletico_madrid:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #32'
+  used_at_utc: 2026-11-21T07:42Z
+- question: LaLiga_2627_getafe_atletico_madrid:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #32'
+  used_at_utc: 2026-11-21T07:42Z
+- question: LaLiga_2627_osasuna_malaga:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #32'
+  used_at_utc: 2026-11-21T07:42Z
+- question: LaLiga_2627_osasuna_malaga:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #32'
+  used_at_utc: 2026-11-21T07:42Z
+- question: LaLiga_2627_racing_santander_real_sociedad:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #32'
+  used_at_utc: 2026-11-21T07:42Z
+- question: LaLiga_2627_racing_santander_real_sociedad:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #32'
+  used_at_utc: 2026-11-21T07:42Z
