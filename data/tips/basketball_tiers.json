@@ -1,0 +1,117 @@
+{
+  "rule": "bb_tiers_v1",
+  "high": 0.74,
+  "low": 0.6,
+  "basis": "Elo walk-forward favourite chance, tuning seasons pooled: EuroLeague 2017/18 to 2021/22, NBL 2017/18 and 2022/23, ACB 2023/24",
+  "tuning_games": 1873,
+  "test": [
+    {
+      "league": "ACB",
+      "tier": "High",
+      "games": 245,
+      "promised": 0.831,
+      "won": 0.804,
+      "won_low": 0.75,
+      "won_high": 0.849
+    },
+    {
+      "league": "ACB",
+      "tier": "Low",
+      "games": 153,
+      "promised": 0.55,
+      "won": 0.556,
+      "won_low": 0.476,
+      "won_high": 0.632
+    },
+    {
+      "league": "ACB",
+      "tier": "Medium",
+      "games": 214,
+      "promised": 0.672,
+      "won": 0.678,
+      "won_low": 0.612,
+      "won_high": 0.737
+    },
+    {
+      "league": "EuroLeague",
+      "tier": "High",
+      "games": 292,
+      "promised": 0.801,
+      "won": 0.815,
+      "won_low": 0.767,
+      "won_high": 0.855
+    },
+    {
+      "league": "EuroLeague",
+      "tier": "Low",
+      "games": 436,
+      "promised": 0.551,
+      "won": 0.573,
+      "won_low": 0.527,
+      "won_high": 0.619
+    },
+    {
+      "league": "EuroLeague",
+      "tier": "Medium",
+      "games": 565,
+      "promised": 0.667,
+      "won": 0.648,
+      "won_low": 0.608,
+      "won_high": 0.686
+    },
+    {
+      "league": "NBL",
+      "tier": "High",
+      "games": 55,
+      "promised": 0.789,
+      "won": 0.709,
+      "won_low": 0.579,
+      "won_high": 0.812
+    },
+    {
+      "league": "NBL",
+      "tier": "Low",
+      "games": 208,
+      "promised": 0.55,
+      "won": 0.558,
+      "won_low": 0.49,
+      "won_high": 0.624
+    },
+    {
+      "league": "NBL",
+      "tier": "Medium",
+      "games": 187,
+      "promised": 0.664,
+      "won": 0.674,
+      "won_low": 0.604,
+      "won_high": 0.737
+    },
+    {
+      "league": "All",
+      "tier": "High",
+      "games": 592,
+      "promised": 0.812,
+      "won": 0.801,
+      "won_low": 0.767,
+      "won_high": 0.831
+    },
+    {
+      "league": "All",
+      "tier": "Low",
+      "games": 797,
+      "promised": 0.551,
+      "won": 0.566,
+      "won_low": 0.531,
+      "won_high": 0.6
+    },
+    {
+      "league": "All",
+      "tier": "Medium",
+      "games": 966,
+      "promised": 0.667,
+      "won": 0.659,
+      "won_low": 0.629,
+      "won_high": 0.689
+    }
+  ]
+}

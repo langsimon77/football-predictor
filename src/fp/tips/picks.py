@@ -15,6 +15,9 @@ Plain English:
      at least `diamond_min_odds`, so it is not a near-certain pick with no price.
 4. `settle` marks each pick won, lost or pending from the results.
 
+5. Basketball adds one winner pick per game (EuroLeague, NBL, ACB), tiered by
+   bb_tiers_v1 (data/tips/basketball_tiers.json), and joins the same products.
+
 Nothing here changes a forecast. A tip is never more certain than its forecast.
 """
 
@@ -142,7 +145,39 @@ def coupons(c: pd.DataFrame, s: Settings = DEFAULT) -> list[dict]:
     return out
 
 
+def basketball_candidates(games: pd.DataFrame, high: float, low: float) -> pd.DataFrame:
+    """Winner picks for basketball games (bb_tiers_v1).
+
+    `games` needs game_id, league, tip_utc, home_name, away_name, p_home. Only leagues
+    whose winner forecast passed its test should be passed in (EuroLeague, NBL, ACB).
+    Tier from the favourite's chance: at or above `high` High, below `low` Low."""
+    rows = []
+    for rec in games.to_dict("records"):
+        p = rec.get("p_home")
+        if p is None or not np.isfinite(p):
+            continue
+        home = p >= 0.5
+        prob = float(p if home else 1 - p)
+        team = rec["home_name"] if home else rec["away_name"]
+        tier = "High" if prob >= high - 1e-9 else "Low" if prob < low - 1e-9 else "Medium"
+        rows.append({"match_id": rec["game_id"], "league": rec["league"],
+                     "kickoff_utc": rec["tip_utc"], "home_id": rec["home_name"],
+                     "away_id": rec["away_name"], "market": "bb_winner",
+                     "side": "home" if home else "away",
+                     "pick": f"{team} to win (overtime counts)", "prob": prob, "tier": tier})
+    out = pd.DataFrame(rows, columns=["match_id", "league", "kickoff_utc", "home_id",
+                                      "away_id", "market", "side", "pick", "prob", "tier"])
+    out["fair_odds"] = (1 / out["prob"]).round(2)
+    out["tier_rank"] = out["tier"].map(TIER_RANK).fillna(0).astype(int)
+    return out
+
+
 def _won(market: str, side: str, res: dict) -> bool | None:
+    if market == "bb_winner":
+        hp, ap = res.get("home_pts"), res.get("away_pts")
+        if hp is None or ap is None or pd.isna(hp) or pd.isna(ap) or hp == ap:
+            return None
+        return bool((hp > ap) == (side == "home"))
     hg, ag = res.get("home_goals"), res.get("away_goals")
     if hg is None or ag is None or pd.isna(hg) or pd.isna(ag):
         return None

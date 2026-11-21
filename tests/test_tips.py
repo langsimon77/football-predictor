@@ -68,3 +68,33 @@ def test_coupon_settles_lost_if_any_leg_lost(cand):
     res = pd.DataFrame([{"match_id": "m4", "home_goals": 0, "away_goals": 1},
                         {"match_id": "m1", "home_goals": 3, "away_goals": 0}])
     assert tp.settle_coupon(double, res) == "lost"
+
+
+def test_basketball_candidates_and_settle():
+    games = pd.DataFrame([
+        {"game_id": "g1", "league": "ACB", "tip_utc": "2026-11-22 18:00",
+         "home_name": "Real Madrid",
+         "away_name": "Joventut", "p_home": 0.86},
+        {"game_id": "g2", "league": "NBL", "tip_utc": "2026-11-22 06:00", "home_name": "Brisbane",
+         "away_name": "Sydney", "p_home": 0.35},
+        {"game_id": "g3", "league": "ACB", "tip_utc": "2026-11-22 18:00", "home_name": "A",
+         "away_name": "B", "p_home": float("nan")}])
+    c = tp.basketball_candidates(games, high=0.74, low=0.60).set_index("match_id")
+    assert list(c.index) == ["g1", "g2"]                 # no chance, no pick
+    assert c.loc["g1", "tier"] == "High" and c.loc["g1", "side"] == "home"
+    assert c.loc["g2", "side"] == "away" and c.loc["g2", "prob"] == pytest.approx(0.65)
+    assert c.loc["g2", "tier"] == "Medium"
+    assert "Sydney to win" in c.loc["g2", "pick"]
+    res = pd.DataFrame([{"match_id": "g1", "home_pts": 90, "away_pts": 95},
+                        {"match_id": "g2", "home_pts": 70, "away_pts": 80}])
+    st = tp.settle(c.reset_index(), res).set_index("match_id")["status"]
+    assert st["g1"] == "lost" and st["g2"] == "won"
+
+
+def test_basketball_and_football_mix_in_products(cand):
+    games = pd.DataFrame([{"game_id": "g1", "league": "ACB", "tip_utc": "2026-11-22 18:00",
+                           "home_name": "X", "away_name": "Y", "p_home": 0.90}])
+    both = pd.concat([cand, tp.basketball_candidates(games, 0.74, 0.60)], ignore_index=True)
+    prem = tp.premium(both)
+    assert prem.iloc[0]["match_id"] == "g1"              # strongest High pick first
+    assert prem.match_id.is_unique

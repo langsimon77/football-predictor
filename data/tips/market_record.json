@@ -1,0 +1,209 @@
+{
+ "basis": "walk-forward forecasts, EPL and La Liga, 2023/24 to 2025/26",
+ "markets": {
+  "1x2": {
+   "High": {
+    "picks": 423,
+    "won": 0.764,
+    "promised": 0.695
+   },
+   "Low": {
+    "picks": 807,
+    "won": 0.415,
+    "promised": 0.413
+   },
+   "Medium": {
+    "picks": 1050,
+    "won": 0.53,
+    "promised": 0.52
+   }
+  },
+  "btts": {
+   "High": {
+    "picks": 689,
+    "won": 0.614,
+    "promised": 0.612
+   },
+   "Low": {
+    "picks": 691,
+    "won": 0.502,
+    "promised": 0.517
+   },
+   "Medium": {
+    "picks": 900,
+    "won": 0.53,
+    "promised": 0.556
+   }
+  },
+  "corners_over_10_5": {
+   "High": {
+    "picks": 343,
+    "won": 0.673,
+    "promised": 0.706
+   },
+   "Low": {
+    "picks": 805,
+    "won": 0.513,
+    "promised": 0.53
+   },
+   "Medium": {
+    "picks": 1132,
+    "won": 0.615,
+    "promised": 0.616
+   }
+  },
+  "corners_over_11_5": {
+   "High": {
+    "picks": 350,
+    "won": 0.774,
+    "promised": 0.802
+   },
+   "Low": {
+    "picks": 812,
+    "won": 0.612,
+    "promised": 0.625
+   },
+   "Medium": {
+    "picks": 1118,
+    "won": 0.728,
+    "promised": 0.723
+   }
+  },
+  "corners_over_8_5": {
+   "High": {
+    "picks": 654,
+    "won": 0.731,
+    "promised": 0.736
+   },
+   "Low": {
+    "picks": 513,
+    "won": 0.546,
+    "promised": 0.555
+   },
+   "Medium": {
+    "picks": 1113,
+    "won": 0.65,
+    "promised": 0.651
+   }
+  },
+  "corners_over_9_5": {
+   "High": {
+    "picks": 541,
+    "won": 0.623,
+    "promised": 0.634
+   },
+   "Low": {
+    "picks": 1028,
+    "won": 0.547,
+    "promised": 0.531
+   },
+   "Medium": {
+    "picks": 711,
+    "won": 0.586,
+    "promised": 0.579
+   }
+  },
+  "over_1_5": {
+   "High": {
+    "picks": 664,
+    "won": 0.869,
+    "promised": 0.835
+   },
+   "Low": {
+    "picks": 699,
+    "won": 0.702,
+    "promised": 0.659
+   },
+   "Medium": {
+    "picks": 917,
+    "won": 0.776,
+    "promised": 0.76
+   }
+  },
+  "over_2_5": {
+   "High": {
+    "picks": 577,
+    "won": 0.643,
+    "promised": 0.661
+   },
+   "Low": {
+    "picks": 839,
+    "won": 0.532,
+    "promised": 0.529
+   },
+   "Medium": {
+    "picks": 864,
+    "won": 0.595,
+    "promised": 0.586
+   }
+  },
+  "over_3_5": {
+   "High": {
+    "picks": 413,
+    "won": 0.814,
+    "promised": 0.828
+   },
+   "Low": {
+    "picks": 1089,
+    "won": 0.626,
+    "promised": 0.622
+   },
+   "Medium": {
+    "picks": 778,
+    "won": 0.731,
+    "promised": 0.738
+   }
+  },
+  "yellows_over_3_5": {
+   "High": {
+    "picks": 9,
+    "won": 0.778,
+    "promised": 0.746
+   },
+   "Low": {
+    "picks": 1076,
+    "won": 0.52,
+    "promised": 0.547
+   },
+   "Medium": {
+    "picks": 1195,
+    "won": 0.682,
+    "promised": 0.675
+   }
+  },
+  "yellows_over_4_5": {
+   "High": {
+    "picks": 16,
+    "won": 0.812,
+    "promised": 0.801
+   },
+   "Low": {
+    "picks": 1183,
+    "won": 0.55,
+    "promised": 0.547
+   },
+   "Medium": {
+    "picks": 1081,
+    "won": 0.65,
+    "promised": 0.669
+   }
+  },
+  "yellows_over_5_5": {
+   "High": {
+    "picks": 18,
+    "won": 0.944,
+    "promised": 0.897
+   },
+   "Low": {
+    "picks": 721,
+    "won": 0.655,
+    "promised": 0.616
+   },
+   "Medium": {
+    "picks": 1541,
+    "won": 0.77,
+    "promised": 0.772
+   }
+  }
+ }
+}

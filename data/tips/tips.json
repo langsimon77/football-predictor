@@ -1,143 +1,8 @@
 {
-  "generated_utc": "2026-11-21T07:50:02.848643+00:00",
-  "rule": "tips_v1, from tiers_v1",
+  "generated_utc": "2026-11-21T18:49:56.153109+00:00",
+  "rule": "tips_v2: football tiers_v1, basketball bb_tiers_v1",
   "note": "Fair odds = 1 / model probability. Bet only if the bookmaker pays more.",
   "free": [
-    {
-      "match_id": "EPL_2627_man_city_fulham",
-      "league": "EPL",
-      "kickoff_utc": "2026-11-21 12:30:00+00:00",
-      "home_id": "man_city",
-      "away_id": "fulham",
-      "market": "over_1_5",
-      "pick": "Over 1.5 goals",
-      "prob": 0.797,
-      "fair_odds": 1.25,
-      "tier": "Medium",
-      "status": "pending",
-      "home": "Manchester City",
-      "away": "Fulham"
-    },
-    {
-      "match_id": "LaLiga_2627_alaves_deportivo_la_coruna",
-      "league": "LaLiga",
-      "kickoff_utc": "2026-11-21 13:00:00+00:00",
-      "home_id": "alaves",
-      "away_id": "deportivo_la_coruna",
-      "market": "over_3_5",
-      "pick": "Under 3.5 goals",
-      "prob": 0.8,
-      "fair_odds": 1.25,
-      "tier": "Medium",
-      "status": "pending",
-      "home": "Deportivo Alav\u00e9s",
-      "away": "Deportivo La Coru\u00f1a"
-    },
-    {
-      "match_id": "EPL_2627_tottenham_ipswich",
-      "league": "EPL",
-      "kickoff_utc": "2026-11-21 15:00:00+00:00",
-      "home_id": "tottenham",
-      "away_id": "ipswich",
-      "market": "over_1_5",
-      "pick": "Over 1.5 goals",
-      "prob": 0.826,
-      "fair_odds": 1.21,
-      "tier": "Medium",
-      "status": "pending",
-      "home": "Tottenham Hotspur",
-      "away": "Ipswich Town"
-    },
-    {
-      "match_id": "EPL_2627_chelsea_leeds",
-      "league": "EPL",
-      "kickoff_utc": "2026-11-21 15:00:00+00:00",
-      "home_id": "chelsea",
-      "away_id": "leeds",
-      "market": "over_1_5",
-      "pick": "Over 1.5 goals",
-      "prob": 0.804,
-      "fair_odds": 1.24,
-      "tier": "Medium",
-      "status": "pending",
-      "home": "Chelsea",
-      "away": "Leeds United"
-    },
-    {
-      "match_id": "EPL_2627_bournemouth_nottm_forest",
-      "league": "EPL",
-      "kickoff_utc": "2026-11-21 15:00:00+00:00",
-      "home_id": "bournemouth",
-      "away_id": "nottm_forest",
-      "market": "over_1_5",
-      "pick": "Over 1.5 goals",
-      "prob": 0.774,
-      "fair_odds": 1.29,
-      "tier": "Medium",
-      "status": "pending",
-      "home": "Bournemouth",
-      "away": "Nottingham Forest"
-    },
-    {
-      "match_id": "EPL_2627_aston_villa_sunderland",
-      "league": "EPL",
-      "kickoff_utc": "2026-11-21 15:00:00+00:00",
-      "home_id": "aston_villa",
-      "away_id": "sunderland",
-      "market": "over_3_5",
-      "pick": "Under 3.5 goals",
-      "prob": 0.751,
-      "fair_odds": 1.33,
-      "tier": "Medium",
-      "status": "pending",
-      "home": "Aston Villa",
-      "away": "Sunderland"
-    },
-    {
-      "match_id": "LaLiga_2627_rayo_vallecano_valencia",
-      "league": "LaLiga",
-      "kickoff_utc": "2026-11-21 15:15:00+00:00",
-      "home_id": "rayo_vallecano",
-      "away_id": "valencia",
-      "market": "over_3_5",
-      "pick": "Under 3.5 goals",
-      "prob": 0.795,
-      "fair_odds": 1.26,
-      "tier": "High",
-      "status": "pending",
-      "home": "Rayo Vallecano",
-      "away": "Valencia"
-    },
-    {
-      "match_id": "LaLiga_2627_sevilla_real_betis",
-      "league": "LaLiga",
-      "kickoff_utc": "2026-11-21 17:30:00+00:00",
-      "home_id": "sevilla",
-      "away_id": "real_betis",
-      "market": "over_1_5",
-      "pick": "Over 1.5 goals",
-      "prob": 0.801,
-      "fair_odds": 1.25,
-      "tier": "Medium",
-      "status": "pending",
-      "home": "Sevilla",
-      "away": "Real Betis"
-    },
-    {
-      "match_id": "EPL_2627_newcastle_arsenal",
-      "league": "EPL",
-      "kickoff_utc": "2026-11-21 17:30:00+00:00",
-      "home_id": "newcastle",
-      "away_id": "arsenal",
-      "market": "over_3_5",
-      "pick": "Under 3.5 goals",
-      "prob": 0.76,
-      "fair_odds": 1.32,
-      "tier": "Medium",
-      "status": "pending",
-      "home": "Newcastle United",
-      "away": "Arsenal"
-    },
     {
       "match_id": "LaLiga_2627_real_madrid_celta_vigo",
       "league": "LaLiga",
@@ -151,7 +16,77 @@
       "tier": "High",
       "status": "pending",
       "home": "Real Madrid",
-      "away": "Celta Vigo"
+      "away": "Celta Vigo",
+      "sport": "football",
+      "reason": "Our model gives this 87 in 100. Expected goals 2.4 v 0.9. Tested: High-tier over/under 1.5 goals picks won 87% of 664 (promised 84%), 2023/24 to 2025/26."
+    },
+    {
+      "match_id": "ACB_202627_ucam_murcia_club_de_baloncesto_basket_zaragoza_2002",
+      "league": "ACB",
+      "kickoff_utc": "2026-11-21 20:00:00+00:00",
+      "home_id": "UCAM Murcia",
+      "away_id": "Casademont Zaragoza",
+      "market": "bb_winner",
+      "pick": "UCAM Murcia to win (overtime counts)",
+      "prob": 0.847,
+      "fair_odds": 1.18,
+      "tier": "High",
+      "status": "pending",
+      "home": "UCAM Murcia",
+      "away": "Casademont Zaragoza",
+      "sport": "basketball",
+      "reason": "Our model gives this 85 in 100. Expected margin about 11 points. Tested: High-tier ACB winner picks won 80% of 245 games (promised 83%)."
+    },
+    {
+      "match_id": "NBL_202627_south_east_melbourne_phoenix_cairns_taipans_2",
+      "league": "NBL",
+      "kickoff_utc": "2026-11-22 04:00:00+00:00",
+      "home_id": "South East Melbourne Phoenix",
+      "away_id": "Cairns Taipans",
+      "market": "bb_winner",
+      "pick": "South East Melbourne Phoenix to win (overtime counts)",
+      "prob": 0.709,
+      "fair_odds": 1.41,
+      "tier": "Medium",
+      "status": "pending",
+      "home": "South East Melbourne Phoenix",
+      "away": "Cairns Taipans",
+      "sport": "basketball",
+      "reason": "Our model gives this 71 in 100. Tested: Medium-tier NBL winner picks won 67% of 187 games (promised 66%)."
+    },
+    {
+      "match_id": "NBL_202627_brisbane_bullets_sydney_kings_1",
+      "league": "NBL",
+      "kickoff_utc": "2026-11-22 06:00:00+00:00",
+      "home_id": "Brisbane Bullets",
+      "away_id": "Sydney Kings",
+      "market": "bb_winner",
+      "pick": "Sydney Kings to win (overtime counts)",
+      "prob": 0.802,
+      "fair_odds": 1.25,
+      "tier": "High",
+      "status": "pending",
+      "home": "Brisbane Bullets",
+      "away": "Sydney Kings",
+      "sport": "basketball",
+      "reason": "Our model gives this 80 in 100. Tested: High-tier NBL winner picks won 71% of 55 games (promised 79%)."
+    },
+    {
+      "match_id": "ACB_202627_club_basquet_coruna_forca_lleida_club_esportiu",
+      "league": "ACB",
+      "kickoff_utc": "2026-11-22 11:30:00+00:00",
+      "home_id": "Leyma Coru\u00f1a",
+      "away_id": "iLerna Lleida",
+      "market": "bb_winner",
+      "pick": "Leyma Coru\u00f1a to win (overtime counts)",
+      "prob": 0.608,
+      "fair_odds": 1.64,
+      "tier": "Medium",
+      "status": "pending",
+      "home": "Leyma Coru\u00f1a",
+      "away": "iLerna Lleida",
+      "sport": "basketball",
+      "reason": "Our model gives this 61 in 100. Expected margin about 3 points. Tested: Medium-tier ACB winner picks won 68% of 214 games (promised 67%)."
     },
     {
       "match_id": "LaLiga_2627_barcelona_villarreal",
@@ -166,7 +101,9 @@
       "tier": "Medium",
       "status": "pending",
       "home": "Barcelona",
-      "away": "Villarreal"
+      "away": "Villarreal",
+      "sport": "football",
+      "reason": "Our model gives this 92 in 100. Expected goals 2.7 v 1.1. Tested: Medium-tier over/under 1.5 goals picks won 78% of 917 (promised 76%), 2023/24 to 2025/26."
     },
     {
       "match_id": "EPL_2627_hull_brighton",
@@ -181,7 +118,26 @@
       "tier": "Medium",
       "status": "pending",
       "home": "Hull City",
-      "away": "Brighton & Hove Albion"
+      "away": "Brighton & Hove Albion",
+      "sport": "football",
+      "reason": "Our model gives this 78 in 100. About 4.0 yellow cards expected. Tested: Medium-tier yellows over 5 5 picks won 77% of 1541 (promised 77%), 2023/24 to 2025/26."
+    },
+    {
+      "match_id": "ACB_202627_valencia_basket_club_baloncesto_breogan",
+      "league": "ACB",
+      "kickoff_utc": "2026-11-22 16:00:00+00:00",
+      "home_id": "Valencia",
+      "away_id": "R\u00edo Breog\u00e1n",
+      "market": "bb_winner",
+      "pick": "Valencia to win (overtime counts)",
+      "prob": 0.873,
+      "fair_odds": 1.15,
+      "tier": "High",
+      "status": "pending",
+      "home": "Valencia",
+      "away": "R\u00edo Breog\u00e1n",
+      "sport": "basketball",
+      "reason": "Our model gives this 87 in 100. Expected margin about 12 points. Tested: High-tier ACB winner picks won 80% of 245 games (promised 83%)."
     },
     {
       "match_id": "LaLiga_2627_osasuna_malaga",
@@ -196,7 +152,26 @@
       "tier": "Medium",
       "status": "pending",
       "home": "Osasuna",
-      "away": "M\u00e1laga"
+      "away": "M\u00e1laga",
+      "sport": "football",
+      "reason": "Our model gives this 76 in 100. About 9.4 corners expected. Tested: Medium-tier corners over 11 5 picks won 73% of 1118 (promised 72%), 2023/24 to 2025/26."
+    },
+    {
+      "match_id": "ACB_202627_real_madrid_baloncesto_club_joventut_badalona",
+      "league": "ACB",
+      "kickoff_utc": "2026-11-22 18:00:00+00:00",
+      "home_id": "Real Madrid",
+      "away_id": "Asisa Joventut",
+      "market": "bb_winner",
+      "pick": "Real Madrid to win (overtime counts)",
+      "prob": 0.861,
+      "fair_odds": 1.16,
+      "tier": "High",
+      "status": "pending",
+      "home": "Real Madrid",
+      "away": "Asisa Joventut",
+      "sport": "basketball",
+      "reason": "Our model gives this 86 in 100. Expected margin about 11 points. Tested: High-tier ACB winner picks won 80% of 245 games (promised 83%)."
     },
     {
       "match_id": "LaLiga_2627_getafe_atletico_madrid",
@@ -211,10 +186,29 @@
       "tier": "Medium",
       "status": "pending",
       "home": "Getafe",
-      "away": "Atl\u00e9tico Madrid"
+      "away": "Atl\u00e9tico Madrid",
+      "sport": "football",
+      "reason": "Our model gives this 84 in 100. Expected goals 0.8 v 1.3. Tested: Medium-tier over/under 3.5 goals picks won 73% of 778 (promised 74%), 2023/24 to 2025/26."
     }
   ],
   "premium": [
+    {
+      "match_id": "ACB_202627_valencia_basket_club_baloncesto_breogan",
+      "league": "ACB",
+      "kickoff_utc": "2026-11-22 16:00:00+00:00",
+      "home_id": "Valencia",
+      "away_id": "R\u00edo Breog\u00e1n",
+      "market": "bb_winner",
+      "pick": "Valencia to win (overtime counts)",
+      "prob": 0.873,
+      "fair_odds": 1.15,
+      "tier": "High",
+      "status": "pending",
+      "home": "Valencia",
+      "away": "R\u00edo Breog\u00e1n",
+      "sport": "basketball",
+      "reason": "Our model gives this 87 in 100. Expected margin about 12 points. Tested: High-tier ACB winner picks won 80% of 245 games (promised 83%)."
+    },
     {
       "match_id": "LaLiga_2627_real_madrid_celta_vigo",
       "league": "LaLiga",
@@ -228,47 +222,104 @@
       "tier": "High",
       "status": "pending",
       "home": "Real Madrid",
-      "away": "Celta Vigo"
+      "away": "Celta Vigo",
+      "sport": "football",
+      "reason": "Our model gives this 87 in 100. Expected goals 2.4 v 0.9. Tested: High-tier over/under 1.5 goals picks won 87% of 664 (promised 84%), 2023/24 to 2025/26."
     },
     {
-      "match_id": "LaLiga_2627_rayo_vallecano_valencia",
-      "league": "LaLiga",
-      "kickoff_utc": "2026-11-21 15:15:00+00:00",
-      "home_id": "rayo_vallecano",
-      "away_id": "valencia",
-      "market": "over_3_5",
-      "pick": "Under 3.5 goals",
-      "prob": 0.795,
-      "fair_odds": 1.26,
+      "match_id": "ACB_202627_real_madrid_baloncesto_club_joventut_badalona",
+      "league": "ACB",
+      "kickoff_utc": "2026-11-22 18:00:00+00:00",
+      "home_id": "Real Madrid",
+      "away_id": "Asisa Joventut",
+      "market": "bb_winner",
+      "pick": "Real Madrid to win (overtime counts)",
+      "prob": 0.861,
+      "fair_odds": 1.16,
       "tier": "High",
       "status": "pending",
-      "home": "Rayo Vallecano",
-      "away": "Valencia"
+      "home": "Real Madrid",
+      "away": "Asisa Joventut",
+      "sport": "basketball",
+      "reason": "Our model gives this 86 in 100. Expected margin about 11 points. Tested: High-tier ACB winner picks won 80% of 245 games (promised 83%)."
+    },
+    {
+      "match_id": "ACB_202627_ucam_murcia_club_de_baloncesto_basket_zaragoza_2002",
+      "league": "ACB",
+      "kickoff_utc": "2026-11-21 20:00:00+00:00",
+      "home_id": "UCAM Murcia",
+      "away_id": "Casademont Zaragoza",
+      "market": "bb_winner",
+      "pick": "UCAM Murcia to win (overtime counts)",
+      "prob": 0.847,
+      "fair_odds": 1.18,
+      "tier": "High",
+      "status": "pending",
+      "home": "UCAM Murcia",
+      "away": "Casademont Zaragoza",
+      "sport": "basketball",
+      "reason": "Our model gives this 85 in 100. Expected margin about 11 points. Tested: High-tier ACB winner picks won 80% of 245 games (promised 83%)."
+    },
+    {
+      "match_id": "NBL_202627_brisbane_bullets_sydney_kings_1",
+      "league": "NBL",
+      "kickoff_utc": "2026-11-22 06:00:00+00:00",
+      "home_id": "Brisbane Bullets",
+      "away_id": "Sydney Kings",
+      "market": "bb_winner",
+      "pick": "Sydney Kings to win (overtime counts)",
+      "prob": 0.802,
+      "fair_odds": 1.25,
+      "tier": "High",
+      "status": "pending",
+      "home": "Brisbane Bullets",
+      "away": "Sydney Kings",
+      "sport": "basketball",
+      "reason": "Our model gives this 80 in 100. Tested: High-tier NBL winner picks won 71% of 55 games (promised 79%)."
     }
   ],
   "diamond": [
     {
-      "match_id": "LaLiga_2627_rayo_vallecano_valencia",
-      "league": "LaLiga",
-      "kickoff_utc": "2026-11-21 15:15:00+00:00",
-      "home_id": "rayo_vallecano",
-      "away_id": "valencia",
-      "market": "over_3_5",
-      "pick": "Under 3.5 goals",
-      "prob": 0.795,
-      "fair_odds": 1.26,
+      "match_id": "NBL_202627_brisbane_bullets_sydney_kings_1",
+      "league": "NBL",
+      "kickoff_utc": "2026-11-22 06:00:00+00:00",
+      "home_id": "Brisbane Bullets",
+      "away_id": "Sydney Kings",
+      "market": "bb_winner",
+      "pick": "Sydney Kings to win (overtime counts)",
+      "prob": 0.802,
+      "fair_odds": 1.25,
       "tier": "High",
       "status": "pending",
-      "home": "Rayo Vallecano",
-      "away": "Valencia"
+      "home": "Brisbane Bullets",
+      "away": "Sydney Kings",
+      "sport": "basketball",
+      "reason": "Our model gives this 80 in 100. Tested: High-tier NBL winner picks won 71% of 55 games (promised 79%)."
     }
   ],
   "coupons": [
     {
       "name": "Double",
-      "prob": 0.689,
-      "fair_odds": 1.45,
+      "prob": 0.756,
+      "fair_odds": 1.32,
       "legs": [
+        {
+          "match_id": "ACB_202627_valencia_basket_club_baloncesto_breogan",
+          "league": "ACB",
+          "kickoff_utc": "2026-11-22 16:00:00+00:00",
+          "home_id": "Valencia",
+          "away_id": "R\u00edo Breog\u00e1n",
+          "market": "bb_winner",
+          "pick": "Valencia to win (overtime counts)",
+          "prob": 0.873,
+          "fair_odds": 1.15,
+          "tier": "High",
+          "status": "pending",
+          "home": "Valencia",
+          "away": "R\u00edo Breog\u00e1n",
+          "sport": "basketball",
+          "reason": "Our model gives this 87 in 100. Expected margin about 12 points. Tested: High-tier ACB winner picks won 80% of 245 games (promised 83%)."
+        },
         {
           "match_id": "LaLiga_2627_real_madrid_celta_vigo",
           "league": "LaLiga",
@@ -282,51 +333,97 @@
           "tier": "High",
           "status": "pending",
           "home": "Real Madrid",
-          "away": "Celta Vigo"
-        },
+          "away": "Celta Vigo",
+          "sport": "football",
+          "reason": "Our model gives this 87 in 100. Expected goals 2.4 v 0.9. Tested: High-tier over/under 1.5 goals picks won 87% of 664 (promised 84%), 2023/24 to 2025/26."
+        }
+      ]
+    },
+    {
+      "name": "Treble",
+      "prob": 0.651,
+      "fair_odds": 1.54,
+      "legs": [
         {
-          "match_id": "LaLiga_2627_rayo_vallecano_valencia",
-          "league": "LaLiga",
-          "kickoff_utc": "2026-11-21 15:15:00+00:00",
-          "home_id": "rayo_vallecano",
-          "away_id": "valencia",
-          "market": "over_3_5",
-          "pick": "Under 3.5 goals",
-          "prob": 0.795,
-          "fair_odds": 1.26,
+          "match_id": "ACB_202627_valencia_basket_club_baloncesto_breogan",
+          "league": "ACB",
+          "kickoff_utc": "2026-11-22 16:00:00+00:00",
+          "home_id": "Valencia",
+          "away_id": "R\u00edo Breog\u00e1n",
+          "market": "bb_winner",
+          "pick": "Valencia to win (overtime counts)",
+          "prob": 0.873,
+          "fair_odds": 1.15,
           "tier": "High",
           "status": "pending",
-          "home": "Rayo Vallecano",
-          "away": "Valencia"
+          "home": "Valencia",
+          "away": "R\u00edo Breog\u00e1n",
+          "sport": "basketball",
+          "reason": "Our model gives this 87 in 100. Expected margin about 12 points. Tested: High-tier ACB winner picks won 80% of 245 games (promised 83%)."
+        },
+        {
+          "match_id": "LaLiga_2627_real_madrid_celta_vigo",
+          "league": "LaLiga",
+          "kickoff_utc": "2026-11-21 20:00:00+00:00",
+          "home_id": "real_madrid",
+          "away_id": "celta_vigo",
+          "market": "over_1_5",
+          "pick": "Over 1.5 goals",
+          "prob": 0.866,
+          "fair_odds": 1.15,
+          "tier": "High",
+          "status": "pending",
+          "home": "Real Madrid",
+          "away": "Celta Vigo",
+          "sport": "football",
+          "reason": "Our model gives this 87 in 100. Expected goals 2.4 v 0.9. Tested: High-tier over/under 1.5 goals picks won 87% of 664 (promised 84%), 2023/24 to 2025/26."
+        },
+        {
+          "match_id": "ACB_202627_real_madrid_baloncesto_club_joventut_badalona",
+          "league": "ACB",
+          "kickoff_utc": "2026-11-22 18:00:00+00:00",
+          "home_id": "Real Madrid",
+          "away_id": "Asisa Joventut",
+          "market": "bb_winner",
+          "pick": "Real Madrid to win (overtime counts)",
+          "prob": 0.861,
+          "fair_odds": 1.16,
+          "tier": "High",
+          "status": "pending",
+          "home": "Real Madrid",
+          "away": "Asisa Joventut",
+          "sport": "basketball",
+          "reason": "Our model gives this 86 in 100. Expected margin about 11 points. Tested: High-tier ACB winner picks won 80% of 245 games (promised 83%)."
         }
       ]
     }
   ],
   "record": {
     "free": {
-      "won": 69,
-      "lost": 20,
-      "pending": 1
+      "won": 104,
+      "lost": 39,
+      "pending": 14
     },
     "premium": {
-      "won": 7,
-      "lost": 2,
-      "pending": 0
+      "won": 21,
+      "lost": 6,
+      "pending": 1
     },
     "diamond": {
-      "won": 2,
+      "won": 8,
+      "lost": 5,
+      "pending": 1
+    },
+    "double": {
+      "won": 3,
       "lost": 3,
       "pending": 0
     },
-    "double": {
-      "won": 1,
-      "lost": 1,
-      "pending": 0
-    },
     "treble": {
-      "won": 0,
-      "lost": 1,
+      "won": 1,
+      "lost": 2,
       "pending": 0
     }
-  }
+  },
+  "basketball_note": "Basketball: winner picks only, EuroLeague, NBL and ACB. NBL High-tier picks were weaker in testing: won 71% of 55, promised 79%."
 }
