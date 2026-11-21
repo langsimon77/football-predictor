@@ -1,0 +1,242 @@
+{
+  "generated_utc": "2026-11-21T06:08:33.441742+00:00",
+  "rule": "tips_v1, from tiers_v1",
+  "note": "Fair odds = 1 / model probability. Bet only if the bookmaker pays more.",
+  "free": [
+    {
+      "match_id": "EPL_2627_man_city_fulham",
+      "league": "EPL",
+      "kickoff_utc": "2026-11-21 12:30:00+00:00",
+      "home_id": "man_city",
+      "away_id": "fulham",
+      "market": "over_1_5",
+      "pick": "Over 1.5 goals",
+      "prob": 0.797,
+      "fair_odds": 1.25,
+      "tier": "Medium",
+      "status": "pending"
+    },
+    {
+      "match_id": "LaLiga_2627_alaves_deportivo_la_coruna",
+      "league": "LaLiga",
+      "kickoff_utc": "2026-11-21 13:00:00+00:00",
+      "home_id": "alaves",
+      "away_id": "deportivo_la_coruna",
+      "market": "over_3_5",
+      "pick": "Under 3.5 goals",
+      "prob": 0.8,
+      "fair_odds": 1.25,
+      "tier": "Medium",
+      "status": "pending"
+    },
+    {
+      "match_id": "EPL_2627_tottenham_ipswich",
+      "league": "EPL",
+      "kickoff_utc": "2026-11-21 15:00:00+00:00",
+      "home_id": "tottenham",
+      "away_id": "ipswich",
+      "market": "over_1_5",
+      "pick": "Over 1.5 goals",
+      "prob": 0.826,
+      "fair_odds": 1.21,
+      "tier": "Medium",
+      "status": "pending"
+    },
+    {
+      "match_id": "EPL_2627_chelsea_leeds",
+      "league": "EPL",
+      "kickoff_utc": "2026-11-21 15:00:00+00:00",
+      "home_id": "chelsea",
+      "away_id": "leeds",
+      "market": "over_1_5",
+      "pick": "Over 1.5 goals",
+      "prob": 0.804,
+      "fair_odds": 1.24,
+      "tier": "Medium",
+      "status": "pending"
+    },
+    {
+      "match_id": "EPL_2627_bournemouth_nottm_forest",
+      "league": "EPL",
+      "kickoff_utc": "2026-11-21 15:00:00+00:00",
+      "home_id": "bournemouth",
+      "away_id": "nottm_forest",
+      "market": "over_1_5",
+      "pick": "Over 1.5 goals",
+      "prob": 0.774,
+      "fair_odds": 1.29,
+      "tier": "Medium",
+      "status": "pending"
+    },
+    {
+      "match_id": "EPL_2627_aston_villa_sunderland",
+      "league": "EPL",
+      "kickoff_utc": "2026-11-21 15:00:00+00:00",
+      "home_id": "aston_villa",
+      "away_id": "sunderland",
+      "market": "over_3_5",
+      "pick": "Under 3.5 goals",
+      "prob": 0.751,
+      "fair_odds": 1.33,
+      "tier": "Medium",
+      "status": "pending"
+    },
+    {
+      "match_id": "LaLiga_2627_rayo_vallecano_valencia",
+      "league": "LaLiga",
+      "kickoff_utc": "2026-11-21 15:15:00+00:00",
+      "home_id": "rayo_vallecano",
+      "away_id": "valencia",
+      "market": "over_3_5",
+      "pick": "Under 3.5 goals",
+      "prob": 0.795,
+      "fair_odds": 1.26,
+      "tier": "High",
+      "status": "pending"
+    },
+    {
+      "match_id": "LaLiga_2627_sevilla_real_betis",
+      "league": "LaLiga",
+      "kickoff_utc": "2026-11-21 17:30:00+00:00",
+      "home_id": "sevilla",
+      "away_id": "real_betis",
+      "market": "over_1_5",
+      "pick": "Over 1.5 goals",
+      "prob": 0.801,
+      "fair_odds": 1.25,
+      "tier": "Medium",
+      "status": "pending"
+    },
+    {
+      "match_id": "EPL_2627_newcastle_arsenal",
+      "league": "EPL",
+      "kickoff_utc": "2026-11-21 17:30:00+00:00",
+      "home_id": "newcastle",
+      "away_id": "arsenal",
+      "market": "over_3_5",
+      "pick": "Under 3.5 goals",
+      "prob": 0.76,
+      "fair_odds": 1.32,
+      "tier": "Medium",
+      "status": "pending"
+    },
+    {
+      "match_id": "LaLiga_2627_real_madrid_celta_vigo",
+      "league": "LaLiga",
+      "kickoff_utc": "2026-11-21 20:00:00+00:00",
+      "home_id": "real_madrid",
+      "away_id": "celta_vigo",
+      "market": "over_1_5",
+      "pick": "Over 1.5 goals",
+      "prob": 0.866,
+      "fair_odds": 1.15,
+      "tier": "High",
+      "status": "pending"
+    }
+  ],
+  "premium": [
+    {
+      "match_id": "LaLiga_2627_real_madrid_celta_vigo",
+      "league": "LaLiga",
+      "kickoff_utc": "2026-11-21 20:00:00+00:00",
+      "home_id": "real_madrid",
+      "away_id": "celta_vigo",
+      "market": "over_1_5",
+      "pick": "Over 1.5 goals",
+      "prob": 0.866,
+      "fair_odds": 1.15,
+      "tier": "High",
+      "status": "pending"
+    },
+    {
+      "match_id": "LaLiga_2627_rayo_vallecano_valencia",
+      "league": "LaLiga",
+      "kickoff_utc": "2026-11-21 15:15:00+00:00",
+      "home_id": "rayo_vallecano",
+      "away_id": "valencia",
+      "market": "over_3_5",
+      "pick": "Under 3.5 goals",
+      "prob": 0.795,
+      "fair_odds": 1.26,
+      "tier": "High",
+      "status": "pending"
+    }
+  ],
+  "diamond": [
+    {
+      "match_id": "LaLiga_2627_rayo_vallecano_valencia",
+      "league": "LaLiga",
+      "kickoff_utc": "2026-11-21 15:15:00+00:00",
+      "home_id": "rayo_vallecano",
+      "away_id": "valencia",
+      "market": "over_3_5",
+      "pick": "Under 3.5 goals",
+      "prob": 0.795,
+      "fair_odds": 1.26,
+      "tier": "High",
+      "status": "pending"
+    }
+  ],
+  "coupons": [
+    {
+      "name": "Double",
+      "prob": 0.689,
+      "fair_odds": 1.45,
+      "legs": [
+        {
+          "match_id": "LaLiga_2627_real_madrid_celta_vigo",
+          "league": "LaLiga",
+          "kickoff_utc": "2026-11-21 20:00:00+00:00",
+          "home_id": "real_madrid",
+          "away_id": "celta_vigo",
+          "market": "over_1_5",
+          "pick": "Over 1.5 goals",
+          "prob": 0.866,
+          "fair_odds": 1.15,
+          "tier": "High",
+          "status": "pending"
+        },
+        {
+          "match_id": "LaLiga_2627_rayo_vallecano_valencia",
+          "league": "LaLiga",
+          "kickoff_utc": "2026-11-21 15:15:00+00:00",
+          "home_id": "rayo_vallecano",
+          "away_id": "valencia",
+          "market": "over_3_5",
+          "pick": "Under 3.5 goals",
+          "prob": 0.795,
+          "fair_odds": 1.26,
+          "tier": "High",
+          "status": "pending"
+        }
+      ]
+    }
+  ],
+  "record": {
+    "free": {
+      "won": 69,
+      "lost": 20,
+      "pending": 1
+    },
+    "premium": {
+      "won": 7,
+      "lost": 2,
+      "pending": 0
+    },
+    "diamond": {
+      "won": 2,
+      "lost": 3,
+      "pending": 0
+    },
+    "double": {
+      "won": 1,
+      "lost": 1,
+      "pending": 0
+    },
+    "treble": {
+      "won": 0,
+      "lost": 1,
+      "pending": 0
+    }
+  }
+}

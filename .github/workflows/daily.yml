@@ -131,6 +131,13 @@ jobs:
             uv run python -m fp.pipeline.ucl
           fi
 
+      - name: Tip products (free, Premium, coupons, Diamond); never blocks the run
+        # Reads the ledger only. Writes data/tips/tips.json and a copy for the Pages site.
+        continue-on-error: true
+        run: |
+          uv run python scripts/make_tips.py --days 3
+          if [ -d site ]; then mkdir -p site/data && cp data/tips/tips.json site/data/tips.json; fi
+
       - name: Ledger is append-only against the last commit
         env:
           BASE_SHA: HEAD
@@ -146,7 +153,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           for path in ledger reports data/manual/answers.yaml data/manual/managers.csv \
                       app/data/ratings_history.csv data/shape/shape_v1.json \
-                      data/shape/shape_v1_trial.json; do
+                      data/shape/shape_v1_trial.json data/tips/tips.json; do
             [ -e "$path" ] && git add "$path"
           done
           if git diff --cached --quiet; then

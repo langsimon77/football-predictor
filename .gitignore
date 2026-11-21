@@ -28,3 +28,6 @@ app/data/*
 !app/data/ratings_history.csv
 !app/data/backtest.parquet
 site/
+
+# Tips backtest picks: rebuilt by scripts/backtest_tips.py
+data/tips/backtest_picks.parquet
