@@ -68,6 +68,15 @@ class Settings:
 
 DEFAULT = Settings()
 
+# Kept out of Diamond, Double and Treble (Lang, 21 Nov 2026): NBL High-tier winner picks
+# tested weakest (won 71% of 55 games, promised 79%). They stay in Free and Premium.
+TOP_EXCLUDED = {("bb_winner", "NBL")}
+
+
+def _top_ok(c: pd.DataFrame) -> pd.Series:
+    return ~pd.Series([(m, lg) in TOP_EXCLUDED for m, lg in zip(c["market"], c["league"],
+                                                                  strict=True)], index=c.index)
+
 
 def _tiers(value: object) -> dict:
     if isinstance(value, dict):
@@ -125,14 +134,14 @@ def premium(c: pd.DataFrame, s: Settings = DEFAULT) -> pd.DataFrame:
 
 
 def diamond(c: pd.DataFrame, s: Settings = DEFAULT) -> pd.DataFrame:
-    high = c[(c["tier"] == "High") & (c["fair_odds"] >= s.diamond_min_odds)]
+    high = c[(c["tier"] == "High") & (c["fair_odds"] >= s.diamond_min_odds) & _top_ok(c)]
     return high.sort_values("prob", ascending=False, kind="stable").head(1).reset_index(drop=True)
 
 
 def coupons(c: pd.DataFrame, s: Settings = DEFAULT) -> list[dict]:
     """Double and treble from the strongest High picks, one leg per match."""
-    legs = _best_per_match(c[c["tier"] == "High"]).sort_values("prob", ascending=False,
-                                                               kind="stable")
+    high = c[(c["tier"] == "High") & _top_ok(c)]
+    legs = _best_per_match(high).sort_values("prob", ascending=False, kind="stable")
     out = []
     for size in s.coupon_sizes:
         if len(legs) < size:

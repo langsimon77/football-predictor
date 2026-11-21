@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-11-21T18:49:56.153109+00:00",
+  "generated_utc": "2026-11-21T18:56:37.337996+00:00",
   "rule": "tips_v2: football tiers_v1, basketball bb_tiers_v1",
   "note": "Fair odds = 1 / model probability. Bet only if the bookmaker pays more.",
   "free": [
@@ -280,21 +280,21 @@
   ],
   "diamond": [
     {
-      "match_id": "NBL_202627_brisbane_bullets_sydney_kings_1",
-      "league": "NBL",
-      "kickoff_utc": "2026-11-22 06:00:00+00:00",
-      "home_id": "Brisbane Bullets",
-      "away_id": "Sydney Kings",
-      "market": "bb_winner",
-      "pick": "Sydney Kings to win (overtime counts)",
-      "prob": 0.802,
-      "fair_odds": 1.25,
+      "match_id": "LaLiga_2627_real_madrid_celta_vigo",
+      "league": "LaLiga",
+      "kickoff_utc": "2026-11-21 20:00:00+00:00",
+      "home_id": "real_madrid",
+      "away_id": "celta_vigo",
+      "market": "1x2",
+      "pick": "Home win",
+      "prob": 0.739,
+      "fair_odds": 1.35,
       "tier": "High",
       "status": "pending",
-      "home": "Brisbane Bullets",
-      "away": "Sydney Kings",
-      "sport": "basketball",
-      "reason": "Our model gives this 80 in 100. Tested: High-tier NBL winner picks won 71% of 55 games (promised 79%)."
+      "home": "Real Madrid",
+      "away": "Celta Vigo",
+      "sport": "football",
+      "reason": "Our model gives this 74 in 100. Expected goals 2.4 v 0.9. Tested: High-tier result picks won 76% of 423 (promised 70%), 2023/24 to 2025/26."
     }
   ],
   "coupons": [
@@ -411,17 +411,17 @@
     },
     "diamond": {
       "won": 8,
-      "lost": 5,
+      "lost": 3,
       "pending": 1
     },
     "double": {
       "won": 3,
-      "lost": 3,
+      "lost": 1,
       "pending": 0
     },
     "treble": {
       "won": 1,
-      "lost": 2,
+      "lost": 1,
       "pending": 0
     }
   },

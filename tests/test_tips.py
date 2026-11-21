@@ -98,3 +98,12 @@ def test_basketball_and_football_mix_in_products(cand):
     prem = tp.premium(both)
     assert prem.iloc[0]["match_id"] == "g1"              # strongest High pick first
     assert prem.match_id.is_unique
+
+
+def test_nbl_kept_out_of_diamond_and_coupons(cand):
+    games = pd.DataFrame([{"game_id": "n1", "league": "NBL", "tip_utc": "2026-11-22 06:00",
+                           "home_name": "X", "away_name": "Y", "p_home": 0.95}])
+    both = pd.concat([cand, tp.basketball_candidates(games, 0.74, 0.60)], ignore_index=True)
+    assert "n1" in set(tp.premium(both).match_id)          # Premium keeps it
+    assert "n1" not in set(tp.diamond(both).match_id)
+    assert all(leg["match_id"] != "n1" for c in tp.coupons(both) for leg in c["legs"])

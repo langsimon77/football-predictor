@@ -90,7 +90,7 @@ value picks.
 | Premium with comment (`yorum`) | Premium with a written reason | High tier; reason = our chance, expected goals or margin, tested win rate of that market and tier |
 | Super Premium | Super Premium | every pick where our safe chance x Gal's price after 20% tax reaches 1.05 (the page's slip engine) |
 | High odds tips of the day | High Odds tip of the day | best of those at Gal odds 2.00 or more |
-| Basketball tips | Basketball winner picks | EuroLeague, NBL, ACB Elo forecasts, tiers bb_tiers_v1 |
+| Basketball tips | Basketball winner picks | EuroLeague, NBL, ACB Elo forecasts, tiers bb_tiers_v1; NBL kept out of Diamond, Double and Treble (Lang) |
 | Tennis | none | no tennis data |
 
 Evidence: `reports/tips_backtest_2026_11.md`, `data/tips/market_record.json`,
