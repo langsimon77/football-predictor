@@ -9,9 +9,15 @@ Script: `scripts/backtest_tips.py`. Picks: `data/tips/backtest_picks.parquet`.
 
 | Product | Picks settled | Model promised (mean) | Hit rate (95% range) | Picks with closing odds | Return per 1 unit at Pinnacle close (95% range) |
 |---|---|---|---|---|---|
-| Free tips | 2280 | 79.1% | 79.1% (77.4% to 80.7%) | 94 | +10.7% (-1.9% to +22.1%) |
-| Premium | 1339 | 81.0% | 81.9% (79.7% to 83.8%) | 47 | +19.2% (+3.0% to +34.2%) |
+| Today's Top 3 | 1147 | 82.2% | 81.4% (79.1% to 83.6%) | 17 | too few to judge |
+| VIP Bankers | 1625 | 79.6% | 80.4% (78.4% to 82.2%) | 94 | +10.7% (-1.9% to +22.1%) |
+| VIP Full Card | 4560 | 77.3% | 77.7% (76.4% to 78.9%) | 259 | +7.8% (+1.0% to +14.1%) |
+| VIP Correct Score | 1604 | 12.7% | 15.1% (13.4% to 16.9%) | 0 | too few to judge |
 | Diamond | 449 | 75.9% | 75.1% (70.9% to 78.8%) | 63 | -6.2% (-22.5% to +9.0%) |
+| Free tips (old) | 2280 | 79.1% | 79.1% (77.4% to 80.7%) | 94 | +10.7% (-1.9% to +22.1%) |
+| Premium (old, top 5) | 1339 | 81.0% | 81.9% (79.7% to 83.8%) | 47 | +19.2% (+3.0% to +34.2%) |
+| VIP Accumulator 3-fold | 240 | 57.0% | 60.4% (54.1% to 66.4%) | 0 | too few to judge |
+| VIP Accumulator 4-fold | 191 | 46.2% | 53.9% (46.8% to 60.8%) | 0 | too few to judge |
 | Double | 303 | 70.0% | 69.6% (64.2% to 74.5%) | 0 | too few to judge |
 | Treble | 240 | 57.0% | 60.4% (54.1% to 66.4%) | 0 | too few to judge |
 

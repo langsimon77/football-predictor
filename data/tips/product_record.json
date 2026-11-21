@@ -1,0 +1,40 @@
+{
+ "basis": "walk-forward forecasts, EPL and La Liga, 2023/24 to 2025/26, one product set per match day",
+ "products": {
+  "top3": {
+   "picks": 1147,
+   "won": 0.814,
+   "promised": 0.822
+  },
+  "bankers": {
+   "picks": 1625,
+   "won": 0.804,
+   "promised": 0.796
+  },
+  "full_card": {
+   "picks": 4560,
+   "won": 0.777,
+   "promised": 0.773
+  },
+  "correct_score": {
+   "picks": 1604,
+   "won": 0.151,
+   "promised": 0.127
+  },
+  "diamond": {
+   "picks": 449,
+   "won": 0.751,
+   "promised": 0.759
+  },
+  "3-fold": {
+   "picks": 240,
+   "won": 0.604,
+   "promised": 0.57
+  },
+  "4-fold": {
+   "picks": 191,
+   "won": 0.539,
+   "promised": 0.462
+  }
+ }
+}

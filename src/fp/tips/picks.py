@@ -182,6 +182,11 @@ def basketball_candidates(games: pd.DataFrame, high: float, low: float) -> pd.Da
 
 
 def _won(market: str, side: str, res: dict) -> bool | None:
+    if market == "correct_score":
+        hg, ag = res.get("home_goals"), res.get("away_goals")
+        if hg is None or ag is None or pd.isna(hg) or pd.isna(ag):
+            return None
+        return f"{int(hg)}-{int(ag)}" == side
     if market == "bb_winner":
         hp, ap = res.get("home_pts"), res.get("away_pts")
         if hp is None or ap is None or pd.isna(hp) or pd.isna(ap) or hp == ap:
@@ -222,6 +227,77 @@ def settle_coupon(coupon: dict, results: pd.DataFrame) -> str:
     if (legs == "lost").any():
         return "lost"
     return "won" if (legs == "won").all() else "pending"
+
+
+FAMILY = {"1x2": "result", "over_1_5": "goals", "over_2_5": "goals", "over_3_5": "goals",
+          "btts": "goals", "bb_winner": "basketball"}
+
+
+def family(market: str) -> str:
+    if market.startswith("corners_"):
+        return "corners"
+    if market.startswith("yellows_"):
+        return "yellows"
+    return FAMILY.get(market, market)
+
+
+def top3(c: pd.DataFrame, s: Settings = DEFAULT) -> pd.DataFrame:
+    """Today's Top 3: the three likeliest picks, one per game, Medium tier or better.
+    The caller passes only today's candidates."""
+    ok = c[c["tier_rank"] >= TIER_RANK[s.free_min_tier]]
+    best = _best_per_match(ok).sort_values("prob", ascending=False, kind="stable")
+    return best.head(3).reset_index(drop=True)
+
+
+def bankers(c: pd.DataFrame) -> pd.DataFrame:
+    """VIP Bankers: every game's strongest High-tier pick, strongest first (no cap)."""
+    best = _best_per_match(c[c["tier"] == "High"])
+    return best.sort_values("prob", ascending=False, kind="stable").reset_index(drop=True)
+
+
+def full_card(c: pd.DataFrame, s: Settings = DEFAULT) -> pd.DataFrame:
+    """VIP Full Card: up to two picks per game, Medium tier or better, from different market
+    families (result, goals, corners, yellows), so the two picks are not the same bet twice."""
+    ok = c[c["tier_rank"] >= TIER_RANK[s.free_min_tier]].assign(
+        family=lambda d: d["market"].map(family))
+    ok = ok.sort_values(["tier_rank", "prob"], ascending=[False, False], kind="stable")
+    ok = ok.drop_duplicates(["match_id", "family"], keep="first")
+    out = ok.groupby("match_id", sort=False).head(2)
+    return out.sort_values(["kickoff_utc", "match_id", "prob"], ascending=[True, True, False],
+                           kind="stable").drop(columns="family").reset_index(drop=True)
+
+
+def correct_scores(forecasts: pd.DataFrame, n: int = 5) -> pd.DataFrame:
+    """VIP Correct Score: each game's likeliest exact score, the `n` likeliest games.
+
+    `forecasts` needs match_id, league, kickoff_utc, home_id, away_id and top_scorelines
+    (JSON list of {"score": "h-a", "p": chance})."""
+    rows = []
+    for rec in forecasts.to_dict("records"):
+        raw = rec.get("top_scorelines")
+        top = json.loads(raw) if isinstance(raw, str) and raw else []
+        if not top:
+            continue
+        best = max(top, key=lambda t: t["p"])
+        rows.append({k: rec.get(k) for k in ("match_id", "league", "kickoff_utc", "home_id",
+                                              "away_id")} |
+                    {"market": "correct_score", "side": best["score"],
+                     "pick": f"Correct score {best['score']}", "prob": float(best["p"]),
+                     "tier": "Low"})
+    out = pd.DataFrame(rows, columns=["match_id", "league", "kickoff_utc", "home_id", "away_id",
+                                      "market", "side", "pick", "prob", "tier"])
+    out["fair_odds"] = (1 / out["prob"]).round(2)
+    out["tier_rank"] = 0
+    return out.sort_values("prob", ascending=False, kind="stable").head(n).reset_index(drop=True)
+
+
+def accumulators(c: pd.DataFrame, sizes: tuple[int, ...] = (3, 4)) -> list[dict]:
+    """VIP Accumulator: 3-fold and 4-fold from the strongest High picks, one leg per game,
+    NBL kept out (TOP_EXCLUDED)."""
+    out = coupons(c, Settings(coupon_sizes=sizes))
+    for cp in out:
+        cp["name"] = f"{len(cp['legs'])}-fold"
+    return out
 
 
 def build_day(c: pd.DataFrame, s: Settings = DEFAULT) -> dict:
