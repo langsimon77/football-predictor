@@ -9,11 +9,11 @@ Script: `scripts/backtest_tips.py`. Picks: `data/tips/backtest_picks.parquet`.
 
 | Product | Picks settled | Model promised (mean) | Hit rate (95% range) | Picks with closing odds | Return per 1 unit at Pinnacle close (95% range) |
 |---|---|---|---|---|---|
-| Free tips | 2280 | 73.9% | 73.9% (72.0% to 75.6%) | 341 | +3.5% (-3.3% to +9.8%) |
-| Premium | 1274 | 73.8% | 74.5% (72.0% to 76.8%) | 264 | +3.2% (-3.8% to +10.7%) |
-| Diamond | 444 | 75.0% | 74.1% (69.8% to 78.0%) | 75 | -5.3% (-19.0% to +8.9%) |
-| Double | 293 | 59.2% | 57.7% (52.0% to 63.2%) | 10 | too few to judge |
-| Treble | 225 | 44.2% | 44.9% (38.5% to 51.4%) | 1 | too few to judge |
+| Free tips | 2280 | 79.1% | 79.1% (77.4% to 80.7%) | 94 | +10.7% (-1.9% to +22.1%) |
+| Premium | 1339 | 81.0% | 81.9% (79.7% to 83.8%) | 47 | +19.2% (+3.0% to +34.2%) |
+| Diamond | 449 | 75.9% | 75.1% (70.9% to 78.8%) | 63 | -6.2% (-22.5% to +9.0%) |
+| Double | 303 | 70.0% | 69.6% (64.2% to 74.5%) | 0 | too few to judge |
+| Treble | 240 | 57.0% | 60.4% (54.1% to 66.4%) | 0 | too few to judge |
 
 How to read it:
 - "Model promised" is the average model probability of the picks. If the hit rate's
@@ -27,13 +27,13 @@ How to read it:
 
 | Product | Picks settled | Model promised (mean) | Hit rate (95% range) | Picks with closing odds | Return per 1 unit at Pinnacle close (95% range) |
 |---|---|---|---|---|---|
-| 1x2 | 211 | 72.3% | 82.0% (76.2% to 86.6%) | 178 | +8.4% (+1.1% to +15.7%) |
-| btts | 101 | 60.7% | 66.3% (56.7% to 74.8%) | 0 | too few to judge |
-| corners_over_10_5 | 1 | 68.0% | 100.0% (20.7% to 100.0%) | 0 | too few to judge |
-| corners_over_11_5 | 350 | 80.2% | 77.4% (72.8% to 81.5%) | 0 | too few to judge |
-| corners_over_8_5 | 494 | 73.8% | 73.7% (69.6% to 77.4%) | 0 | too few to judge |
-| over_2_5 | 96 | 65.6% | 55.2% (45.3% to 64.8%) | 86 | -7.4% (-24.3% to +9.8%) |
-| yellows_over_3_5 | 4 | 75.0% | 100.0% (51.0% to 100.0%) | 0 | too few to judge |
+| 1x2 | 60 | 67.0% | 80.0% (68.2% to 88.2%) | 47 | +19.2% (+3.0% to +34.2%) |
+| btts | 21 | 58.7% | 52.4% (32.4% to 71.7%) | 0 | too few to judge |
+| corners_over_11_5 | 143 | 80.3% | 75.5% (67.9% to 81.8%) | 0 | too few to judge |
+| corners_over_8_5 | 115 | 72.3% | 69.6% (60.6% to 77.2%) | 0 | too few to judge |
+| over_1_5 | 613 | 83.6% | 87.1% (84.2% to 89.5%) | 0 | too few to judge |
+| over_3_5 | 367 | 83.0% | 80.7% (76.3% to 84.4%) | 0 | too few to judge |
+| yellows_over_3_5 | 3 | 73.9% | 100.0% (43.8% to 100.0%) | 0 | too few to judge |
 | yellows_over_5_5 | 17 | 89.8% | 94.1% (73.0% to 99.0%) | 0 | too few to judge |
 
 ## Limits of this test

@@ -15,6 +15,9 @@ Plain English:
      at least `diamond_min_odds`, so it is not a near-certain pick with no price.
 4. `settle` marks each pick won, lost or pending from the results.
 
+5. Basketball adds one winner pick per game (EuroLeague, NBL, ACB), tiered by
+   bb_tiers_v1 (data/tips/basketball_tiers.json), and joins the same products.
+
 Nothing here changes a forecast. A tip is never more certain than its forecast.
 """
 
@@ -64,6 +67,15 @@ class Settings:
 
 
 DEFAULT = Settings()
+
+# Kept out of Diamond, Double and Treble (Lang, 21 Nov 2026): NBL High-tier winner picks
+# tested weakest (won 71% of 55 games, promised 79%). They stay in Free and Premium.
+TOP_EXCLUDED = {("bb_winner", "NBL")}
+
+
+def _top_ok(c: pd.DataFrame) -> pd.Series:
+    return ~pd.Series([(m, lg) in TOP_EXCLUDED for m, lg in zip(c["market"], c["league"],
+                                                                  strict=True)], index=c.index)
 
 
 def _tiers(value: object) -> dict:
@@ -122,14 +134,14 @@ def premium(c: pd.DataFrame, s: Settings = DEFAULT) -> pd.DataFrame:
 
 
 def diamond(c: pd.DataFrame, s: Settings = DEFAULT) -> pd.DataFrame:
-    high = c[(c["tier"] == "High") & (c["fair_odds"] >= s.diamond_min_odds)]
+    high = c[(c["tier"] == "High") & (c["fair_odds"] >= s.diamond_min_odds) & _top_ok(c)]
     return high.sort_values("prob", ascending=False, kind="stable").head(1).reset_index(drop=True)
 
 
 def coupons(c: pd.DataFrame, s: Settings = DEFAULT) -> list[dict]:
     """Double and treble from the strongest High picks, one leg per match."""
-    legs = _best_per_match(c[c["tier"] == "High"]).sort_values("prob", ascending=False,
-                                                               kind="stable")
+    high = c[(c["tier"] == "High") & _top_ok(c)]
+    legs = _best_per_match(high).sort_values("prob", ascending=False, kind="stable")
     out = []
     for size in s.coupon_sizes:
         if len(legs) < size:
@@ -142,7 +154,39 @@ def coupons(c: pd.DataFrame, s: Settings = DEFAULT) -> list[dict]:
     return out
 
 
+def basketball_candidates(games: pd.DataFrame, high: float, low: float) -> pd.DataFrame:
+    """Winner picks for basketball games (bb_tiers_v1).
+
+    `games` needs game_id, league, tip_utc, home_name, away_name, p_home. Only leagues
+    whose winner forecast passed its test should be passed in (EuroLeague, NBL, ACB).
+    Tier from the favourite's chance: at or above `high` High, below `low` Low."""
+    rows = []
+    for rec in games.to_dict("records"):
+        p = rec.get("p_home")
+        if p is None or not np.isfinite(p):
+            continue
+        home = p >= 0.5
+        prob = float(p if home else 1 - p)
+        team = rec["home_name"] if home else rec["away_name"]
+        tier = "High" if prob >= high - 1e-9 else "Low" if prob < low - 1e-9 else "Medium"
+        rows.append({"match_id": rec["game_id"], "league": rec["league"],
+                     "kickoff_utc": rec["tip_utc"], "home_id": rec["home_name"],
+                     "away_id": rec["away_name"], "market": "bb_winner",
+                     "side": "home" if home else "away",
+                     "pick": f"{team} to win (overtime counts)", "prob": prob, "tier": tier})
+    out = pd.DataFrame(rows, columns=["match_id", "league", "kickoff_utc", "home_id",
+                                      "away_id", "market", "side", "pick", "prob", "tier"])
+    out["fair_odds"] = (1 / out["prob"]).round(2)
+    out["tier_rank"] = out["tier"].map(TIER_RANK).fillna(0).astype(int)
+    return out
+
+
 def _won(market: str, side: str, res: dict) -> bool | None:
+    if market == "bb_winner":
+        hp, ap = res.get("home_pts"), res.get("away_pts")
+        if hp is None or ap is None or pd.isna(hp) or pd.isna(ap) or hp == ap:
+            return None
+        return bool((hp > ap) == (side == "home"))
     hg, ag = res.get("home_goals"), res.get("away_goals")
     if hg is None or ag is None or pd.isna(hg) or pd.isna(ag):
         return None

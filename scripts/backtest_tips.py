@@ -52,6 +52,12 @@ def forecasts(matches: pd.DataFrame) -> pd.DataFrame:
                       "p_home": g["bdc_home"], "p_draw": g["bdc_draw"],
                       "p_away": g["bdc_away"], "p_over_2_5": g["bdc_over_2_5"],
                       "p_btts": g["bdc_btts"], "intervals": g["bdc_intervals"]})
+    # Over 1.5 and 3.5 goals from the 11 x 11 scoreline table (rows home goals); the same
+    # table reproduces the stored over 2.5 exactly.
+    goals = np.add.outer(np.arange(11), np.arange(11))
+    mats = np.stack([np.asarray(m, dtype=float).reshape(11, 11) for m in g["bdc_matrix"]])
+    for line in (1.5, 3.5):
+        f[f"p_over_{str(line).replace('.', '_')}"] = mats[:, goals > line].sum(axis=1)
     co = co.set_index("match_id")
     ca = ca.set_index("match_id")
     for line in ("8_5", "9_5", "10_5", "11_5"):
@@ -135,6 +141,18 @@ def run(matches_path: Path) -> None:
     out_dir = ROOT / "data" / "tips"
     out_dir.mkdir(parents=True, exist_ok=True)
     singles.drop(columns=["tier_rank"]).to_parquet(out_dir / "backtest_picks.parquet")
+    # Tested win rate of every candidate by market and tier: the evidence line in each
+    # tip's written reason (scripts/make_tips.py).
+    allc = tp.settle(cand, results)
+    allc = allc[allc["status"] != "pending"]
+    rec = {}
+    for (mk, tier), g in allc.groupby(["market", "tier"]):
+        rec.setdefault(mk, {})[tier] = {"picks": int(len(g)),
+                                        "won": round(float((g["status"] == "won").mean()), 3),
+                                        "promised": round(float(g["prob"].mean()), 3)}
+    (out_dir / "market_record.json").write_text(json.dumps(
+        {"basis": "walk-forward forecasts, EPL and La Liga, 2023/24 to 2025/26",
+         "markets": rec}, indent=1) + "\n", encoding="utf-8")
     report(singles, coupons, cand)
 
 
