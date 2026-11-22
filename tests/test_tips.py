@@ -163,3 +163,29 @@ def test_bb_markets_match_live():
     spec.loader.exec_module(mt)
     live = importlib.import_module("live")
     assert {k: tuple(v) for k, v in live.MARKETS.items()} == mt.BB_MARKETS
+
+
+def _make_tips():
+    import importlib.util
+    from pathlib import Path
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location("make_tips", root / "scripts" / "make_tips.py")
+    mt = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mt)
+    return mt
+
+
+def test_scorecard_counts_and_scores(cand):
+    mt = _make_tips()
+    res = pd.DataFrame([{"match_id": "m4", "home_goals": 2, "away_goals": 0},
+                        {"match_id": "m1", "home_goals": 0, "away_goals": 1},
+                        {"match_id": "g9", "home_pts": 80, "away_pts": 75}])
+    scores = mt.score_text(res)
+    assert scores == {"m4": "2-0", "m1": "0-1", "g9": "80-75"}
+    sc = mt.scorecard(cand, pd.DataFrame(columns=["match_id", "league", "kickoff_utc", "home_id",
+                                                   "away_id", "top_scorelines"]),
+                      res, {}, scores)
+    b = sc["categories"]["bankers"]
+    assert (b["won"], b["lost"], b["pending"]) == (1, 1, 1)     # m4 won, m1 lost, m2 waiting
+    assert b["expected"] == pytest.approx(0.80 + 0.70)          # settled picks only
+    assert {p["match_id"]: p["score"] for p in b["picks"]}["m4"] == "2-0"

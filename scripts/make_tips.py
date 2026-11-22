@@ -99,6 +99,47 @@ def basketball_card(games: pd.DataFrame, bbt: dict, now: pd.Timestamp,
     return sorted(out, key=lambda r: (r["kickoff_utc"] or r["date"] + "T12"))
 
 
+def score_text(results: pd.DataFrame) -> dict[str, str]:
+    """Final score per match id: goals for football, points for basketball."""
+    out = {}
+    for r in results.to_dict("records"):
+        hg, ag = r.get("home_goals"), r.get("away_goals")
+        hp, ap = r.get("home_pts"), r.get("away_pts")
+        if hg is not None and pd.notna(hg) and pd.notna(ag):
+            out[r["match_id"]] = f"{int(hg)}-{int(ag)}"
+        elif hp is not None and pd.notna(hp) and pd.notna(ap):
+            out[r["match_id"]] = f"{int(hp)}-{int(ap)}"
+    return out
+
+
+def scorecard(c: pd.DataFrame, prim_day: pd.DataFrame, results: pd.DataFrame,
+              why: dict, scores: dict[str, str]) -> dict:
+    """Yesterday's tips under today's rules, from the forecasts locked before kickoff,
+    settled against the results: what we said, the score, won or lost, and promised vs won."""
+    cats = {"top3": tp.top3(c), "bankers": tp.bankers(c), "full_card": tp.full_card(c),
+            "correct_score": tp.correct_scores(prim_day), "diamond": tp.diamond(c)}
+    out: dict = {"categories": {}, "accumulators": []}
+    for name, df in cats.items():
+        st = tp.settle(df, results)
+        recs = _records(st, why)
+        for r in recs:
+            r["score"] = scores.get(r["match_id"])
+        done = st[st["status"] != "pending"]
+        out["categories"][name] = {
+            "picks": recs, "won": int((st["status"] == "won").sum()),
+            "lost": int((st["status"] == "lost").sum()),
+            "pending": int((st["status"] == "pending").sum()),
+            "expected": round(float(done["prob"].sum()), 2)}
+    for cp in tp.accumulators(c):
+        legs = _records(tp.settle(pd.DataFrame(cp["legs"]), results), why)
+        for r in legs:
+            r["score"] = scores.get(r["match_id"])
+        out["accumulators"].append({"name": cp["name"], "prob": round(cp["prob"], 3),
+                                    "fair_odds": cp["fair_odds"], "legs": legs,
+                                    "status": tp.settle_coupon(cp, results)})
+    return out
+
+
 def reason(rec: dict, fc: dict, record: dict, bb: dict, prod: dict | None = None) -> str:
     """The written reason on a tip (Winning Gang's Premium 'yorum'), from our numbers only."""
     p, mk, tier = rec["prob"], rec["market"], rec["tier"]
@@ -234,6 +275,14 @@ def main() -> None:
             r = record.setdefault(cp["name"].lower(), {"won": 0, "lost": 0, "pending": 0})
             r[tp.settle_coupon(cp, results)] += 1
     out["record"] = record
+    # Yesterday's scorecard (Juba calendar day before today).
+    yday = today - pd.Timedelta(days=1)
+    out["yesterday"] = {"day": str(yday),
+                        "note": "Today's tip rules applied to yesterday's forecasts, each "
+                                "locked before kickoff, settled against the results.",
+                        **scorecard(cand[cand["day"] == yday],
+                                    prim_k[prim_k["day"] == yday], results, why,
+                                    score_text(results))}
     out["basketball_note"] = ("Basketball tips: winner picks only, EuroLeague, NBL and ACB. "
                               "NBL High-tier picks were weaker in testing: "
                               + next((f"won {_pct(r['won'])} of {r['games']}, promised "
