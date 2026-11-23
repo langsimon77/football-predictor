@@ -72,3 +72,22 @@ def test_missing_arm_raises():
     del frames["blend"]
     with pytest.raises(ValueError, match="blend"):
         collect(frames, fits, START)
+
+
+def test_mixed_datetime_resolutions():
+    frames, fits = _args()
+    for a in frames:
+        frames[a]["lock_utc"] = frames[a]["lock_utc"].astype("datetime64[us, UTC]")
+        fits[a]["as_of_utc"] = fits[a]["as_of_utc"].astype("datetime64[ns, UTC]")
+    out = collect(frames, fits, START)
+    assert out["fit_ok"].all()
+
+
+def test_nothing_before_part_b_returns_empty():
+    frames, fits = _args(locks=("2026-11-24T12:00:00Z",))
+    out = collect(frames, fits, START)
+    assert out.empty
+    assert list(out.columns) == [
+        "match_id", "league", "lock_utc", "arm",
+        "p_home", "p_draw", "p_away", "p_over_2_5", "p_btts", "fit_ok",
+    ]

@@ -50,3 +50,14 @@ such matches happens later, in the scoring step, not in this file.
 `result_available_utc` is kickoff plus 3 hours. But football-data.co.uk publishes xG some days
 later. So part A sees xG slightly earlier than live running would. Weekly refits keep this
 small. It is the same rule shots on target already use.
+
+## Coverage and re-run
+
+The first runs (45200379711, 45200387862, 45200398219) used data up to 8 Nov 2026: 419 matches
+per version, locks from 14 Aug to 7 Nov 2026. Matches locked after that and before the part B
+start (mainly the 21 to 23 Nov weekend) are not yet in part A.
+
+Rule: part A is re-run once, after football-data.co.uk has published results and xG for every
+match locked before 2026-11-23T15:00:11Z (expected by 1 Dec 2026), with the same settings. That
+re-run replaces `part_a.parquet` and `part_a_fits.parquet`, and its run IDs are added here.
+Nothing is chosen from the first runs' numbers.

@@ -32,9 +32,9 @@ def _fit_ok_from_fits(pred: pd.DataFrame, fits: pd.DataFrame) -> pd.Series:
     though the backtest carried an older good fit forward. No earlier fit means False.
     """
     f = fits[["league", "as_of_utc", "ok"]].copy()
-    f["as_of_utc"] = pd.to_datetime(f["as_of_utc"], utc=True)
+    f["as_of_utc"] = pd.to_datetime(f["as_of_utc"], utc=True).astype("datetime64[ns, UTC]")
     left = pred[["league", "lock_utc"]].copy()
-    left["lock_utc"] = pd.to_datetime(left["lock_utc"], utc=True)
+    left["lock_utc"] = pd.to_datetime(left["lock_utc"], utc=True).astype("datetime64[ns, UTC]")
     left["_i"] = range(len(left))
     merged = pd.merge_asof(
         left.sort_values("lock_utc"), f.sort_values("as_of_utc"),
