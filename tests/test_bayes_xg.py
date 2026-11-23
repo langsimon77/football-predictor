@@ -110,8 +110,19 @@ def test_partial_xg_rows_add_nothing():
     half.loc[half.index[::2], ["home_xg", "away_xg"]] = np.nan
     only = df.loc[half.index[1::2]].reset_index(drop=True)
     assert value(build(half, "joint"), "xg") == pytest.approx(value(build(only, "joint"), "xg"))
-    # unaffected rows keep plain goals under blend only where xG is missing
+    # joint leaves the goals term alone
     assert value(build(half, "joint"), "goals") == value(build(half, "none"), "goals")
+
+
+def test_blend_partial_xg_rows():
+    df = frame(n=40)
+    half = df.copy()
+    half.loc[half.index[::2], ["home_xg", "away_xg"]] = np.nan
+    xg_rows = df.loc[half.index[1::2]].reset_index(drop=True)
+    nan_rows = df.loc[half.index[::2]].drop(columns=["home_xg", "away_xg"]).reset_index(drop=True)
+    # Row terms add up, so blend(all) - blend(xG rows) is the NaN rows, which are plain goals.
+    diff = value(build(half, "blend"), "goals") - value(build(xg_rows, "blend"), "goals")
+    assert diff == pytest.approx(value(build(nan_rows, "none"), "goals"))
 
 
 def test_joint_xg_term_matches_formula():
@@ -122,6 +133,24 @@ def test_joint_xg_term_matches_formula():
     eh, ea = 0.3 + 0.1, 0.3
     expected = np.sum(d["w"] * (d["xh"] * eh - np.exp(eh) + d["xa"] * ea - np.exp(ea)))
     assert value(m, "xg") == pytest.approx(expected)
+
+
+def test_joint_xg_term_nonzero_strengths():
+    df = frame()
+    m = build(df, "joint")
+    ip = m.initial_point()
+    rng = np.random.default_rng(9)
+    att_raw, def_raw = rng.normal(0, 0.4, 6), rng.normal(0, 0.4, 6)
+    ip.update(att_raw=att_raw, def_raw=def_raw, mu_x=np.array(0.5), home_x=np.array(0.3),
+              c_att=np.array(1.4), c_def=np.array(0.7))
+    att, dfn = att_raw - att_raw.mean(), def_raw - def_raw.mean()
+    d = bayes_dc._arrays(df, TEAMS, AS_OF, bayes_dc.BayesParams())
+    hi, ai = d["hi"], d["ai"]
+    ex_h = 0.5 + 0.3 + 1.4 * att[hi] + 0.7 * dfn[ai]
+    ex_a = 0.5 + 1.4 * att[ai] + 0.7 * dfn[hi]
+    expected = np.sum(d["w"] * d["mx"] * (d["xh"] * ex_h - np.exp(ex_h)
+                                          + d["xa"] * ex_a - np.exp(ex_a)))
+    assert value(m, "xg", ip) == pytest.approx(expected)
 
 
 def test_bad_mode_rejected():

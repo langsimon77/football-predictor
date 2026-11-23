@@ -163,8 +163,8 @@ def _arrays(train: pd.DataFrame, teams: list[str], as_of: pd.Timestamp, p: Bayes
         "xh": np.nan_to_num(xh),
         "xa": np.nan_to_num(xa),
         # 1 where both xG values are known; other rows use goals only. Absent columns
-        # count as unknown (unlike shots, where a zero filler is harmless because
-        # use_sot is off).
+        # count as unknown. (Shots use a zero filler via _column; the training frame
+        # always carries shots columns, so that never arises there.)
         "mx": (np.isfinite(xh) & np.isfinite(xa)).astype(float),
     }
 
