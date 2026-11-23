@@ -53,6 +53,8 @@ class BayesParams:
     chains: int = 4
     target_accept: float = 0.9
     sampler: str = "nutpie"   # "nutpie" or "numpyro"; benchmarked in Phase 2
+    # xg_mode: "none", "joint" (xG as a second likelihood) or "blend" (half xG goals)
+    xg_mode: str = "none"
     seed: int = 2026
 
 
@@ -146,6 +148,8 @@ def _arrays(train: pd.DataFrame, teams: list[str], as_of: pd.Timestamp, p: Bayes
     age = (as_of - train["kickoff_utc"]).dt.total_seconds().to_numpy() / 86400
     x = train["home_goals"].to_numpy(dtype=float)
     y = train["away_goals"].to_numpy(dtype=float)
+    xh = _column(train, "home_xg") if "home_xg" in train else np.full(len(train), np.nan)
+    xa = _column(train, "away_xg") if "away_xg" in train else np.full(len(train), np.nan)
     return {
         "hi": train["home_id"].map(idx).to_numpy(), "ai": train["away_id"].map(idx).to_numpy(),
         "x": x, "y": y, "w": np.exp(-p.xi * age),
@@ -157,6 +161,12 @@ def _arrays(train: pd.DataFrame, teams: list[str], as_of: pd.Timestamp, p: Bayes
         # still counts for goals; its missing shots simply add nothing.
         "ms": (np.isfinite(_column(train, "home_sot"))
                & np.isfinite(_column(train, "away_sot"))).astype(float),
+        "xh": np.nan_to_num(xh),
+        "xa": np.nan_to_num(xa),
+        # 1 where both xG values are known; other rows use goals only. Absent columns
+        # count as unknown. (Shots use a zero filler via _column; the training frame
+        # always carries shots columns, so that never arises there.)
+        "mx": (np.isfinite(xh) & np.isfinite(xa)).astype(float),
     }
 
 
@@ -169,7 +179,9 @@ def _column(frame: pd.DataFrame, name: str) -> np.ndarray:
 
 def build_model(d: dict, n: int, prior_mean_att: np.ndarray, prior_sd_att: np.ndarray,
                 prior_mean_def: np.ndarray, prior_sd_def: np.ndarray, promoted: np.ndarray,
-                use_sot: bool, centred: bool = True) -> pm.Model:
+                use_sot: bool, centred: bool = True, xg_mode: str = "none") -> pm.Model:
+    if xg_mode not in ("none", "joint", "blend"):
+        raise ValueError(f"xg_mode must be none, joint or blend, got {xg_mode!r}")
     with pm.Model() as model:
         mu = pm.Normal("mu", 0.2, 0.5)
         home = pm.Normal("home", 0.25, 0.25)
@@ -198,8 +210,26 @@ def build_model(d: dict, n: int, prior_mean_att: np.ndarray, prior_sd_att: np.nd
         lam, nu = pt.exp(eta_h), pt.exp(eta_a)
         tau = (1 - d["m00"] * lam * nu * rho + d["m01"] * lam * rho
                + d["m10"] * nu * rho - d["m11"] * rho)
-        ll = (pt.log(pt.maximum(tau, 1e-10)) + d["x"] * eta_h - lam + d["y"] * eta_a - nu)
+        # Blend: where xG is known, the goal counts are half real goals and half xG.
+        # The Dixon-Coles tau above keeps the real score.
+        if xg_mode == "blend":
+            has_xg = d["mx"] > 0
+            x_obs = pt.where(has_xg, 0.5 * d["x"] + 0.5 * d["xh"], d["x"])
+            y_obs = pt.where(has_xg, 0.5 * d["y"] + 0.5 * d["xa"], d["y"])
+        else:
+            x_obs, y_obs = d["x"], d["y"]
+        ll = (pt.log(pt.maximum(tau, 1e-10)) + x_obs * eta_h - lam + y_obs * eta_a - nu)
         pm.Potential("goals", pt.sum(d["w"] * ll))
+
+        if xg_mode == "joint":
+            mu_x = pm.Normal("mu_x", 0.3, 0.5)
+            home_x = pm.Normal("home_x", 0.1, 0.2)
+            c_att = pm.Normal("c_att", 1.0, 0.5)
+            c_def = pm.Normal("c_def", 1.0, 0.5)
+            ex_h = mu_x + home_x + c_att * att[d["hi"]] + c_def * dfn[d["ai"]]
+            ex_a = mu_x + c_att * att[d["ai"]] + c_def * dfn[d["hi"]]
+            ll_x = d["xh"] * ex_h - pt.exp(ex_h) + d["xa"] * ex_a - pt.exp(ex_a)
+            pm.Potential("xg", pt.sum(d["w"] * d["mx"] * ll_x))
 
         if use_sot:
             mu_s = pm.Normal("mu_s", 1.4, 0.5)
@@ -211,6 +241,9 @@ def build_model(d: dict, n: int, prior_mean_att: np.ndarray, prior_sd_att: np.nd
             ll_s = d["xs"] * es_h - pt.exp(es_h) + d["ys"] * es_a - pt.exp(es_a)
             pm.Potential("shots_on_target", pt.sum(d["w"] * d["ms"] * ll_s))
     return model
+
+
+XG_JOINT_NAMES = ("mu_x", "home_x", "c_att", "c_def")
 
 
 def fit(train: pd.DataFrame, as_of: pd.Timestamp, teams: list[str],
@@ -241,15 +274,19 @@ def fit(train: pd.DataFrame, as_of: pd.Timestamp, teams: list[str],
                      "tau_def"]
     else:
         model = build_model(d, n, pri[:, 0], pri[:, 1], pri[:, 2], pri[:, 3], is_prom,
-                            p.use_sot, p.centred)
+                            p.use_sot, p.centred, p.xg_mode)
         var_names = ["mu", "home", "rho", "att", "def", "sigma_att", "sigma_def"]
 
+    # The joint xG block adds four scalars. They are kept so they can be logged, but the
+    # convergence gate (summary below) stays on the original list.
+    keep_names = [*var_names, *XG_JOINT_NAMES] if (p.xg_mode == "joint" and not p.dynamic) \
+        else var_names
     start = time.time()
     with model:
         idata = pm.sample(
             draws=p.draws, tune=p.tune, chains=p.chains, target_accept=p.target_accept,
             nuts_sampler=p.sampler, random_seed=p.seed, progressbar=False,
-            var_names=var_names,
+            var_names=keep_names,
         )
     seconds = time.time() - start
     summ = az.summary(idata, var_names=var_names, kind="diagnostics")
@@ -262,6 +299,9 @@ def fit(train: pd.DataFrame, as_of: pd.Timestamp, teams: list[str],
         "n_matches": len(train),
     }
     post = idata["posterior"].to_dataset().stack(sample=("chain", "draw"))
+    if keep_names is not var_names:  # posterior means of the xG link, for fits.parquet and logs
+        for name in XG_JOINT_NAMES:
+            diag[f"xg_{name}"] = float(post[name].mean())
     return Posterior(
         teams=teams,
         mu=post["mu"].to_numpy(), home=post["home"].to_numpy(), rho=post["rho"].to_numpy(),

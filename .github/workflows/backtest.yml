@@ -22,6 +22,9 @@ on:
       sampler:
         description: "nutpie or numpyro"
         default: "numpyro"
+      xg:
+        description: "xG use for the goals model: none, joint or blend"
+        default: "none"
       leagues:
         description: "Leagues, space separated (on trial: SerieA Ligue1)"
         default: "EPL LaLiga"
@@ -86,7 +89,7 @@ jobs:
               dynamic) flag="--dynamic --period-days 60" ;;
             esac
             uv run python -m fp.evaluate.backtest_bayes ${{ matrix.league }} ${{ matrix.season }} \
-              $flag --sampler ${{ inputs.sampler }} --out "$out"
+              $flag --xg ${{ inputs.xg }} --sampler ${{ inputs.sampler }} --out "$out"
           else
             flag=""
             [ "${{ inputs.variant }}" = "poisson" ] && flag="--poisson"

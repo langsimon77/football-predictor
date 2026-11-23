@@ -39,6 +39,9 @@ request.
    tested, locked forecasts on the Predictions tab. Keep it, or remove it?
 2. The odds reader routine is suspended (it needs your computer awake). Switch it on again?
 3. Three older routines carry connectors they do not use. Remove them and run one test each?
+4. xG test plan (23 Nov 2026, `data/audit/preregistration_xg_2026_11.md`): two xG shadow
+   versions of the goals model, scored on all of 2026/27, one verdict at the season's end.
+   Approve the plan, so the build can start (three steps, about half a day [E])?
 
 ## Earlier: 14 Nov 2026, basketball in three more leagues (B5)
 

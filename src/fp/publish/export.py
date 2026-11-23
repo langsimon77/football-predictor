@@ -122,6 +122,8 @@ def _thin(x: np.ndarray, n: int = WHATIF_DRAWS) -> list[float]:
 
 def detail(view: RunView, row: pd.Series, all_rows: pd.DataFrame) -> dict | None:
     """Everything the match page needs for one match, from this run's fits."""
+    from fp.pipeline import daily  # late: daily imports this module
+    hidden = set(daily.XG_MODELS.values())
     m = view.models.get(str(row["league"]))
     home, away = str(row["home_id"]), str(row["away_id"])
     if m is None or m.bayes is None or home not in m.bayes.teams or away not in m.bayes.teams:
@@ -143,7 +145,8 @@ def detail(view: RunView, row: pd.Series, all_rows: pd.DataFrame) -> dict | None
         "models": json.dumps([
             {"model": str(r.model_name), "p_home": float(r.p_home), "p_draw": float(r.p_draw),
              "p_away": float(r.p_away)}
-            for r in all_rows[all_rows["match_id"] == row["match_id"]].itertuples()]),
+            for r in all_rows[all_rows["match_id"] == row["match_id"]].itertuples()
+            if r.model_name not in hidden]),  # the xG shadow arms stay hidden
         "drivers": json.dumps(drivers.drivers(
             post, home, away, view.names, str(row["league"]),
             elo_gap=float(m.tracker.gap(home, away)), news=news[0] if news else None,
