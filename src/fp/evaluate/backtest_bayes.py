@@ -6,7 +6,7 @@ the latest fit made at or before that time. A fit can be up to a week older than
 the lock, so it may know less than the live system would, never more.
 
 Run one league and a list of seasons per process, so leagues can run in parallel:
-    uv run python -m fp.evaluate.backtest_bayes EPL 2021 2022 --out PATH [--sot]
+    uv run python -m fp.evaluate.backtest_bayes EPL 2021 2022 --out PATH [--sot] [--xg none|joint|blend]
 """
 
 from __future__ import annotations
@@ -95,13 +95,16 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--period-days", type=int, default=30, help="random-walk step length")
     ap.add_argument("--xi", type=float, default=0.002)
     ap.add_argument("--sampler", default="nutpie")
+    ap.add_argument("--xg", choices=["none", "joint", "blend"], default="none",
+                    help="use xG: joint (second likelihood) or blend (half xG goals)")
     ap.add_argument("--until", help="stop after this date (smoke test)")
     args = ap.parse_args(argv)
     tables = processed_dir(args.league)  # trial leagues read their own tables
     matches = pd.read_parquet(tables / "matches.parquet")
     second_tier = pd.read_parquet(tables / "second_tier.parquet")
     params = bayes_dc.BayesParams(xi=args.xi, use_sot=args.sot, dynamic=args.dynamic,
-                                  period_days=args.period_days, sampler=args.sampler)
+                                  period_days=args.period_days, sampler=args.sampler,
+                                  xg_mode=args.xg)
     start = time.time()
     until = pd.Timestamp(args.until, tz="UTC") if args.until else None
     preds, fits = predict_league(matches, second_tier, args.league, args.seasons, params, until)
