@@ -24,7 +24,7 @@ import logging
 import os
 import subprocess
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import cast
@@ -69,6 +69,9 @@ RELOCK_DAYS = 7
 # published Bayesian row carries the fix; a plain copy is locked as a shadow row.
 SHAPE_LIVE = True
 NO_SHAPE_MODEL = shape.UNSHAPED_MODEL
+# xG shadow arms (data/audit/preregistration_xg_2026_11.md, part B): locked beside the
+# control row, never published, never stored in the posterior store.
+XG_MODELS = {"joint": "dc_bayes_xg_joint_v1", "blend": "dc_bayes_xg_blend_v1"}
 # Failure-path test (Phase 7): set by FP_FORCE_FAIL, honoured only on dry runs.
 # "bayes" fails the Bayesian diagnostics so the run falls back; "crash" stops the run.
 FORCE_FAIL = ""
@@ -98,6 +101,9 @@ class LeagueModels:
     games_played: dict[str, int]
     bayes: bayes_dc.Posterior | None = None
     bayes_fallback: bool = False
+    # xG shadow arms whose fit passed its gate this run ("joint", "blend"); a failed arm
+    # is left out and locks nothing (pre-registration section 6).
+    xg: dict[str, bayes_dc.Posterior] = field(default_factory=dict)
 
 
 def model_version() -> tuple[str, bool]:
@@ -148,7 +154,28 @@ def fit_league(matches: pd.DataFrame, fixtures: pd.DataFrame, league: str, now: 
             else:
                 log.warning("%s: diagnostics failed and no stored posterior; "
                             "no Bayesian rows this run", league)
+        models.xg = fit_xg_arms(known, now, sorted(teams_by_season[season]), priors, league)
     return models
+
+
+def fit_xg_arms(known: pd.DataFrame, now: pd.Timestamp, teams: list[str],
+                priors: dict, league: str) -> dict[str, bayes_dc.Posterior]:
+    """The xG shadow arms. Each arm that raises or fails its gate is left out, so it
+    locks nothing this run; the published row never depends on them. Not stored."""
+    out: dict[str, bayes_dc.Posterior] = {}
+    for mode in XG_MODELS:
+        try:
+            post = bayes_dc.fit_checked(known, now, teams, priors,
+                                        replace(BAYES_PARAMS, xg_mode=mode))
+        except Exception as exc:  # a shadow arm must never stop the run
+            log.warning("%s: xG %s fit raised (%s); that arm locks nothing", league, mode, exc)
+            continue
+        log.info("%s xG %s fit %.1fs %s", league, mode, post.seconds, post.diagnostics)
+        if post.ok:
+            out[mode] = post
+        else:
+            log.warning("%s: xG %s diagnostics failed; that arm locks nothing", league, mode)
+    return out
 
 
 def prior_promoted(teams_by_season: dict[int, set[str]], season: int) -> set[str]:
@@ -253,6 +280,26 @@ def build_rows(cands: pd.DataFrame, models: dict[str, LeagueModels], now: pd.Tim
                     "flags": json.dumps([*b_flags, "shadow", "no_shape"]),
                 })
                 b_flags.append(shape.RULE)
+            # The xG shadow arms (pre-registration xG 2026-11, part B): same lock time and
+            # team-news scale as the control row, no shape fix, never published.
+            xg = getattr(m, "xg", None) or {}  # older callers build models without xg
+            for mode, name in XG_MODELS.items():
+                post = xg.get(mode)
+                if post is None or home not in post.teams or away not in post.teams:
+                    continue
+                _, x = bayes_markets(post, home, away, scale, None)
+                x = dict(x)
+                x_top, x_iv = x.pop("top_scorelines"), x.pop("intervals")
+                x.pop("matrix")
+                x_flags = [*flags, "shadow", "xg"]
+                if scale != (1.0, 1.0):
+                    x_flags.append("news_adjusted")
+                rows.append({
+                    **common, **x, "prediction_id": f"{r.match_id}:{name}",
+                    "model_name": name, "degraded": False,
+                    "top_scorelines": json.dumps(x_top), "intervals": json.dumps(x_iv),
+                    "flags": json.dumps(x_flags), "news_adjustments": json.dumps(adjustments),
+                })
             if scale != (1.0, 1.0):
                 b_flags.append("news_adjusted")
                 # The same forecast without news, kept to test whether news helps (S6.5).

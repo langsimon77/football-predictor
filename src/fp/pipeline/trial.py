@@ -8,6 +8,8 @@ What locks, for the markets that passed the pre-registered backtest
 - `dc_bayes_v1_noshape`: the same forecast without the fix, with its expected goals,
   because the monthly refit of the fix learns from them.
 - `elo_v0`: home, draw, away, the benchmark.
+- `dc_bayes_xg_joint_v1`, `dc_bayes_xg_blend_v1`: the xG shadow arms
+  (data/audit/preregistration_xg_2026_11.md), kept like the no-shape row.
 Goal lines, both teams score and corners failed the backtest and are not locked.
 
 Where it writes: ledger/trial/ (its own hash-chained ledger, results and report),
@@ -61,7 +63,8 @@ STORE = posterior_store.STORE / "trial"
 SHAPE_STORE = shape.STORE.with_name("shape_v1_trial.json")
 SHAPE_BACKTEST = ROOT / "data" / "backtests" / "trial" / "dc_bayes_v1_walkforward_2021_2025.parquet"
 COMPETITIONS = {lg.fdorg: lg.code for lg in leagues.TRIAL}
-KEEP_MODELS = (daily.BAYES_MODEL, daily.NO_SHAPE_MODEL, daily.ELO_MODEL)
+KEEP_MODELS = (daily.BAYES_MODEL, daily.NO_SHAPE_MODEL, daily.ELO_MODEL,
+               *daily.XG_MODELS.values())
 # Columns that stay empty: the markets that failed the backtest.
 DROP = ["p_over_1_5", "p_over_2_5", "p_over_3_5", "p_btts",
         "p_corners_over_8_5", "p_corners_over_9_5", "p_corners_over_10_5", "p_corners_over_11_5",
