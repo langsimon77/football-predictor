@@ -90,3 +90,10 @@ def test_history_records_only_for_final_forecasts_not_yet_recorded(tmp_path):
     code = refresh.main(["history", str(tmp_path), "--have", str(have), "--out", str(out),
                          "--now", "2026-11-20 09:00"])
     assert code == 0 and sorted(p.name for p in out.iterdir()) == ["played.json", "soon.json"]
+
+
+def test_an_extra_xg_test_file_does_not_block_the_check(tmp_path):
+    write(tmp_path)
+    (tmp_path / "xg_test.json").write_text(json.dumps({"arms": {}}), encoding="utf-8")
+    (tmp_path / "tips.json").write_text(json.dumps({"free": []}), encoding="utf-8")
+    assert refresh.check(tmp_path, NOW, None).startswith("PUBLISH")

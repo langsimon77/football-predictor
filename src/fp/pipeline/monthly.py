@@ -24,7 +24,7 @@ import pandas as pd
 from fp import ROOT, ledger
 from fp.ensemble import calibration as cal
 from fp.evaluate import backtest as bt
-from fp.evaluate import metrics
+from fp.evaluate import metrics, xg_test
 from fp.ingest import matches as build
 from fp.pipeline import data as data_pipeline
 from fp.pipeline import weekly
@@ -105,6 +105,18 @@ def refresh_card(section: str) -> None:
     CARD.write_text(text, encoding="utf-8")
 
 
+def xg_progress(ledger_dir: Path, now: pd.Timestamp, part_a: Path = xg_test.PART_A,
+                played: list[Path] | None = None) -> str:
+    """The one-line xG test progress note (pre-registration section 8). No verdict."""
+    try:
+        preds, results = xg_test.load_ledgers(ledger_dir)
+        data = xg_test.build(preds, results, xg_test.load_part_a(part_a), now,
+                             xg_test.load_played(played))
+        return xg_test.progress_line(data)
+    except Exception as error:  # a broken note must not stop the monthly report
+        return f"xG test: progress not available this month ({type(error).__name__})."
+
+
 def run(now: pd.Timestamp, dry_run: bool = False, pred_path: Path = ledger.PREDICTIONS,
         results_path: Path = ledger.RESULTS) -> dict:
     matches = pd.read_parquet(build.PROCESSED / "matches.parquet")
@@ -135,6 +147,10 @@ The strict rule: the whole 95% interval of the change must be below zero. A pass
 proposal for Lang, not an automatic change: live forecasts use no calibration map today.
 
 {live_record(live, now).replace(START, '').replace(END, '')}
+
+## xG test progress
+
+{xg_progress(pred_path.parent, now)}
 """
     if dry_run:
         print(report)

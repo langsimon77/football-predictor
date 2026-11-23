@@ -138,6 +138,13 @@ jobs:
           uv run python scripts/make_tips.py --days 3
           if [ -d site ]; then mkdir -p site/data && cp data/tips/tips.json site/data/tips.json; fi
 
+      - name: xG test file (hidden test, no verdict); never blocks the run
+        # Reads both ledgers and the part A file. Writes data/xg_test/xg_test.json with the
+        # paired mean change per xG arm (pre-registration data/audit/preregistration_xg_2026_11.md).
+        # The log shows match counts only.
+        continue-on-error: true
+        run: uv run python scripts/make_xg_test.py --out data/xg_test/xg_test.json
+
       - name: Ledger is append-only against the last commit
         env:
           BASE_SHA: HEAD
@@ -153,7 +160,8 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           for path in ledger reports data/manual/answers.yaml data/manual/managers.csv \
                       app/data/ratings_history.csv data/shape/shape_v1.json \
-                      data/shape/shape_v1_trial.json data/tips/tips.json; do
+                      data/shape/shape_v1_trial.json data/tips/tips.json \
+                      data/xg_test/xg_test.json; do
             [ -e "$path" ] && git add "$path"
           done
           if git diff --cached --quiet; then
@@ -186,6 +194,8 @@ jobs:
           python3 scripts/model_lab_refresh.py check "$RUNNER_TEMP/lab"
           # Tips page file (public picks only; written by the tips step above).
           if [ -f data/tips/tips.json ]; then cp data/tips/tips.json "$RUNNER_TEMP/lab/tips.json"; fi
+          # xG test file (hidden test, no verdict; written by the xG test step above).
+          if [ -f data/xg_test/xg_test.json ]; then cp data/xg_test/xg_test.json "$RUNNER_TEMP/lab/xg_test.json"; fi
           export GIT_INDEX_FILE="$RUNNER_TEMP/lab.index"
           for f in "$RUNNER_TEMP"/lab/*.json; do
             git update-index --add --cacheinfo "100644,$(git hash-object -w "$f"),$(basename "$f")"
