@@ -287,19 +287,23 @@ def build_rows(cands: pd.DataFrame, models: dict[str, LeagueModels], now: pd.Tim
                 post = xg.get(mode)
                 if post is None or home not in post.teams or away not in post.teams:
                     continue
-                _, x = bayes_markets(post, home, away, scale, None)
-                x = dict(x)
-                x_top, x_iv = x.pop("top_scorelines"), x.pop("intervals")
-                x.pop("matrix")
-                x_flags = [*flags, "shadow", "xg"]
-                if scale != (1.0, 1.0):
-                    x_flags.append("news_adjusted")
-                rows.append({
-                    **common, **x, "prediction_id": f"{r.match_id}:{name}",
-                    "model_name": name, "degraded": False,
-                    "top_scorelines": json.dumps(x_top), "intervals": json.dumps(x_iv),
-                    "flags": json.dumps(x_flags), "news_adjustments": json.dumps(adjustments),
-                })
+                try:  # a shadow arm must never stop the lock
+                    _, x = bayes_markets(post, home, away, scale, None)
+                    x = dict(x)
+                    x_top, x_iv = x.pop("top_scorelines"), x.pop("intervals")
+                    x.pop("matrix")
+                    x_row = {
+                        **common, **x, "prediction_id": f"{r.match_id}:{name}",
+                        "model_name": name, "degraded": False,
+                        "top_scorelines": json.dumps(x_top), "intervals": json.dumps(x_iv),
+                        "flags": json.dumps([*flags, "shadow", "xg"]),
+                        "news_adjustments": json.dumps(adjustments),
+                    }
+                except Exception as exc:
+                    log.warning("%s: xG %s markets raised (%s); no %s row",
+                                r.match_id, mode, exc, name)
+                    continue
+                rows.append(x_row)
             if scale != (1.0, 1.0):
                 b_flags.append("news_adjusted")
                 # The same forecast without news, kept to test whether news helps (S6.5).

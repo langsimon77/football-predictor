@@ -94,7 +94,9 @@ def test_xg_rows_use_news_scale(monkeypatch):
         want = bayes_dc.markets(xg[mode], "a", "b", scale=(1.1, 0.9))
         for col in P_COLS:
             assert rows.loc[name, col] == pytest.approx(want[col])
-        assert "news_adjusted" in json.loads(rows.loc[name, "flags"])
+        # Same flag pattern as the no-shape control row: no news_adjusted.
+        assert "news_adjusted" not in json.loads(rows.loc[name, "flags"])
+    assert "news_adjusted" in json.loads(rows.loc["dc_bayes_v1", "flags"])
 
 
 def test_published_row_unchanged():
@@ -105,6 +107,20 @@ def test_published_row_unchanged():
     pd.testing.assert_frame_equal(a, b)
     # The xG rows are the only extra rows.
     assert set(with_xg["model_name"]) - set(without["model_name"]) == {JOINT, BLEND}
+
+
+def test_arm_whose_markets_raise_locks_nothing():
+    broken = posterior(seed=5)
+    broken.teams = ["a", "b"]
+    broken.att = broken.att[:, :1]                      # index b out of range: markets raise
+    xg = {"joint": broken, "blend": arms()["blend"]}
+    rows = daily.build_rows(cands(), league_models(xg), NOW, False, sh=SH)
+    names = set(rows["model_name"])
+    assert JOINT not in names and BLEND in names
+    without = daily.build_rows(cands(), league_models(), NOW, False, sh=SH)
+    pd.testing.assert_frame_equal(
+        rows[rows["model_name"] == "dc_bayes_v1"].reset_index(drop=True),
+        without[without["model_name"] == "dc_bayes_v1"].reset_index(drop=True))
 
 
 def test_xg_rows_without_shape_fix():

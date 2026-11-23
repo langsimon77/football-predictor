@@ -6,7 +6,8 @@ the latest fit made at or before that time. A fit can be up to a week older than
 the lock, so it may know less than the live system would, never more.
 
 Run one league and a list of seasons per process, so leagues can run in parallel:
-    uv run python -m fp.evaluate.backtest_bayes EPL 2021 2022 --out PATH [--sot] [--xg none|joint|blend]
+    uv run python -m fp.evaluate.backtest_bayes EPL 2021 2022 --out PATH [--sot]
+        [--xg none|joint|blend]
 """
 
 from __future__ import annotations

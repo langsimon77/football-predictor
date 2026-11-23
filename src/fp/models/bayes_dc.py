@@ -53,7 +53,8 @@ class BayesParams:
     chains: int = 4
     target_accept: float = 0.9
     sampler: str = "nutpie"   # "nutpie" or "numpyro"; benchmarked in Phase 2
-    xg_mode: str = "none"     # "none", "joint" (xG as a second likelihood) or "blend" (half xG goals)
+    # xg_mode: "none", "joint" (xG as a second likelihood) or "blend" (half xG goals)
+    xg_mode: str = "none"
     seed: int = 2026
 
 
