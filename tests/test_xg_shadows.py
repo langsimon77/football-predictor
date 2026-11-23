@@ -16,6 +16,7 @@ from scipy.stats import poisson
 from fp.models import bayes_dc, shape
 from fp.models.bayes_dc import Posterior
 from fp.pipeline import daily, trial
+from fp.publish import export
 
 NOW = pd.Timestamp("2026-11-23 04:41", tz="UTC")
 MATCH = "EPL_2627_a_b"
@@ -134,11 +135,44 @@ def test_trial_keeps_xg_rows():
     assert {JOINT, BLEND} <= set(out.index)
     for name in (JOINT, BLEND):  # treated like the no-shape shadow row
         assert pd.notna(out.loc[name, "exp_goals_home"])
-        assert pd.isna(out.loc[name, "p_over_2_5"])
         assert "trial" in json.loads(out.loc[name, "flags"])
 
 
-def fit_league_env(monkeypatch, tmp_path, xg_fit):
+def test_trial_keeps_guard_markets_for_control_and_xg_arms_only():
+    """Pre-registration sections 4 and 5 need over 2.5 and BTTS for the control and both arms."""
+    rows = daily.build_rows(cands(), league_models(arms()), NOW, False, sh=SH)
+    out = trial.trim(rows).set_index("model_name")
+    for name in (daily.NO_SHAPE_MODEL, JOINT, BLEND):
+        assert out.loc[name, ["p_over_2_5", "p_btts"]].notna().all()
+    for name in (daily.BAYES_MODEL, daily.ELO_MODEL):  # published rows stay trimmed
+        assert out.loc[name, ["p_over_2_5", "p_btts"]].isna().all()
+
+
+def detail_view(rows):
+    fixtures = pd.DataFrame([{"league": "EPL", "home_id": "a"}, {"league": "EPL",
+                                                                   "home_id": "b"}])
+    return export.RunView(now=NOW, ledger=rows, results=pd.DataFrame(),
+                          provisional=pd.DataFrame(), matches=pd.DataFrame(),
+                          fixtures=fixtures, models=league_models(arms()),
+                          names={"a": "A", "b": "B"})
+
+
+def test_detail_models_list_leaves_out_xg_rows():
+    with_xg = daily.build_rows(cands(), league_models(arms()), NOW, False, sh=SH)
+    without = daily.build_rows(cands(), league_models(), NOW, False, sh=SH)
+    assert {JOINT, BLEND} <= set(with_xg["model_name"])
+
+    def listed(rows):
+        rows = rows.assign(locked=True)
+        row = rows[rows["model_name"] == daily.BAYES_MODEL].iloc[0]
+        d = export.detail(detail_view(rows), row, rows)
+        return json.loads(d["models"])
+    a, b = listed(with_xg), listed(without)
+    assert not {m["model"] for m in a} & set(daily.XG_MODELS.values())
+    assert a == b and a  # otherwise unchanged
+
+
+def fit_league_env(monkeypatch, tmp_path, xg_fit, with_xg=True):
     """Stub every model fit in fit_league; xg_fit(params) handles the xG arms."""
     t = NOW - pd.Timedelta(days=3)
     matches = pd.DataFrame([{"league": "EPL", "season": 2026, "home_id": "a", "away_id": "b",
@@ -171,8 +205,16 @@ def fit_league_env(monkeypatch, tmp_path, xg_fit):
     prior = SimpleNamespace(for_season=lambda tbs, season: {})
     models = daily.fit_league(matches, fixtures, "EPL", NOW, prior, 2026,
                               second_tier=pd.DataFrame(), promo=object(), with_bayes=True,
-                              store=tmp_path)
+                              with_xg=with_xg, store=tmp_path)
     return models, main, calls, saved
+
+
+def test_xg_arms_are_not_fitted_unless_asked(monkeypatch, tmp_path):
+    def boom(params):
+        raise AssertionError("xG arm fitted without with_xg")
+    models, main, calls, saved = fit_league_env(monkeypatch, tmp_path, boom, with_xg=False)
+    assert models.bayes is main and models.xg == {}
+    assert calls == ["none"]
 
 
 def test_xg_fit_error_does_not_block(monkeypatch, tmp_path):

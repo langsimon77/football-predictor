@@ -119,7 +119,7 @@ def model_version() -> tuple[str, bool]:
 def fit_league(matches: pd.DataFrame, fixtures: pd.DataFrame, league: str, now: pd.Timestamp,
                prior: PromotedPrior, season: int, second_tier: pd.DataFrame | None = None,
                promo: PromotionModel | None = None, with_bayes: bool = False,
-               store: Path = posterior_store.STORE) -> LeagueModels:
+               with_xg: bool = False, store: Path = posterior_store.STORE) -> LeagueModels:
     lg = matches[matches["league"] == league]
     teams_by_season = season_teams(matches, league)
     teams_by_season[season] = set(fixtures.loc[fixtures["league"] == league, "home_id"])
@@ -154,7 +154,8 @@ def fit_league(matches: pd.DataFrame, fixtures: pd.DataFrame, league: str, now: 
             else:
                 log.warning("%s: diagnostics failed and no stored posterior; "
                             "no Bayesian rows this run", league)
-        models.xg = fit_xg_arms(known, now, sorted(teams_by_season[season]), priors, league)
+        if with_xg:  # only the daily run and the trial run lock xG rows
+            models.xg = fit_xg_arms(known, now, sorted(teams_by_season[season]), priors, league)
     return models
 
 
@@ -522,7 +523,8 @@ def run_once(now: pd.Timestamp, ctx: Context, dry_run: bool = False) -> pd.DataF
         for problem in results_feed.cross_check(ctx.matches, ctx.fast_sources):
             log.warning("result check: %s", problem)
     models = {lg: fit_league(goal_matches, ctx.fixtures, lg, now, ctx.prior, season,
-                             ctx.second_tier, ctx.promo, bayes, ctx.store) for lg in LEAGUES}
+                             ctx.second_tier, ctx.promo, bayes, bayes, ctx.store)
+              for lg in LEAGUES}
     sh = (shape.current(ctx.matches, existing, now, ctx.shape_store, save=not dry_run)
           if SHAPE_LIVE and bayes else None)
     counts = fixture_features = referees = None

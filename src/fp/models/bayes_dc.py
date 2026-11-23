@@ -243,6 +243,9 @@ def build_model(d: dict, n: int, prior_mean_att: np.ndarray, prior_sd_att: np.nd
     return model
 
 
+XG_JOINT_NAMES = ("mu_x", "home_x", "c_att", "c_def")
+
+
 def fit(train: pd.DataFrame, as_of: pd.Timestamp, teams: list[str],
         promoted_priors: dict[str, tuple[float, float, float, float]] | None = None,
         params: BayesParams | None = None) -> Posterior:
@@ -274,12 +277,16 @@ def fit(train: pd.DataFrame, as_of: pd.Timestamp, teams: list[str],
                             p.use_sot, p.centred, p.xg_mode)
         var_names = ["mu", "home", "rho", "att", "def", "sigma_att", "sigma_def"]
 
+    # The joint xG block adds four scalars. They are kept so they can be logged, but the
+    # convergence gate (summary below) stays on the original list.
+    keep_names = [*var_names, *XG_JOINT_NAMES] if (p.xg_mode == "joint" and not p.dynamic) \
+        else var_names
     start = time.time()
     with model:
         idata = pm.sample(
             draws=p.draws, tune=p.tune, chains=p.chains, target_accept=p.target_accept,
             nuts_sampler=p.sampler, random_seed=p.seed, progressbar=False,
-            var_names=var_names,
+            var_names=keep_names,
         )
     seconds = time.time() - start
     summ = az.summary(idata, var_names=var_names, kind="diagnostics")
@@ -292,6 +299,9 @@ def fit(train: pd.DataFrame, as_of: pd.Timestamp, teams: list[str],
         "n_matches": len(train),
     }
     post = idata["posterior"].to_dataset().stack(sample=("chain", "draw"))
+    if keep_names is not var_names:  # posterior means of the xG link, for fits.parquet and logs
+        for name in XG_JOINT_NAMES:
+            diag[f"xg_{name}"] = float(post[name].mean())
     return Posterior(
         teams=teams,
         mu=post["mu"].to_numpy(), home=post["home"].to_numpy(), rho=post["rho"].to_numpy(),

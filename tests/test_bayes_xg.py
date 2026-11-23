@@ -170,3 +170,53 @@ def test_fit_checked_retry_keeps_xg_mode(monkeypatch):
     monkeypatch.setattr(bayes_dc, "fit", fake_fit)
     bayes_dc.fit_checked(frame(), AS_OF, TEAMS, params=bayes_dc.BayesParams(xg_mode="blend"))
     assert seen == ["blend", "blend"]
+
+
+def fake_sample(seen):
+    import xarray as xr
+
+    def sample(**kw):
+        seen["var_names"] = list(kw["var_names"])
+        rng = np.random.default_rng(0)
+        chains, draws, n = 2, 20, len(TEAMS)
+        data = {}
+        for name in kw["var_names"]:
+            shape = (chains, draws, n) if name in ("att", "def") else (chains, draws)
+            data[name] = (("chain", "draw") + (("t",) if len(shape) == 3 else ()),
+                          1.0 + rng.normal(0, 0.1, shape))
+        if "c_att" in data:
+            data["c_att"] = (("chain", "draw"), np.full((chains, draws), 1.25))
+        stats = xr.Dataset({"diverging": (("chain", "draw"), np.zeros((chains, draws), bool))})
+        return xr.DataTree.from_dict({"posterior": xr.Dataset(data), "sample_stats": stats})
+    return sample
+
+
+def run_fit(monkeypatch, mode):
+    seen = {}
+    summary_names = []
+    real_summary = bayes_dc.az.summary
+
+    def summary(idata, var_names=None, **kw):
+        summary_names.append(list(var_names))
+        return real_summary(idata, var_names=var_names, **kw)
+    monkeypatch.setattr(bayes_dc.pm, "sample", fake_sample(seen))
+    monkeypatch.setattr(bayes_dc.az, "summary", summary)
+    post = bayes_dc.fit(frame(), AS_OF, TEAMS, params=bayes_dc.BayesParams(xg_mode=mode))
+    return post, seen["var_names"], summary_names[0]
+
+
+def test_joint_fit_saves_xg_link_and_keeps_the_gate_on_the_old_list(monkeypatch):
+    post, sampled, gated = run_fit(monkeypatch, "joint")
+    base = ["mu", "home", "rho", "att", "def", "sigma_att", "sigma_def"]
+    assert gated == base
+    assert sampled == [*base, "mu_x", "home_x", "c_att", "c_def"]
+    for name in ("xg_mu_x", "xg_home_x", "xg_c_att", "xg_c_def"):
+        assert isinstance(post.diagnostics[name], float)
+    assert post.diagnostics["xg_c_att"] == pytest.approx(1.25)
+
+
+@pytest.mark.parametrize("mode", ["none", "blend"])
+def test_other_modes_sample_and_log_nothing_extra(monkeypatch, mode):
+    post, sampled, gated = run_fit(monkeypatch, mode)
+    assert sampled == gated
+    assert not [k for k in post.diagnostics if k.startswith("xg_")]

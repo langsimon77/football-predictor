@@ -32,7 +32,9 @@ def test_only_the_markets_that_passed_are_kept():
     out = trial.trim(rows()).set_index("model_name")
     assert list(out.index) == [daily.BAYES_MODEL, daily.NO_SHAPE_MODEL, daily.ELO_MODEL]
     for col in ("p_over_2_5", "p_btts", "p_corners_over_9_5", "exp_corners_home"):
-        assert out[col].isna().all()
+        assert out.loc[[daily.BAYES_MODEL, daily.ELO_MODEL], col].isna().all()
+    # The no-shape control keeps the guard and BTTS markets (pre-registration 4 and 5).
+    assert out.loc[daily.NO_SHAPE_MODEL, ["p_over_2_5", "p_btts"]].notna().all()
     assert out.loc[daily.BAYES_MODEL, "p_home"] == 0.5
     assert out.loc[daily.BAYES_MODEL, "p_yellows_over_4_5"] == 0.4
     # The fix keeps expected goals; only the plain copy carries them, for the monthly refit.

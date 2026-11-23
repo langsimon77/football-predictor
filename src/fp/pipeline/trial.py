@@ -93,9 +93,12 @@ def trim(rows: pd.DataFrame) -> pd.DataFrame:
     if rows.empty:
         return rows
     out = rows[rows["model_name"].isin(KEEP_MODELS)].copy()
+    # The no-shape control and the xG arms keep every market: the pre-registration scores
+    # over 2.5 (guard) and BTTS for them. Only the published rows are blanked.
+    blank = ~out["model_name"].isin([daily.NO_SHAPE_MODEL, *daily.XG_MODELS.values()])
     for col in DROP:
         if col in out:
-            out[col] = np.nan
+            out[col] = out[col].astype(float).where(~blank, np.nan)
     primary = out["model_name"] == daily.BAYES_MODEL
     for col in ("exp_goals_home", "exp_goals_away"):
         if col in out:  # the fix keeps them; the plain copy carries them for the refit
@@ -127,7 +130,8 @@ def run_once(now: pd.Timestamp, ctx: TrialContext, dry_run: bool = False) -> pd.
     promo = fit_promotion_model(ctx.matches, ctx.second_tier)
     codes = [lg.code for lg in leagues.TRIAL]
     models = {lg: daily.fit_league(ctx.goal_matches, ctx.fixtures, lg, now, prior, season,
-                                   ctx.second_tier, promo, True, ctx.store) for lg in codes}
+                                   ctx.second_tier, promo, True, True, ctx.store)
+              for lg in codes}
     sh = shape.current(ctx.matches, existing, now, ctx.shape_store, save=not dry_run,
                        backtest=SHAPE_BACKTEST)
     features = rolling.match_features(known_as_of(ctx.matches, now))
