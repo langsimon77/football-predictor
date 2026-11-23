@@ -148,9 +148,12 @@ def build(preds: pd.DataFrame, results: pd.DataFrame, part_a: pd.DataFrame,
         base = _log_loss(control, result)
         if base is None:
             continue
-        losses = {arm: _log_loss(by_arm[arm], result) if arm in by_arm else None
-                  for arm in ARMS}
-        if any(loss is None for loss in losses.values()):
+        losses: dict[str, float] = {}
+        for arm in ARMS:
+            loss = _log_loss(by_arm[arm], result) if arm in by_arm else None
+            if loss is not None:
+                losses[arm] = loss
+        if len(losses) < len(ARMS):
             dropped += 1
             continue
         scored.append({"match_id": match, "league": control["league"],
@@ -173,6 +176,7 @@ def build(preds: pd.DataFrame, results: pd.DataFrame, part_a: pd.DataFrame,
                        "mean_change": {arm: _mean([s[arm] for s in items]) for arm in ARMS}}
 
     xg_b = b_raw[b_raw["arm"].isin(ARMS)]
+    fits: dict[str, str | bool | None]
     if xg_b.empty:
         fits = {"last_run_utc": None, "joint_ok": None, "blend_ok": None}
     else:
