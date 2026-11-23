@@ -87,8 +87,16 @@ def part_a_rows(part_a: pd.DataFrame) -> pd.DataFrame:
     return a[["match_id", "league", "lock_utc", "arm", *PROBS]]
 
 
-def _log_loss(row: pd.Series, side: str) -> float:
-    return -math.log(float(row[f"p_{side}"]))
+def _log_loss(row: pd.Series, side: str) -> float | None:
+    """-ln(p of the actual outcome), or None when that p is not finite or not above 0 (the
+    forecast is then unusable: no clipping)."""
+    try:
+        prob = float(row[f"p_{side}"])
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(prob) or prob <= 0:
+        return None
+    return -math.log(prob)
 
 
 def _mean(values: list[float]) -> float | None:
@@ -100,24 +108,35 @@ def build(preds: pd.DataFrame, results: pd.DataFrame, part_a: pd.DataFrame,
     """The xg_test.json content. Results: the ledger results first (the table the weekly and
     monthly scoring use), then the processed match tables (`played`, every played match) for
     matches the ledger never recorded, such as most part A matches.
-    Paired per arm (pre-registration section 6): a match counts for an arm only if that arm
-    and the control both have a usable forecast and the result is known.
-    `dropped` counts matches with a control forecast and a result but no forecast for that
-    arm. A degraded control row still counts: it is what the published model said."""
+
+    Paired as pre-registration section 6 says: "Matches that miss either arm are dropped
+    from both (paired), and the report counts them." A match is scored only if the control,
+    joint and blend all have a usable forecast and the result is known, so both arms share
+    one match set and one n. `dropped` (top level, and the same number in each arm) counts
+    matches with a usable control forecast and a result but a missing or unusable arm. A
+    degraded control row still counts: it is what the published model said.
+
+    Part A or B: a match leaves part A only when part B holds a usable control row for it
+    (locked at or after the start). A lone xG relock after the start leaves it in part A.
+
+    `fits`: joint_ok and blend_ok describe the latest run that produced any xG row (rows
+    within RUN_WINDOW of the latest xG lock); a run where both arms failed leaves no row and
+    does not show here."""
     b_raw = part_b_rows(preds)
     a_raw = part_a_rows(part_a)
     b = _latest(b_raw.dropna(subset=PROBS))
     a = _latest(a_raw.dropna(subset=PROBS))
-    b_matches = set(b_raw["match_id"])
+    b_matches = set(b.loc[b["arm"] == "control", "match_id"])
     a = a[~a["match_id"].isin(b_matches)]                 # part B wins; each match once
+    b = b[b["match_id"].isin(b_matches)]
     side = outcomes(results)
     if played is not None and not played.empty:
         extra = outcomes(played)
         side = pd.concat([side, extra[~extra.index.isin(side.index)]])
 
     rows = pd.concat([a.assign(part="A"), b.assign(part="B")], ignore_index=True)
-    scored: dict[str, list[dict]] = {arm: [] for arm in ARMS}
-    dropped = dict.fromkeys(ARMS, 0)
+    scored: list[dict] = []
+    dropped = 0
     for match, group in rows.groupby("match_id", sort=True):
         if match not in side.index:
             continue
@@ -126,30 +145,32 @@ def build(preds: pd.DataFrame, results: pd.DataFrame, part_a: pd.DataFrame,
             continue
         control = by_arm["control"]
         result = side[match]
-        for arm in ARMS:
-            if arm not in by_arm:
-                dropped[arm] += 1
-                continue
-            change = _log_loss(by_arm[arm], result) - _log_loss(control, result)
-            scored[arm].append({"match_id": match, "league": control["league"],
-                                "part": control["part"], "change": change})
+        base = _log_loss(control, result)
+        if base is None:
+            continue
+        losses = {arm: _log_loss(by_arm[arm], result) if arm in by_arm else None
+                  for arm in ARMS}
+        if any(loss is None for loss in losses.values()):
+            dropped += 1
+            continue
+        scored.append({"match_id": match, "league": control["league"],
+                       "part": control["part"],
+                       **{arm: loss - base for arm, loss in losses.items()}})
 
     arms = {}
     for arm, name in ARMS.items():
-        items = scored[arm]
         by_league = {}
         for league in LEAGUES:
-            vals = [s["change"] for s in items if s["league"] == league]
+            vals = [s[arm] for s in scored if s["league"] == league]
             by_league[league] = {"n": len(vals), "mean_change": _mean(vals)}
-        arms[name] = {"n": len(items), "mean_change": _mean([s["change"] for s in items]),
-                      "by_league": by_league, "dropped": dropped[arm]}
+        arms[name] = {"n": len(scored), "mean_change": _mean([s[arm] for s in scored]),
+                      "by_league": by_league, "dropped": dropped}
 
     parts = {}
     for part in ("A", "B"):
-        counted = {s["match_id"] for arm in ARMS for s in scored[arm] if s["part"] == part}
-        parts[part] = {"n": len(counted), "mean_change": {
-            arm: _mean([s["change"] for s in scored[arm] if s["part"] == part])
-            for arm in ARMS}}
+        items = [s for s in scored if s["part"] == part]
+        parts[part] = {"n": len(items),
+                       "mean_change": {arm: _mean([s[arm] for s in items]) for arm in ARMS}}
 
     xg_b = b_raw[b_raw["arm"].isin(ARMS)]
     if xg_b.empty:
@@ -161,7 +182,7 @@ def build(preds: pd.DataFrame, results: pd.DataFrame, part_a: pd.DataFrame,
                 **{f"{arm}_ok": bool((run["arm"] == arm).any()) for arm in ARMS}}
 
     return {"as_of": _stamp(pd.Timestamp(now)), "end_date": END_DATE, "arms": arms,
-            "parts": parts, "fits": fits}
+            "dropped": dropped, "parts": parts, "fits": fits}
 
 
 def progress_line(data: dict) -> str:
