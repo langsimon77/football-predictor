@@ -27,6 +27,7 @@ from fp.evaluate.xg_test import (  # noqa: E402, F401
     build,
     load_ledgers,
     load_part_a,
+    load_played,
     progress_line,
 )
 
@@ -41,7 +42,7 @@ def main(argv: list[str] | None = None) -> int:
     now = pd.Timestamp(args.now) if args.now else pd.Timestamp(datetime.now(UTC))
     now = now.tz_convert("UTC") if now.tzinfo else now.tz_localize("UTC")
     preds, results = load_ledgers(args.ledger)
-    data = build(preds, results, load_part_a(args.part_a), now)
+    data = build(preds, results, load_part_a(args.part_a), now, load_played())
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(data, indent=1) + "\n", encoding="utf-8")
     # Counts only: the means stay in the file, out of the job log.

@@ -18,6 +18,7 @@ from pathlib import Path
 import pandas as pd
 
 from fp import ROOT
+from fp.ingest import matches as build_matches
 
 CONTROL = "dc_bayes_v1_noshape"
 ARMS = {"joint": "dc_bayes_xg_joint_v1", "blend": "dc_bayes_xg_blend_v1"}
@@ -95,11 +96,14 @@ def _mean(values: list[float]) -> float | None:
 
 
 def build(preds: pd.DataFrame, results: pd.DataFrame, part_a: pd.DataFrame,
-          now: pd.Timestamp) -> dict:
-    """The xg_test.json content. Paired per arm (pre-registration section 6): a match counts
-    for an arm only if that arm and the control both have a usable forecast and the result is
-    known. `dropped` counts matches with a control forecast and a result but no forecast for
-    that arm. A degraded control row still counts: it is what the published model said."""
+          now: pd.Timestamp, played: pd.DataFrame | None = None) -> dict:
+    """The xg_test.json content. Results: the ledger results first (the table the weekly and
+    monthly scoring use), then the processed match tables (`played`, every played match) for
+    matches the ledger never recorded, such as most part A matches.
+    Paired per arm (pre-registration section 6): a match counts for an arm only if that arm
+    and the control both have a usable forecast and the result is known.
+    `dropped` counts matches with a control forecast and a result but no forecast for that
+    arm. A degraded control row still counts: it is what the published model said."""
     b_raw = part_b_rows(preds)
     a_raw = part_a_rows(part_a)
     b = _latest(b_raw.dropna(subset=PROBS))
@@ -107,8 +111,8 @@ def build(preds: pd.DataFrame, results: pd.DataFrame, part_a: pd.DataFrame,
     b_matches = set(b_raw["match_id"])
     a = a[~a["match_id"].isin(b_matches)]                 # part B wins; each match once
     side = outcomes(results)
-    if {"home_goals", "away_goals"} <= set(part_a.columns):
-        extra = outcomes(part_a.drop_duplicates("match_id"))
+    if played is not None and not played.empty:
+        extra = outcomes(played)
         side = pd.concat([side, extra[~extra.index.isin(side.index)]])
 
     rows = pd.concat([a.assign(part="A"), b.assign(part="B")], ignore_index=True)
@@ -190,3 +194,22 @@ def load_ledgers(folder: Path = LEDGER) -> tuple[pd.DataFrame, pd.DataFrame]:
 def load_part_a(path: Path = PART_A) -> pd.DataFrame:
     """The part A file arrives in a separate PR; until then part A is empty."""
     return _read(path) if path.exists() else pd.DataFrame(columns=PART_A_COLUMNS)
+
+
+def load_played(paths: list[Path] | None = None) -> pd.DataFrame:
+    """Played matches of the four leagues from the processed match tables (live tables for
+    EPL and La Liga, trial tables for Serie A and Ligue 1). A missing table is skipped."""
+    if paths is None:
+        paths = list(dict.fromkeys(build_matches.processed_dir(lg) / "matches.parquet"
+                                   for lg in LEAGUES))
+    frames = []
+    for path in paths:
+        frame = _read(path)
+        if frame.empty:
+            continue
+        if "league" in frame.columns:
+            frame = frame[frame["league"].isin(LEAGUES)]
+        frames.append(frame[["match_id", "home_goals", "away_goals"]])
+    if not frames:
+        return pd.DataFrame(columns=["match_id", "home_goals", "away_goals"])
+    return pd.concat(frames, ignore_index=True)

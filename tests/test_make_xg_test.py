@@ -174,7 +174,31 @@ def test_monthly_progress_line_reads_both_ledgers(tmp_path):
                   pred("m1", JOINT, (0.6, 0.25, 0.15), league="SerieA")]).to_parquet(
         tmp_path / "trial" / "predictions.parquet")
     pd.DataFrame([res("m1", 1, 0)]).to_parquet(tmp_path / "trial" / "results.parquet")
-    line = monthly.xg_progress(tmp_path, NOW, tmp_path / "none.parquet")
+    line = monthly.xg_progress(tmp_path, NOW, tmp_path / "none.parquet", played=[])
     want = math.log(0.5) - math.log(0.6)
     assert line == (f"xG test: 1 matches scored; joint {want:+.4f}, blend not yet. "
                     "No verdict until 7 Jun 2027.")
+
+
+def test_part_a_result_from_processed_table_is_scored(tmp_path):
+    part_a = [part_a_row("m1", "control", (0.5, 0.3, 0.2), league="Ligue1"),
+              part_a_row("m1", "joint", (0.6, 0.25, 0.15), league="Ligue1")]
+    table = tmp_path / "matches.parquet"
+    pd.DataFrame([{"league": "Ligue1", "match_id": "m1", "home_goals": 3, "away_goals": 1},
+                  {"league": "Bundesliga", "match_id": "m9", "home_goals": 0,
+                   "away_goals": 0}]).to_parquet(table)
+    played = xt.load_played([table, tmp_path / "missing.parquet"])
+    assert list(played["match_id"]) == ["m1"]
+    out = xt.build(pd.DataFrame(), pd.DataFrame(),
+                   pd.DataFrame(part_a, columns=xt.PART_A_COLUMNS), NOW, played)
+    assert out["parts"]["A"]["n"] == 1
+    assert out["arms"][JOINT]["by_league"]["Ligue1"]["n"] == 1
+    assert abs(out["arms"][JOINT]["mean_change"] - (math.log(0.5) - math.log(0.6))) < 1e-12
+
+
+def test_ledger_result_wins_over_processed_table():
+    preds = [pred("m1", CONTROL, (0.5, 0.3, 0.2)), pred("m1", JOINT, (0.6, 0.25, 0.15))]
+    played = pd.DataFrame([{"match_id": "m1", "home_goals": 0, "away_goals": 2}])
+    out = xt.build(pd.DataFrame(preds), pd.DataFrame([res("m1", 1, 0)]),
+                   pd.DataFrame(columns=xt.PART_A_COLUMNS), NOW, played)
+    assert abs(out["arms"][JOINT]["mean_change"] - (math.log(0.5) - math.log(0.6))) < 1e-12

@@ -160,7 +160,8 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           for path in ledger reports data/manual/answers.yaml data/manual/managers.csv \
                       app/data/ratings_history.csv data/shape/shape_v1.json \
-                      data/shape/shape_v1_trial.json data/tips/tips.json; do
+                      data/shape/shape_v1_trial.json data/tips/tips.json \
+                      data/xg_test/xg_test.json; do
             [ -e "$path" ] && git add "$path"
           done
           if git diff --cached --quiet; then

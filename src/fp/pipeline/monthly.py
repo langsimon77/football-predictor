@@ -105,11 +105,13 @@ def refresh_card(section: str) -> None:
     CARD.write_text(text, encoding="utf-8")
 
 
-def xg_progress(ledger_dir: Path, now: pd.Timestamp, part_a: Path = xg_test.PART_A) -> str:
+def xg_progress(ledger_dir: Path, now: pd.Timestamp, part_a: Path = xg_test.PART_A,
+                played: list[Path] | None = None) -> str:
     """The one-line xG test progress note (pre-registration section 8). No verdict."""
     try:
         preds, results = xg_test.load_ledgers(ledger_dir)
-        data = xg_test.build(preds, results, xg_test.load_part_a(part_a), now)
+        data = xg_test.build(preds, results, xg_test.load_part_a(part_a), now,
+                             xg_test.load_played(played))
         return xg_test.progress_line(data)
     except Exception as error:  # a broken note must not stop the monthly report
         return f"xG test: progress not available this month ({type(error).__name__})."
