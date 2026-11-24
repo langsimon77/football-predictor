@@ -1,9 +1,9 @@
-# Leagues on trial: 2026-11-23 08:18 UTC
+# Leagues on trial: 2026-11-24 00:28 UTC
 
 Serie A and Ligue 1 in the background: locked and scored, not published (Lang, 13 Oct 2026). Markets: home, draw, away (with double chance) and yellows.
 
 - Matches locked so far: 105 (Ligue1 45, SerieA 60)
-- Results recorded: 104
+- Results recorded: 105
 - Goals fix this month: home dispersion 1.051, away 1.000, rho -0.0045, stretch +0.0289
 - SerieA Bayesian model: fit passed
 - Ligue1 Bayesian model: fit passed
