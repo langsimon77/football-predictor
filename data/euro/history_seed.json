@@ -6,7 +6,7 @@
 "a": "Hapoel Be'er Sheva",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 5",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -41,7 +41,7 @@
 "a": "Ararat-Armenia",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 5",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -76,7 +76,7 @@
 "a": "Benfica",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 5",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -97,7 +97,7 @@
 "mkt": "btts",
 "k": "BTTS",
 "label": "Both score: yes",
-"p": 0.5558,
+"p": 0.5557,
 "result": null
 }
 ],
@@ -111,7 +111,7 @@
 "a": "Bayer Leverkusen",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 5",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -132,7 +132,7 @@
 "mkt": "btts",
 "k": "BTTS",
 "label": "Both score: yes",
-"p": 0.5591,
+"p": 0.559,
 "result": null
 }
 ],
@@ -146,7 +146,7 @@
 "a": "Milan",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 5",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -181,7 +181,7 @@
 "a": "Levski Sofia",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 5",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -216,7 +216,7 @@
 "a": "Lech Pozna\u0144",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 5",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -251,7 +251,7 @@
 "a": "Bournemouth",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 5",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -286,7 +286,7 @@
 "a": "AZ",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 5",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -321,7 +321,7 @@
 "a": "Real Sociedad",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 5",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -356,7 +356,7 @@
 "a": "Celje",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 5",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -391,7 +391,7 @@
 "a": "Omonia",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 5",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -426,7 +426,7 @@
 "a": "Rennes",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 5",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -461,7 +461,7 @@
 "a": "Anderlecht",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 5",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -496,14 +496,14 @@
 "a": "Lillestr\u00f8m",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 5",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
 "mkt": "result",
 "k": "H",
 "label": "Lyon win",
-"p": 0.8665,
+"p": 0.8666,
 "result": null
 },
 {
@@ -531,7 +531,7 @@
 "a": "Celtic",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 5",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -566,7 +566,7 @@
 "a": "Jagiellonia Bia\u0142ystok",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 5",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -601,14 +601,14 @@
 "a": "Sturm Graz",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 5",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
 "mkt": "result",
 "k": "H",
 "label": "TSG Hoffenheim win",
-"p": 0.5576,
+"p": 0.5577,
 "result": null
 },
 {
@@ -636,7 +636,7 @@
 "a": "Mj\u00e4llby AIF",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 4",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -671,7 +671,7 @@
 "a": "Thun",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 4",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -706,7 +706,7 @@
 "a": "U Craiova",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 4",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -727,7 +727,7 @@
 "mkt": "btts",
 "k": "NoBTTS",
 "label": "Both score: no",
-"p": 0.5807,
+"p": 0.5808,
 "result": null
 }
 ],
@@ -741,7 +741,7 @@
 "a": "Getafe",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 4",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -776,7 +776,7 @@
 "a": "Lugano",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 4",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -811,28 +811,28 @@
 "a": "Riga",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 4",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
 "mkt": "result",
 "k": "A",
 "label": "Riga win",
-"p": 0.456,
+"p": 0.4559,
 "result": null
 },
 {
 "mkt": "goals",
 "k": "G<2.5",
 "label": "Under 2.5 goals",
-"p": 0.5658,
+"p": 0.5659,
 "result": null
 },
 {
 "mkt": "btts",
 "k": "NoBTTS",
 "label": "Both score: no",
-"p": 0.5196,
+"p": 0.5198,
 "result": null
 }
 ],
@@ -846,7 +846,7 @@
 "a": "Monaco",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 4",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -881,28 +881,28 @@
 "a": "Lincoln Red Imps",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 4",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
 "mkt": "result",
 "k": "H",
 "label": "Egnatia win",
-"p": 0.5271,
+"p": 0.5272,
 "result": null
 },
 {
 "mkt": "goals",
 "k": "G<2.5",
 "label": "Under 2.5 goals",
-"p": 0.5927,
+"p": 0.5928,
 "result": null
 },
 {
 "mkt": "btts",
 "k": "NoBTTS",
 "label": "Both score: no",
-"p": 0.5715,
+"p": 0.5716,
 "result": null
 }
 ],
@@ -916,7 +916,7 @@
 "a": "Midtjylland",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 4",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -930,7 +930,7 @@
 "mkt": "goals",
 "k": "G>2.5",
 "label": "Over 2.5 goals",
-"p": 0.5098,
+"p": 0.5097,
 "result": null
 },
 {
@@ -951,7 +951,7 @@
 "a": "AGF",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 4",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -986,7 +986,7 @@
 "a": "Panathinaikos",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 4",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -1000,7 +1000,7 @@
 "mkt": "goals",
 "k": "G>2.5",
 "label": "Over 2.5 goals",
-"p": 0.5645,
+"p": 0.5644,
 "result": null
 },
 {
@@ -1021,7 +1021,7 @@
 "a": "Atalanta",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 4",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -1035,7 +1035,7 @@
 "mkt": "goals",
 "k": "G<2.5",
 "label": "Under 2.5 goals",
-"p": 0.5143,
+"p": 0.5144,
 "result": null
 },
 {
@@ -1056,7 +1056,7 @@
 "a": "Sint-Truiden",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 4",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -1070,14 +1070,14 @@
 "mkt": "goals",
 "k": "G>2.5",
 "label": "Over 2.5 goals",
-"p": 0.5064,
+"p": 0.5063,
 "result": null
 },
 {
 "mkt": "btts",
 "k": "BTTS",
 "label": "Both score: yes",
-"p": 0.5472,
+"p": 0.5471,
 "result": null
 }
 ],
@@ -1091,7 +1091,7 @@
 "a": "Copenhagen",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 4",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -1105,14 +1105,14 @@
 "mkt": "goals",
 "k": "G>2.5",
 "label": "Over 2.5 goals",
-"p": 0.6297,
+"p": 0.6296,
 "result": null
 },
 {
 "mkt": "btts",
 "k": "BTTS",
 "label": "Both score: yes",
-"p": 0.5448,
+"p": 0.5447,
 "result": null
 }
 ],
@@ -1126,7 +1126,7 @@
 "a": "Red Star Belgrade",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 4",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -1161,7 +1161,7 @@
 "a": "Trabzonspor",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 4",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
@@ -1196,14 +1196,14 @@
 "a": "KuPS",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 4",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
 "mkt": "result",
 "k": "H",
 "label": "Braga win",
-"p": 0.8016,
+"p": 0.8017,
 "result": null
 },
 {
@@ -1231,7 +1231,7 @@
 "a": "Twente",
 "kickoff": "2026-11-26T15:30Z",
 "round": "League phase, matchday 4",
-"locked_at": "2026-11-23T17:45Z",
+"locked_at": "2026-11-24T17:17Z",
 "model_version": "eur-1",
 "calls": [
 {
