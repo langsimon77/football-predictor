@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-11-24T00:31:31.174852+00:00",
+  "generated_utc": "2026-11-25T09:20:31.490756+00:00",
   "rule": "tips_v3: football tiers_v1, basketball bb_tiers_v1",
   "top3_day": null,
   "note": "Fair odds = 1 / model probability. Bet only if the bookmaker pays more.",
@@ -85,52 +85,15 @@
     }
   },
   "yesterday": {
-    "day": "2026-11-23",
+    "day": "2026-11-24",
     "note": "Today's tip rules applied to yesterday's forecasts, each locked before kickoff, settled against the results.",
     "categories": {
       "top3": {
-        "picks": [
-          {
-            "match_id": "EPL_2627_brentford_everton",
-            "league": "EPL",
-            "kickoff_utc": "2026-11-23 20:00:00+00:00",
-            "home_id": "brentford",
-            "away_id": "everton",
-            "market": "yellows_over_5_5",
-            "pick": "Under 5.5 yellow cards",
-            "prob": 0.808,
-            "fair_odds": 1.24,
-            "tier": "Medium",
-            "status": "won",
-            "home": "Brentford",
-            "away": "Everton",
-            "sport": "football",
-            "reason": "Our model gives this 81 in 100. About 3.8 yellow cards expected. Tested: Medium-tier yellows over 5 5 picks won 77% of 1541 (promised 77%), 2023/24 to 2025/26.",
-            "score": "4-0"
-          },
-          {
-            "match_id": "LaLiga_2627_levante_elche",
-            "league": "LaLiga",
-            "kickoff_utc": "2026-11-23 20:00:00+00:00",
-            "home_id": "levante",
-            "away_id": "elche",
-            "market": "corners_over_11_5",
-            "pick": "Under 11.5 corners",
-            "prob": 0.785,
-            "fair_odds": 1.27,
-            "tier": "Medium",
-            "status": "won",
-            "home": "Levante",
-            "away": "Elche",
-            "sport": "football",
-            "reason": "Our model gives this 79 in 100. About 9.2 corners expected. Tested: Medium-tier corners over 11 5 picks won 73% of 1118 (promised 72%), 2023/24 to 2025/26.",
-            "score": "1-1"
-          }
-        ],
-        "won": 2,
+        "picks": [],
+        "won": 0,
         "lost": 0,
         "pending": 0,
-        "expected": 1.59
+        "expected": 0.0
       },
       "bankers": {
         "picks": [],
@@ -140,128 +103,18 @@
         "expected": 0.0
       },
       "full_card": {
-        "picks": [
-          {
-            "match_id": "EPL_2627_brentford_everton",
-            "league": "EPL",
-            "kickoff_utc": "2026-11-23 20:00:00+00:00",
-            "home_id": "brentford",
-            "away_id": "everton",
-            "market": "yellows_over_5_5",
-            "pick": "Under 5.5 yellow cards",
-            "prob": 0.808,
-            "fair_odds": 1.24,
-            "tier": "Medium",
-            "status": "won",
-            "home": "Brentford",
-            "away": "Everton",
-            "sport": "football",
-            "reason": "Our model gives this 81 in 100. About 3.8 yellow cards expected. Tested: Medium-tier yellows over 5 5 picks won 77% of 1541 (promised 77%), 2023/24 to 2025/26.",
-            "score": "4-0"
-          },
-          {
-            "match_id": "EPL_2627_brentford_everton",
-            "league": "EPL",
-            "kickoff_utc": "2026-11-23 20:00:00+00:00",
-            "home_id": "brentford",
-            "away_id": "everton",
-            "market": "over_1_5",
-            "pick": "Over 1.5 goals",
-            "prob": 0.761,
-            "fair_odds": 1.31,
-            "tier": "Medium",
-            "status": "won",
-            "home": "Brentford",
-            "away": "Everton",
-            "sport": "football",
-            "reason": "Our model gives this 76 in 100. Expected goals 1.4 v 1.2. Tested: Medium-tier over/under 1.5 goals picks won 78% of 917 (promised 76%), 2023/24 to 2025/26.",
-            "score": "4-0"
-          },
-          {
-            "match_id": "LaLiga_2627_levante_elche",
-            "league": "LaLiga",
-            "kickoff_utc": "2026-11-23 20:00:00+00:00",
-            "home_id": "levante",
-            "away_id": "elche",
-            "market": "corners_over_11_5",
-            "pick": "Under 11.5 corners",
-            "prob": 0.785,
-            "fair_odds": 1.27,
-            "tier": "Medium",
-            "status": "won",
-            "home": "Levante",
-            "away": "Elche",
-            "sport": "football",
-            "reason": "Our model gives this 79 in 100. About 9.2 corners expected. Tested: Medium-tier corners over 11 5 picks won 73% of 1118 (promised 72%), 2023/24 to 2025/26.",
-            "score": "1-1"
-          },
-          {
-            "match_id": "LaLiga_2627_levante_elche",
-            "league": "LaLiga",
-            "kickoff_utc": "2026-11-23 20:00:00+00:00",
-            "home_id": "levante",
-            "away_id": "elche",
-            "market": "over_1_5",
-            "pick": "Over 1.5 goals",
-            "prob": 0.779,
-            "fair_odds": 1.28,
-            "tier": "Medium",
-            "status": "won",
-            "home": "Levante",
-            "away": "Elche",
-            "sport": "football",
-            "reason": "Our model gives this 78 in 100. Expected goals 1.5 v 1.2. Tested: Medium-tier over/under 1.5 goals picks won 78% of 917 (promised 76%), 2023/24 to 2025/26.",
-            "score": "1-1"
-          }
-        ],
-        "won": 4,
+        "picks": [],
+        "won": 0,
         "lost": 0,
         "pending": 0,
-        "expected": 3.13
+        "expected": 0.0
       },
       "correct_score": {
-        "picks": [
-          {
-            "match_id": "EPL_2627_brentford_everton",
-            "league": "EPL",
-            "kickoff_utc": "2026-11-23 20:00:00+00:00",
-            "home_id": "brentford",
-            "away_id": "everton",
-            "market": "correct_score",
-            "pick": "Correct score 1-1",
-            "prob": 0.143,
-            "fair_odds": 6.98,
-            "tier": "Low",
-            "status": "lost",
-            "home": "Brentford",
-            "away": "Everton",
-            "sport": "football",
-            "reason": "Our model gives this 14 in 100. Expected goals 1.4 v 1.2; this is the single likeliest score. Tested: the day's five likeliest scores came true 15% of 1604 times (promised 13%), 2023/24 to 2025/26.",
-            "score": "4-0"
-          },
-          {
-            "match_id": "LaLiga_2627_levante_elche",
-            "league": "LaLiga",
-            "kickoff_utc": "2026-11-23 20:00:00+00:00",
-            "home_id": "levante",
-            "away_id": "elche",
-            "market": "correct_score",
-            "pick": "Correct score 1-1",
-            "prob": 0.138,
-            "fair_odds": 7.24,
-            "tier": "Low",
-            "status": "won",
-            "home": "Levante",
-            "away": "Elche",
-            "sport": "football",
-            "reason": "Our model gives this 14 in 100. Expected goals 1.5 v 1.2; this is the single likeliest score. Tested: the day's five likeliest scores came true 15% of 1604 times (promised 13%), 2023/24 to 2025/26.",
-            "score": "1-1"
-          }
-        ],
-        "won": 1,
-        "lost": 1,
+        "picks": [],
+        "won": 0,
+        "lost": 0,
         "pending": 0,
-        "expected": 0.28
+        "expected": 0.0
       },
       "diamond": {
         "picks": [],
