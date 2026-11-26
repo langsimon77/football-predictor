@@ -1258,3 +1258,27 @@
   threat_out: false
   source: 'Issue #34'
   used_at_utc: 2026-11-22T07:29Z
+- question: EPL_2627_nottm_forest_chelsea:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #46'
+  used_at_utc: 2026-11-26T08:55Z
+- question: EPL_2627_nottm_forest_chelsea:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #46'
+  used_at_utc: 2026-11-26T08:55Z
+- question: LaLiga_2627_levante_racing_santander:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #46'
+  used_at_utc: 2026-11-26T08:55Z
+- question: LaLiga_2627_levante_racing_santander:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #46'
+  used_at_utc: 2026-11-26T08:55Z

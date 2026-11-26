@@ -1,12 +1,100 @@
 {
-  "generated_utc": "2026-11-25T09:20:31.490756+00:00",
+  "generated_utc": "2026-11-26T09:05:24.410796+00:00",
   "rule": "tips_v3: football tiers_v1, basketball bb_tiers_v1",
-  "top3_day": null,
+  "top3_day": "2026-11-27",
   "note": "Fair odds = 1 / model probability. Bet only if the bookmaker pays more.",
-  "top3": [],
+  "top3": [
+    {
+      "match_id": "EPL_2627_nottm_forest_chelsea",
+      "league": "EPL",
+      "kickoff_utc": "2026-11-27 20:00:00+00:00",
+      "home_id": "nottm_forest",
+      "away_id": "chelsea",
+      "market": "over_1_5",
+      "pick": "Over 1.5 goals",
+      "prob": 0.801,
+      "fair_odds": 1.25,
+      "tier": "Medium",
+      "status": "pending",
+      "home": "Nottingham Forest",
+      "away": "Chelsea",
+      "sport": "football",
+      "reason": "Our model gives this 80 in 100. Expected goals 1.5 v 1.4. Tested: Medium-tier over/under 1.5 goals picks won 78% of 917 (promised 76%), 2023/24 to 2025/26."
+    }
+  ],
   "bankers": [],
-  "full_card": [],
-  "correct_score": [],
+  "full_card": [
+    {
+      "match_id": "EPL_2627_nottm_forest_chelsea",
+      "league": "EPL",
+      "kickoff_utc": "2026-11-27 20:00:00+00:00",
+      "home_id": "nottm_forest",
+      "away_id": "chelsea",
+      "market": "over_1_5",
+      "pick": "Over 1.5 goals",
+      "prob": 0.801,
+      "fair_odds": 1.25,
+      "tier": "Medium",
+      "status": "pending",
+      "home": "Nottingham Forest",
+      "away": "Chelsea",
+      "sport": "football",
+      "reason": "Our model gives this 80 in 100. Expected goals 1.5 v 1.4. Tested: Medium-tier over/under 1.5 goals picks won 78% of 917 (promised 76%), 2023/24 to 2025/26."
+    },
+    {
+      "match_id": "EPL_2627_nottm_forest_chelsea",
+      "league": "EPL",
+      "kickoff_utc": "2026-11-27 20:00:00+00:00",
+      "home_id": "nottm_forest",
+      "away_id": "chelsea",
+      "market": "corners_over_8_5",
+      "pick": "Over 8.5 corners",
+      "prob": 0.688,
+      "fair_odds": 1.45,
+      "tier": "Medium",
+      "status": "pending",
+      "home": "Nottingham Forest",
+      "away": "Chelsea",
+      "sport": "football",
+      "reason": "Our model gives this 69 in 100. About 10.2 corners expected. Tested: Medium-tier corners over 8 5 picks won 65% of 1113 (promised 65%), 2023/24 to 2025/26."
+    }
+  ],
+  "correct_score": [
+    {
+      "match_id": "EPL_2627_nottm_forest_chelsea",
+      "league": "EPL",
+      "kickoff_utc": "2026-11-27 20:00:00+00:00",
+      "home_id": "nottm_forest",
+      "away_id": "chelsea",
+      "market": "correct_score",
+      "pick": "Correct score 1-1",
+      "prob": 0.135,
+      "fair_odds": 7.42,
+      "tier": "Low",
+      "status": "pending",
+      "home": "Nottingham Forest",
+      "away": "Chelsea",
+      "sport": "football",
+      "reason": "Our model gives this 13 in 100. Expected goals 1.5 v 1.4; this is the single likeliest score. Tested: the day's five likeliest scores came true 15% of 1604 times (promised 13%), 2023/24 to 2025/26."
+    },
+    {
+      "match_id": "LaLiga_2627_levante_racing_santander",
+      "league": "LaLiga",
+      "kickoff_utc": "2026-11-27 20:00:00+00:00",
+      "home_id": "levante",
+      "away_id": "racing_santander",
+      "market": "correct_score",
+      "pick": "Correct score 2-1",
+      "prob": 0.108,
+      "fair_odds": 9.24,
+      "tier": "Low",
+      "status": "pending",
+      "home": "Levante",
+      "away": "Racing Santander",
+      "sport": "football",
+      "reason": "Our model gives this 11 in 100. Expected goals 2.2 v 1.4; this is the single likeliest score. Tested: the day's five likeliest scores came true 15% of 1604 times (promised 13%), 2023/24 to 2025/26."
+    }
+  ],
   "diamond": [],
   "accumulators": [],
   "basketball": [],
@@ -85,7 +173,7 @@
     }
   },
   "yesterday": {
-    "day": "2026-11-24",
+    "day": "2026-11-25",
     "note": "Today's tip rules applied to yesterday's forecasts, each locked before kickoff, settled against the results.",
     "categories": {
       "top3": {
