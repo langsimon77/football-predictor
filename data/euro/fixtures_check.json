@@ -1,14 +1,14 @@
 {
- "run_date": "2026-11-26",
+ "run_date": "2026-11-27",
  "wikipedia_entries": 252,
  "results": {
   "verified": 54,
-  "unverified": 72,
+  "unverified": 108,
   "conflicts": []
  },
  "upcoming": {
   "verified": 0,
-  "unverified": 36,
-  "time_unconfirmed": 36
+  "unverified": 0,
+  "time_unconfirmed": 0
  }
 }
