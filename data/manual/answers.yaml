@@ -1282,3 +1282,87 @@
   threat_out: false
   source: 'Issue #46'
   used_at_utc: 2026-11-26T08:55Z
+- question: EPL_2627_ipswich_aston_villa:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #49'
+  used_at_utc: 2026-11-27T09:06Z
+- question: EPL_2627_ipswich_aston_villa:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #49'
+  used_at_utc: 2026-11-27T09:06Z
+- question: EPL_2627_leeds_coventry:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #49'
+  used_at_utc: 2026-11-27T09:06Z
+- question: EPL_2627_leeds_coventry:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #49'
+  used_at_utc: 2026-11-27T09:06Z
+- question: EPL_2627_man_united_brentford:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #49'
+  used_at_utc: 2026-11-27T09:06Z
+- question: EPL_2627_man_united_brentford:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #49'
+  used_at_utc: 2026-11-27T09:06Z
+- question: LaLiga_2627_elche_atletico_madrid:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #49'
+  used_at_utc: 2026-11-27T09:06Z
+- question: LaLiga_2627_elche_atletico_madrid:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #49'
+  used_at_utc: 2026-11-27T09:06Z
+- question: LaLiga_2627_malaga_athletic_bilbao:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #49'
+  used_at_utc: 2026-11-27T09:06Z
+- question: LaLiga_2627_malaga_athletic_bilbao:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #49'
+  used_at_utc: 2026-11-27T09:06Z
+- question: LaLiga_2627_real_betis_rayo_vallecano:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #49'
+  used_at_utc: 2026-11-27T09:06Z
+- question: LaLiga_2627_real_betis_rayo_vallecano:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #49'
+  used_at_utc: 2026-11-27T09:06Z
+- question: LaLiga_2627_real_madrid_alaves:home
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #49'
+  used_at_utc: 2026-11-27T09:06Z
+- question: LaLiga_2627_real_madrid_alaves:away
+  status: unanswered
+  starters_out: 0
+  threat_out: false
+  source: 'Issue #49'
+  used_at_utc: 2026-11-27T09:06Z

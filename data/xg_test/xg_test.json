@@ -1,5 +1,5 @@
 {
- "as_of": "2026-11-26T09:05Z",
+ "as_of": "2026-11-27T09:17Z",
  "end_date": "2027-06-07",
  "arms": {
   "dc_bayes_xg_joint_v1": {
@@ -67,7 +67,7 @@
   }
  },
  "fits": {
-  "last_run_utc": "2026-11-26T09:02Z",
+  "last_run_utc": "2026-11-27T09:14Z",
   "joint_ok": true,
   "blend_ok": true
  }
