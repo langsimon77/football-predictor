@@ -1,0 +1,74 @@
+{
+ "as_of": "2026-11-28T08:36Z",
+ "end_date": "2027-06-07",
+ "arms": {
+  "dc_bayes_xg_joint_v1": {
+   "n": 423,
+   "mean_change": 0.00042895515874626436,
+   "by_league": {
+    "EPL": {
+     "n": 101,
+     "mean_change": -0.0007761278173042878
+    },
+    "LaLiga": {
+     "n": 120,
+     "mean_change": 0.001450311124858249
+    },
+    "SerieA": {
+     "n": 111,
+     "mean_change": -0.00045500067674136585
+    },
+    "Ligue1": {
+     "n": 91,
+     "mean_change": 0.0014978536465132372
+    }
+   },
+   "dropped": 0
+  },
+  "dc_bayes_xg_blend_v1": {
+   "n": 423,
+   "mean_change": 0.0007663257189958654,
+   "by_league": {
+    "EPL": {
+     "n": 101,
+     "mean_change": 0.00013274080357509674
+    },
+    "LaLiga": {
+     "n": 120,
+     "mean_change": 0.0008179991475621176
+    },
+    "SerieA": {
+     "n": 111,
+     "mean_change": 0.002153580426469841
+    },
+    "Ligue1": {
+     "n": 91,
+     "mean_change": -0.0002907512864993428
+    }
+   },
+   "dropped": 0
+  }
+ },
+ "dropped": 0,
+ "parts": {
+  "A": {
+   "n": 419,
+   "mean_change": {
+    "joint": 0.0005474748762448479,
+    "blend": 0.0009231228686364868
+   }
+  },
+  "B": {
+   "n": 4,
+   "mean_change": {
+    "joint": -0.011985985249230363,
+    "blend": -0.01565817570585923
+   }
+  }
+ },
+ "fits": {
+  "last_run_utc": "2026-11-28T08:34Z",
+  "joint_ok": true,
+  "blend_ok": true
+ }
+}
